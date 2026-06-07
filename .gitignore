@@ -1,0 +1,17 @@
+# macOS
+.DS_Store
+
+# Dependencies
+node_modules/
+
+# Lockfiles are intentionally not committed yet (skeleton stage); revisit later.
+
+# mise machine-local overrides
+mise.local.toml
+.mise.local.toml
+
+# Secrets / machine-specific values (keep *.template, commit those)
+*.local
+.env
+.env.*
+!*.template

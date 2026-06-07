@@ -1,0 +1,32 @@
+{
+  "cSpell.customDictionaries": {
+    "app-words": {
+      "name": "app-words",
+      "path": "${workspaceRoot}/.cspell/app-words.txt",
+      "description": "Words specific to this application",
+      "addWords": true,
+      "scope": "workspace"
+    }
+  },
+  "cSpell.ignorePaths": [
+    "node_modules",
+    "package-lock.json",
+    "package.json",
+    "bun.lockb",
+    "*.lock",
+    ".vscode",
+    "dist",
+    "build"
+  ],
+  "search.exclude": {
+    "**/node_modules": true
+  },
+  "explorer.fileNesting.enabled": true,
+  "explorer.fileNesting.expand": false,
+  "explorer.fileNesting.patterns": {
+    ".env.example": ".env*",
+    "*.ts": "$(capture).test.ts, $(capture).spec.ts",
+    "package.json": "package-lock.json, bun.lockb, bun.lock, bun.lockb, .npmrc",
+    "CLAUDE.md": "AGENTS.md"
+  }
+}

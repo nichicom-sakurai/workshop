@@ -1,0 +1,13 @@
+{
+  "session_start": [
+    {
+      "hooks": [
+        {
+          "type": "command",
+          "command": "printf '%s\\n' '[workshop] Drive tasks via mise. bun is mise-managed and not on PATH — use `mise run dev <name>` / `mise run dev:all`, or `mise exec -- bun ...` for manual bun. git is not initialized; terraform is installed but unused. See AGENTS.md.'",
+          "timeout": 10
+        }
+      ]
+    }
+  ]
+}

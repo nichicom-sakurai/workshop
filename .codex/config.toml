@@ -1,0 +1,31 @@
+# Codex project-scoped configuration for the workshop monorepo.
+#
+# This file IS loaded by the Codex CLI for trusted projects and merges over
+# ~/.codex/config.toml (values here win for this repo). Every key below is
+# commented out, so by default this file changes nothing — uncomment and tune
+# as needed. Reference: https://developers.openai.com/codex/config-reference
+#
+# Project INSTRUCTIONS for Codex do NOT go here — they live in ./AGENTS.md,
+# which Codex merges from the git root down to the current directory.
+
+# --- Common project-scoped options (uncomment to use) ---
+
+# File-write sandbox: "read-only" | "workspace-write" | "danger-full-access"
+# sandbox_mode = "workspace-write"
+
+# When to ask for approval: "untrusted" | "on-request" | "never"
+# approval_policy = "on-request"
+
+# Web search mode (default: cached)
+# web_search = "cached"
+
+# Max bytes of merged AGENTS.md pulled into context (default ~32 KiB)
+# project_doc_max_bytes = 32768
+
+# --- Hooks (lifecycle automation) ---
+# A live hook is registered in .codex/hooks.json (a session_start reminder);
+# Codex auto-discovers it for trusted projects and asks you to approve it on
+# first run. You can also register hooks here as [[hooks.<Event>]] tables.
+# See .codex/hooks/README.md. Hooks are enabled by default; to disable:
+# [features]
+# hooks = false

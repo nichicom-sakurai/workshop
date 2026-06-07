@@ -1,0 +1,23 @@
+[tools]
+bun = "1.3.14"
+terraform = "1.14.7"
+
+[tasks.bootstrap]
+alias = "bs"
+description = "Bootstrap project dependencies and setup"
+run = "./tools/bootstrap.sh"
+
+# --- packages/* の実行タスク ---
+
+[tasks.dev]
+description = "指定プロジェクトを実行 (例: mise run dev aws)"
+run = "mise exec -- bun run --cwd=packages/{{arg(name='project')}} start"
+
+[tasks."dev:all"]
+description = "packages 配下の全プロジェクトを実行"
+run = """
+for d in packages/*/; do
+  echo "[${d}]"
+  (cd "${d}" && mise exec -- bun run start)
+done
+"""
