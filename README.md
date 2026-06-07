@@ -23,6 +23,7 @@ workshop/
     ├── aws/
     ├── gc/
     └── sample/
+        └── terraform/   # AWS caller identity を読む read-only Terraform サンプル
 ```
 
 `packages/` 配下の各プロジェクトは `bun` のバージョンを root の `mise.toml` から継承します。特定プロジェクトだけ別ツール / バージョンが必要な場合は、そのフォルダに `mise.toml` を置くと差分だけ上書きできます。
@@ -64,6 +65,13 @@ mise run dev aws      # aws / gc / sample を個別実行
 mise run dev:all      # まとめて実行
 mise tasks            # 登録済みタスク一覧
 ```
+
+### Terraform サンプル
+
+`packages/sample/terraform/` に、AWS provider の認証と Terraform の基本操作を学ぶための read-only サンプルがあります。
+`aws_caller_identity` data source を読むだけなので、AWS リソースは作成・変更・削除しません。
+
+手順は [`packages/sample/terraform/README.md`](./packages/sample/terraform/README.md) を参照してください。
 
 ## プロジェクトの追加
 

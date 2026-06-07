@@ -9,15 +9,15 @@ AI-agent guide for the `workshop` monorepo. For human-facing detail, see [README
 ## TL;DR (read first)
 
 - **Cloud / IaC learning monorepo.** Independent projects live in `packages/<name>/`. Tool versions are centrally pinned by [mise](https://mise.jdx.dev/) in `mise.toml`.
-- **Skeleton stage.** `packages/{aws,gc,sample}/` are just `package.json` + `index.ts` (`console.log("Hello from <name>")`). No real cloud / IaC code exists yet.
-- **[WARNING] git is not initialized · no test / lint / typecheck / tsconfig · terraform is installed but unused (no `.tf` files).** See "Gotchas".
+- **Learning skeleton with first Terraform sample.** `packages/{aws,gc}/` are still just `package.json` + `index.ts` (`console.log("Hello from <name>")`). `packages/sample/` also has a read-only Terraform AWS caller identity sample under `packages/sample/terraform/`.
+- **[WARNING] no test / lint / typecheck / tsconfig.** Terraform exists only as a read-only learning sample so far; no provisioning resources or remote backend are configured. See "Gotchas".
 - Drive everything through mise tasks (`mise run ...`). A bare `bun` is not on PATH, but the tasks wrap it (`mise exec -- bun`), so `mise run` works as-is.
 
 ## 1. Orientation (layout)
 
 - `mise.toml` — tool versions (`[tools]`) + task definitions (`[tasks.*]`). **The single source of version truth.**
 - `tools/bootstrap.sh` — idempotent full setup (`set -euo pipefail`); skips gracefully when mise is absent.
-- `packages/*` — the projects. Targets of `bun install` / `dev` / `dev:all`. Each is independent (no root npm workspaces). Currently `aws`, `gc`, `sample`.
+- `packages/*` — the projects. Targets of `bun install` / `dev` / `dev:all`. Each is independent (no root npm workspaces). Currently `aws`, `gc`, `sample`; `sample` also contains `terraform/` for the read-only AWS caller identity sample.
 - `.claude/` and `.codex/` — agent tooling for this repo; see §8.
 
 ## 2. Run
@@ -53,6 +53,12 @@ Add a project (reference: `packages/aws/`) — or run the `/new-package <name>` 
 
 `dev:all` and bootstrap auto-discover packages via `find`, so **no task edits are needed** when adding one.
 
+Terraform learning sample:
+
+- `packages/sample/terraform/` — read-only AWS caller identity sample.
+- Use `mise exec -- terraform -chdir=packages/sample/terraform ...`.
+- It uses `data "aws_caller_identity" "current" {}` only and does not create, update, or destroy AWS resources.
+
 ## 4. Verify
 
 > No test runner / typechecker is configured, so verification today means "run it and check the output."
@@ -78,10 +84,10 @@ Note: skeleton packages have no dependencies, so `bun install` creates no `node_
 
 ## 6. Gotchas
 
-- **git is not initialized.** Not a git repo (`git rev-parse` fails, no `.git`). Branches / commits / PRs don't apply until `git init`; confirm with the user before assuming git workflows. After init, follow the global `CLAUDE.md` conventions (branch `{prefix}/GH-{issue}`, commit `{type}({scope}): {description}`).
+- **git is initialized.** Branches / commits / PRs apply. Follow the global conventions: branch `{prefix}/GH-{issue}` when an issue exists, otherwise `{prefix}/{kebab-case-description}`; commit `{type}({scope}): {Japanese description}`.
 - **`bun: command not found` (exit 127).** Shell not activated — use `mise exec -- bun ...` or `eval "$(mise activate zsh)"`. Does not affect `mise run dev` / `dev:all`.
-- **terraform is unused.** Pinned in `mise.toml` and installed (`mise exec -- terraform version`), but there are no `.tf` files and bootstrap does no provisioning. It's a forward declaration for future IaC projects — don't try to use it yet.
-- **No lockfiles / tsconfig.** Neither `bun.lock` nor `tsconfig.json` is committed; bun runs TypeScript / ESM natively, so `index.ts` runs directly. There is no typecheck step — don't assume one exists.
+- **Terraform sample is read-only.** `packages/sample/terraform/` reads AWS caller identity only. There are no resource-creating `.tf` files, no remote backend, and bootstrap does no provisioning.
+- **No Bun lockfile / tsconfig.** Neither `bun.lock` nor `tsconfig.json` is committed; bun runs TypeScript / ESM natively, so `index.ts` runs directly. There is no typecheck step — don't assume one exists. Terraform's `.terraform.lock.hcl` is committed for provider repeatability.
 
 ## 7. Troubleshooting (symptom -> fix)
 
