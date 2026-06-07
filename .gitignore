@@ -11,7 +11,7 @@ terraform.tfstate.*
 *.tfvars
 *.tfvars.json
 
-# Lockfiles are intentionally not committed yet (skeleton stage); revisit later.
+# Bun lockfiles are intentionally not committed yet (skeleton stage); revisit later.
 
 # mise machine-local overrides
 mise.local.toml

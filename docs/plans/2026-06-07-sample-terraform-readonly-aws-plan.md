@@ -348,7 +348,7 @@ git commit -m "chore: Terraform ローカル成果物を除外"
 **Step 1: Write the failing check**
 
 ```bash
-rg "terraform is unused|no `\\.tf` files|no real cloud / IaC code exists" AGENTS.md
+rg 'terraform is unused|no `\\.tf` files|no real cloud / IaC code exists' AGENTS.md
 ```
 
 **Step 2: Run check to verify it fails**
@@ -356,7 +356,7 @@ rg "terraform is unused|no `\\.tf` files|no real cloud / IaC code exists" AGENTS
 Run:
 
 ```bash
-rg "terraform is unused|no `\\.tf` files|no real cloud / IaC code exists" AGENTS.md
+rg 'terraform is unused|no `\\.tf` files|no real cloud / IaC code exists' AGENTS.md
 ```
 
 Expected: PASS with stale wording found, which confirms docs need updating.
@@ -385,7 +385,7 @@ Run:
 
 ```bash
 rg "packages/sample/terraform|caller identity|read-only|Terraform" README.md AGENTS.md
-if rg "terraform is unused|no `\\.tf` files|no real cloud / IaC code exists" AGENTS.md; then
+if rg 'terraform is unused|no `\\.tf` files|no real cloud / IaC code exists' AGENTS.md; then
   exit 1
 fi
 ```
