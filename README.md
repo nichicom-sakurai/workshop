@@ -26,6 +26,7 @@ workshop/
     │       └── examples/             # AWS 操作ごとの独立した Terraform サンプル
     │           └── caller-identity/  # caller identity を読む read-only サンプル
     └── gc/
+        └── terraform/                # Google Cloud project nck-sakurai を読む read-only Terraform サンプル
 ```
 
 `packages/` 配下の各プロジェクトは `bun` のバージョンを root の `mise.toml` から継承します。特定プロジェクトだけ別ツール / バージョンが必要な場合は、そのフォルダに `mise.toml` を置くと差分だけ上書きできます。
@@ -70,9 +71,11 @@ mise tasks            # 登録済みタスク一覧
 
 ### Terraform サンプル
 
-`packages/aws/terraform/examples/<operation>/` に、AWS 操作ごとの自己完結した Terraform サンプルを並べています。各サンプルは独立した root module で、`mise run tf <operation> <command>`（例: `mise run tf caller-identity plan`）で個別に実行できます。最初のサンプル `caller-identity` は `aws_caller_identity` を読むだけの read-only サンプル（AWS リソースは作成・変更・削除しません）です。
+provider の認証と Terraform の基本操作を学ぶための read-only サンプルがあります。どれも data source を読むだけで、クラウドリソースは作成・変更・削除しません。
 
-サンプル一覧と共通手順は [`packages/aws/terraform/README.md`](./packages/aws/terraform/README.md) を参照してください。
+`packages/aws/terraform/examples/<operation>/` に、AWS 操作ごとの自己完結した Terraform サンプルを並べています。各サンプルは独立した root module で、`mise run tf <operation> <command>`（例: `mise run tf caller-identity plan`）で個別に実行できます。最初のサンプル `caller-identity` は `aws_caller_identity` を読むだけの read-only サンプルです。サンプル一覧と共通手順は [`packages/aws/terraform/README.md`](./packages/aws/terraform/README.md) を参照してください。
+
+`packages/gc/terraform/` は Google Cloud provider のサンプルで、`google_project` data source で project `nck-sakurai` を読み、project number を `postcondition` で検証します。`tf` タスクは AWS examples 専用のため、`mise exec -- terraform -chdir=packages/gc/terraform ...` で直接実行します。手順は [`packages/gc/terraform/README.md`](./packages/gc/terraform/README.md) を参照してください。
 
 ### AWS CLI
 
