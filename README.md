@@ -9,6 +9,7 @@
 | [mise](https://mise.jdx.dev/getting-started.html) | ツールバージョン管理・タスクランナー | 手動インストール |
 | [bun](https://bun.sh/) | JavaScript / TypeScript ランタイム | mise 管理 |
 | [terraform](https://developer.hashicorp.com/terraform) | IaC | mise 管理 |
+| [aws-cli](https://docs.aws.amazon.com/cli/) | AWS 操作 CLI（[基本コマンド](./docs/guides/aws-cli/README.md)） | mise 管理 |
 
 > バージョンは [`mise.toml`](./mise.toml) で固定管理しています（README には転記しません）。
 
@@ -72,6 +73,10 @@ mise tasks            # 登録済みタスク一覧
 `aws_caller_identity` data source を読むだけなので、AWS リソースは作成・変更・削除しません。
 
 手順は [`packages/sample/terraform/README.md`](./packages/sample/terraform/README.md) を参照してください。
+
+### AWS CLI
+
+AWS の操作には mise 管理の AWS CLI を使います。認証 (`aws login` / アクセスキー) や認証情報の設定、疎通確認 (`aws sts get-caller-identity`)、基本コマンドは [`docs/guides/aws-cli/README.md`](./docs/guides/aws-cli/README.md) を参照してください。
 
 ## プロジェクトの追加
 
