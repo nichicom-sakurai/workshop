@@ -22,3 +22,9 @@ mise.local.toml
 .env
 .env.*
 !*.template
+
+# Scratch / temporary working files (not for commit)
+tmp/
+
+# Agent worktrees (internal tooling artifacts, not for commit)
+.claude/worktrees/
