@@ -19,7 +19,8 @@
 workshop/
 ├── mise.toml            # ツールのバージョン + タスク定義
 ├── tools/
-│   └── bootstrap.sh     # 全環境のセットアップスクリプト
+│   ├── bootstrap.sh     # 全環境のセットアップスクリプト
+│   └── git-hooks/       # git フック (commit-msg: Conventional Commits 検証)
 └── packages/            # プロジェクト群 (この配下が bootstrap / dev の対象)
     ├── aws/
     │   └── terraform/
@@ -45,6 +46,7 @@ mise run bs
 1. root のツールを `mise install`
 2. `packages/*` の各プロジェクトで `mise install`（固有 `mise.toml` がある場合のみ）
 3. `packages/*` の各プロジェクトで `bun install`（`package.json` がある場合）
+4. git フックを有効化（`core.hooksPath` を `tools/git-hooks` に設定）
 
 ### shell への activate（推奨）
 
@@ -62,6 +64,7 @@ eval "$(mise activate zsh)"
 | `dev` | プロジェクトを指定して実行 | `mise run dev aws` |
 | `dev:all` | `packages/` 配下を全実行 | `mise run dev:all` |
 | `bootstrap` (alias `bs`) | 全環境の依存セットアップ | `mise run bs` |
+| `install-hooks` | git commit-msg フックを有効化 | `mise run install-hooks` |
 
 ```bash
 mise run dev aws      # aws / gc を個別実行
@@ -80,6 +83,16 @@ provider の認証と Terraform の基本操作を学ぶための read-only サ�
 ### AWS CLI
 
 AWS の操作には mise 管理の AWS CLI を使います。認証 (`aws login` / アクセスキー) や認証情報の設定、疎通確認 (`aws sts get-caller-identity`)、基本コマンドは [`docs/guides/aws-cli/README.md`](./docs/guides/aws-cli/README.md) を参照してください。
+
+## コミット規約
+
+コミットメッセージは [Conventional Commits](https://www.conventionalcommits.org/) 形式（`<type>(<scope>): <説明>`）で書きます。`mise run bs` で有効化される commit-msg フック（`tools/git-hooks/commit-msg`、依存ゼロの bash スクリプト）が、形式・type・subject 72 文字以内を自動チェックします。
+
+- `type`: `feat` / `fix` / `docs` / `style` / `refactor` / `perf` / `test` / `build` / `chore` / `ci` / `revert`
+- `scope`: 任意（例: `aws` / `gc`）。強制はしません。
+- 例: `feat(aws): S3 バケット一覧タスクを追加`、`docs: README を更新`
+
+`bs` を実行していないクローンでフックだけ有効化するには `mise run install-hooks` を実行します。
 
 ## プロジェクトの追加
 

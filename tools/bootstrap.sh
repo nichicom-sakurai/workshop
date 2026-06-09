@@ -60,6 +60,20 @@ fi
 
 ##############################################################################
 ##
+##  git hooks (commit-msg: Conventional Commits 検証)
+##
+##############################################################################
+echo ""
+echo "[INFO] git hooks: Start"
+if type git >/dev/null 2>&1 && git rev-parse --git-dir >/dev/null 2>&1; then
+  git config core.hooksPath tools/git-hooks
+  echo "[OK] git hooks: core.hooksPath = tools/git-hooks"
+else
+  echo "[WARNING] git hooks: Skip (git repository not found)."
+fi
+
+##############################################################################
+##
 ##  Finish
 ##
 ##############################################################################
