@@ -76,25 +76,16 @@ mise tasks            # 登録済みタスク一覧
 
 ### Terraform サンプル
 
-provider の認証と Terraform の基本操作を学ぶための read-only サンプルがあります。どれも data source を読むだけで、クラウドリソースは作成・変更・削除しません。
+- AWS: [`packages/aws/terraform/README.md`](./packages/aws/terraform/README.md)
+- Google Cloud: [`packages/gc/terraform/README.md`](./packages/gc/terraform/README.md)
 
-`packages/aws/terraform/<operation>/` に、AWS 操作ごとの自己完結した Terraform サンプルを並べています。各サンプルは独立した root module で、`mise run tf <operation> <command>`（例: `mise run tf caller-identity plan`）で個別に実行できます。最初のサンプル `caller-identity` は `aws_caller_identity` を読むだけの read-only サンプルです。サンプル一覧と共通手順は [`packages/aws/terraform/README.md`](./packages/aws/terraform/README.md) を参照してください。
+### ガイド
 
-`packages/gc/terraform/<operation>/` に、Google Cloud 操作ごとの自己完結した Terraform サンプルを並べています。各サンプルは独立した root module です。最初のサンプル `project-info` は `google_project` data source で project `nck-sakurai` を読み、project number を `postcondition` で検証する read-only サンプルです。`tf` タスクは AWS サンプル専用のため、`mise exec -- terraform -chdir=packages/gc/terraform/<operation> ...` で直接実行します。サンプル一覧と共通手順は [`packages/gc/terraform/README.md`](./packages/gc/terraform/README.md) を参照してください。
+各種操作の手順は [`docs/guides/`](./docs/guides/) にまとめています。
 
-### AWS CLI
-
-AWS の操作には mise 管理の AWS CLI を使います。認証 (`aws login` / アクセスキー) や認証情報の設定、疎通確認 (`aws sts get-caller-identity`)、基本コマンドは [`docs/guides/aws-cli/README.md`](./docs/guides/aws-cli/README.md) を参照してください。
-
-## コミット規約
-
-コミットメッセージは [Conventional Commits](https://www.conventionalcommits.org/) 形式（`<type>(<scope>): <説明>`）で書きます。`mise run bs` で有効化される commit-msg フック（`tools/git-hooks/commit-msg`、依存ゼロの bash スクリプト）が、形式・type・subject 72 文字以内を自動チェックします。
-
-- `type`: `feat` / `fix` / `docs` / `style` / `refactor` / `perf` / `test` / `build` / `chore` / `ci` / `revert`
-- `scope`: 任意（例: `aws` / `gc`）。強制はしません。
-- 例: `feat(aws): S3 バケット一覧タスクを追加`、`docs: README を更新`
-
-`bs` を実行していないクローンでフックだけ有効化するには `mise run install-hooks` を実行します。
+- [AWS CLI 基本コマンド](./docs/guides/aws-cli/README.md)
+- [AWS CLI 認証情報の設定](./docs/guides/aws-cli-credentials/README.md)
+- [IAM ユーザー作成とアクセスキー取得手順](./docs/guides/aws-iam-user-creation/README.md)
 
 ## プロジェクトの追加
 
