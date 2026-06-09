@@ -25,7 +25,8 @@ workshop/
     ├── aws/
     │   └── terraform/
     │       ├── README.md             # サンプル一覧と共通手順
-    │       └── caller-identity/      # AWS 操作ごとの独立した read-only サンプル (caller identity を読む)
+    │       ├── caller-identity/      # AWS 操作ごとの独立した read-only サンプル (caller identity を読む)
+    │       └── s3-private-bucket/    # private S3 bucket を作成し destroy まで学ぶ mutating サンプル
     └── gc/
         └── terraform/
             ├── README.md             # サンプル一覧と共通手順
