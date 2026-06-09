@@ -20,13 +20,7 @@ Google Cloud provider の認証と Terraform の基本操作を学ぶための�
 gcloud auth application-default login
 ```
 
-または service account key の path を環境変数で渡します。
-
-```bash
-export GOOGLE_APPLICATION_CREDENTIALS=/path/to/key.json
-```
-
-シークレット値や key path は repository に保存しないでください。
+シークレット値は repository に保存しないでください。
 
 ## 使い方
 

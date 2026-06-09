@@ -62,7 +62,7 @@ Terraform learning samples (all read-only):
   - Add one: create `examples/<operation>/` (copy `terraform.tf` / `providers.tf` so it stays self-contained), then add a row to `packages/aws/terraform/README.md` (the shared-workflow index).
 - `packages/gc/terraform/` — Google Cloud project check for `nck-sakurai`. Uses `data "google_project" "current"` with a `postcondition` asserting the project number.
   - Not covered by the `tf` task (which targets AWS examples); run directly with `mise exec -- terraform -chdir=packages/gc/terraform ...`.
-- None of these create, update, or destroy resources. Credentials come from each provider's standard mechanism (AWS env / profile; Google ADC or `GOOGLE_APPLICATION_CREDENTIALS`) — never hardcoded.
+- None of these create, update, or destroy resources. Credentials come from each provider's standard mechanism (AWS env / profile; Google ADC) — never hardcoded.
 
 ## 4. Verify
 
