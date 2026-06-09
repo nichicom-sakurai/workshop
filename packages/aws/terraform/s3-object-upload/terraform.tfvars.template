@@ -1,0 +1,12 @@
+# Copy this file to terraform.tfvars and set your own values, then run plan/apply:
+#   cp terraform.tfvars.template terraform.tfvars
+#
+# terraform.tfvars is gitignored (it matches *.tfvars), so your real values stay
+# local and are never committed. Only this *.template file is tracked.
+
+# Use the same bucket_name you created in ../s3-private-bucket/.
+bucket_name = "REPLACE-WITH-YOUR-S3-PRIVATE-BUCKET-NAME"
+
+# Optional: object key inside the bucket. Slash creates a folder-like path in
+# the S3 console.
+# object_key = "samples/hello.txt"
