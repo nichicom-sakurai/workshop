@@ -1,0 +1,1 @@
+Hello from workshop S3 object upload sample.

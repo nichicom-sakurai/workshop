@@ -9,6 +9,7 @@ AWS provider の認証と Terraform の基本操作を学ぶための、自己�
 | --- | --- | --- |
 | [caller-identity](./caller-identity/) | read-only | STS caller identity（account ID / ARN / user ID）を読む最小サンプル |
 | [s3-private-bucket](./s3-private-bucket/) | mutating | `aws_s3_bucket` で private S3 bucket を1つ作成し、`destroy` まで lifecycle を学ぶ |
+| [s3-object-upload](./s3-object-upload/) | mutating | `aws_s3_object` で既存 bucket に local file を1つ upload し、object cleanup まで学ぶ |
 
 新しいサンプルは `terraform/` 直下にディレクトリを 1 つ足し、この表に 1 行追加します（`<operation>` は `s3-bucket-list` のような kebab-case の「対象 + 操作」）。read-only は名詞 / `*-list` / `*-read`、リソースを作成する mutating はリソース名中心で命名し、本表の「種別」列で区別します。
 
@@ -18,7 +19,7 @@ read-only の基礎から、低リスクな mutating（リソース作成）へ�
 
 1. [caller-identity](./caller-identity/) — provider 設定 / AWS 認証 / `aws_caller_identity` / outputs を学ぶ。
 2. [s3-private-bucket](./s3-private-bucket/) — `plan` / `apply` / `state` / `destroy` を private S3 bucket 1つで学ぶ。
-3. `s3-object`（未追加） — bucket に object を置く lifecycle を学ぶ。
+3. [s3-object-upload](./s3-object-upload/) — 既存 bucket に local file を object として upload し、object と bucket の cleanup 順序を学ぶ。
 4. `iam-policy-document`（未追加） — policy JSON の組み立てを read-only で学ぶ。
 5. `s3-bucket-policy`（未追加） — bucket policy の attachment と least privilege を学ぶ。
 
@@ -27,6 +28,7 @@ read-only の基礎から、低リスクな mutating（リソース作成）へ�
 - **read-only**: data source を読むだけで、リソースの作成・変更・削除はしません。`destroy` で消す対象もありません。
 - **mutating**: AWS の状態（有効な API やリソース）を変更します。**学習後は各サンプルの README に従って `destroy` してください**。
   - [s3-private-bucket](./s3-private-bucket/) は private S3 bucket を作成します。bucket 名が衝突した場合は `bucket_prefix` を変えて再実行してください。
+  - [s3-object-upload](./s3-object-upload/) は既存 bucket に object を作成します。bucket を削除する前に、このサンプルの [`cleanup.md`](./s3-object-upload/cleanup.md) で object を先に削除してください。
 
 ## 前提
 

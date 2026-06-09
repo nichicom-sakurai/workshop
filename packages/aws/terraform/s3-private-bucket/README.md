@@ -57,6 +57,11 @@ mise run tf s3-private-bucket state list # state 上のリソースを確認
 mise run tf s3-private-bucket destroy   # 学習後に削除
 ```
 
+## object を追加する（発展）
+
+bucket に object を追加する発展サンプルは [s3-object-upload](../s3-object-upload/) で扱います。
+`s3-private-bucket` で作成した bucket 名を `s3-object-upload` に渡し、`aws_s3_object` で local file を upload します。
+
 ## 出力 (outputs)
 
 | output | 内容 |
@@ -81,4 +86,4 @@ mise run tf s3-private-bucket plan -destroy
 mise run tf s3-private-bucket destroy
 ```
 
-このサンプルは object を作成しません。将来 object を入れる発展サンプルを実行した場合は、bucket を削除する前に object を削除してください。
+このサンプルは object を作成しません。[s3-object-upload](../s3-object-upload/) を実行した場合は、bucket を削除する前にその sample の [`cleanup.md`](../s3-object-upload/cleanup.md) で object を削除してください。

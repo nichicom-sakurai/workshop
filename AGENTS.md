@@ -9,7 +9,7 @@ AI-agent guide for the `workshop` monorepo. For human-facing detail, see [README
 ## TL;DR (read first)
 
 - **Cloud / IaC learning monorepo.** Independent projects live in `packages/<name>/`. Tool versions are centrally pinned by [mise](https://mise.jdx.dev/) in `mise.toml`.
-- **Learning skeleton + Terraform samples.** Each of `packages/aws/` and `packages/gc/` keeps its `package.json` + `index.ts` skeleton (`console.log("Hello from <name>")`) and adds self-contained Terraform samples under `packages/<provider>/terraform/<operation>/`. AWS starts with `caller-identity` (read-only) and `s3-private-bucket` (mutating); Google Cloud starts with `project-info` and expands through storage learning samples.
+- **Learning skeleton + Terraform samples.** Each of `packages/aws/` and `packages/gc/` keeps its `package.json` + `index.ts` skeleton (`console.log("Hello from <name>")`) and adds self-contained Terraform samples under `packages/<provider>/terraform/<operation>/`. AWS starts with `caller-identity` (read-only), `s3-private-bucket` (mutating), and `s3-object-upload` (mutating); Google Cloud starts with `project-info` and expands through storage learning samples.
 - **[WARNING] no test / lint / typecheck / tsconfig.** Terraform exists as learning samples with local state only; no remote backend is configured. See "Gotchas".
 - Drive everything through mise tasks (`mise run ...`). A bare `bun` is not on PATH, but the tasks wrap it (`mise exec -- bun`), so `mise run` works as-is.
 
@@ -18,7 +18,7 @@ AI-agent guide for the `workshop` monorepo. For human-facing detail, see [README
 - `mise.toml` — tool versions (`[tools]`) + task definitions (`[tasks.*]`). **The single source of version truth.**
 - `tools/bootstrap.sh` — idempotent full setup (`set -euo pipefail`); skips gracefully when mise is absent.
 - `tools/git-hooks/commit-msg` — dependency-free bash validator for Conventional Commits (`<type>(<scope>): ...`, fixed type enum, 72-char subject; merge/autosquash skipped). Enabled via `core.hooksPath` by `mise run install-hooks` / `bs`. **scope is free-form, not enum-checked** (keeps the auto-discover model — no per-package config edits).
-- `packages/*` — the projects. Targets of `bun install` / `dev` / `dev:all`. Each is independent (no root npm workspaces). Currently `aws` and `gc`; each contains `terraform/<operation>/` — one independent Terraform root module per cloud operation. AWS includes `caller-identity` (read-only) and `s3-private-bucket` (mutating); Google Cloud includes `project-info` and storage learning samples.
+- `packages/*` — the projects. Targets of `bun install` / `dev` / `dev:all`. Each is independent (no root npm workspaces). Currently `aws` and `gc`; each contains `terraform/<operation>/` — one independent Terraform root module per cloud operation. AWS includes `caller-identity` (read-only), `s3-private-bucket` (mutating), and `s3-object-upload` (mutating); Google Cloud includes `project-info` and storage learning samples.
 - `.claude/` and `.codex/` — agent tooling for this repo; see §8.
 
 ## 2. Run
@@ -57,7 +57,7 @@ Add a project (reference: `packages/gc/`) — or run the `/new-package <name>` s
 
 Terraform learning samples:
 
-- `packages/aws/terraform/<operation>/` — each AWS operation is a self-contained, independent root module (own state) placed directly under `terraform/`. Current samples include `caller-identity` (read-only, uses `data "aws_caller_identity" "current" {}` only) and `s3-private-bucket` (mutating, creates a private S3 bucket and public access block).
+- `packages/aws/terraform/<operation>/` — each AWS operation is a self-contained, independent root module (own state) placed directly under `terraform/`. Current samples include `caller-identity` (read-only, uses `data "aws_caller_identity" "current" {}` only), `s3-private-bucket` (mutating, creates a private S3 bucket and public access block), and `s3-object-upload` (mutating, uploads a local file to an existing S3 bucket).
   - Run via the `tf` task: `mise run tf <operation> <command>` (e.g. `mise run tf caller-identity plan`), or directly `mise exec -- terraform -chdir=packages/aws/terraform/<operation> ...`.
   - Add one: create `<operation>/` under `terraform/` (copy `terraform.tf` / `providers.tf` so it stays self-contained), then add a row to `packages/aws/terraform/README.md` (the shared-workflow index).
 - `packages/gc/terraform/<operation>/` — each Google Cloud operation is a self-contained, independent root module (own state) placed directly under `terraform/`. First sample: `project-info`, which reads `data "google_project" "current"` with a `postcondition` asserting the project number for `nck-sakurai`.
