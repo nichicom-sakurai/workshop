@@ -14,7 +14,8 @@ resource "aws_s3_bucket" "this" {
 
 # Public access block:
 # 4つの public access block 設定をすべて true にし、bucket policy や ACL が公開設定へ
-# 変わっても public access を制限できるようにします。
+# 変わっても public access を制限できるようにします。ACL は Access Control List の略で、
+# S3 bucket / object 単位の古いアクセス許可設定です。
 resource "aws_s3_bucket_public_access_block" "this" {
   bucket = aws_s3_bucket.this.id
 
