@@ -23,6 +23,8 @@ Google Cloud provider の認証と Terraform の基本操作を学ぶための�
 gcloud auth application-default login
 ```
 
+`gcloud` の基本コマンドや active account / project の確認手順は [gcloud CLI 基本コマンド](../../../docs/guides/gcloud-cli/README.md) を参照してください。
+
 シークレット値は repository に保存しないでください。
 
 ## 使い方
