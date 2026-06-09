@@ -10,6 +10,8 @@
 | [bun](https://bun.sh/) | JavaScript / TypeScript ランタイム | mise 管理 |
 | [terraform](https://developer.hashicorp.com/terraform) | IaC | mise 管理 |
 | [aws-cli](https://docs.aws.amazon.com/cli/) | AWS 操作 CLI（[基本コマンド](./docs/guides/aws-cli/README.md)） | mise 管理 |
+| [gcloud](https://cloud.google.com/sdk/gcloud) | Google Cloud 操作 CLI（ADC 認証など） | mise 管理 |
+| [python](https://www.python.org/) | gcloud の実行ランタイム（mise-gcloud は Python 非同梱） | mise 管理 |
 
 > バージョンは [`mise.toml`](./mise.toml) で固定管理しています（README には転記しません）。
 
