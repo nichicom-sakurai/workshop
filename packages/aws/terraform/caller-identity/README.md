@@ -4,7 +4,7 @@
 `data "aws_caller_identity" "current"` を読むだけで、**AWS リソースは作成・変更・削除しません**。
 
 > 前提（認証情報の設定）と共通コマンド（`init` / `fmt` / `validate` / `plan` / `apply`）は
-> [親 README](../../README.md) を参照してください。`<example>` を `caller-identity` に読み替えます。
+> [親 README](../README.md) を参照してください。`<example>` を `caller-identity` に読み替えます。
 > 例: `mise run tf caller-identity plan`
 
 ## 出力 (outputs)

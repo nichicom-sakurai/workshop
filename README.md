@@ -24,10 +24,12 @@ workshop/
 └── packages/            # プロジェクト群 (この配下が bootstrap / dev の対象)
     ├── aws/
     │   └── terraform/
-    │       └── examples/             # AWS 操作ごとの独立した Terraform サンプル
-    │           └── caller-identity/  # caller identity を読む read-only サンプル
+    │       ├── README.md             # サンプル一覧と共通手順
+    │       └── caller-identity/      # AWS 操作ごとの独立した read-only サンプル (caller identity を読む)
     └── gc/
-        └── terraform/                # Google Cloud project nck-sakurai を読む read-only Terraform サンプル
+        └── terraform/
+            ├── README.md             # サンプル一覧と共通手順
+            └── project-info/         # Google Cloud 操作ごとの独立した read-only サンプル (project nck-sakurai を読む)
 ```
 
 `packages/` 配下の各プロジェクトは `bun` のバージョンを root の `mise.toml` から継承します。特定プロジェクトだけ別ツール / バージョンが必要な場合は、そのフォルダに `mise.toml` を置くと差分だけ上書きできます。
@@ -76,9 +78,9 @@ mise tasks            # 登録済みタスク一覧
 
 provider の認証と Terraform の基本操作を学ぶための read-only サンプルがあります。どれも data source を読むだけで、クラウドリソースは作成・変更・削除しません。
 
-`packages/aws/terraform/examples/<operation>/` に、AWS 操作ごとの自己完結した Terraform サンプルを並べています。各サンプルは独立した root module で、`mise run tf <operation> <command>`（例: `mise run tf caller-identity plan`）で個別に実行できます。最初のサンプル `caller-identity` は `aws_caller_identity` を読むだけの read-only サンプルです。サンプル一覧と共通手順は [`packages/aws/terraform/README.md`](./packages/aws/terraform/README.md) を参照してください。
+`packages/aws/terraform/<operation>/` に、AWS 操作ごとの自己完結した Terraform サンプルを並べています。各サンプルは独立した root module で、`mise run tf <operation> <command>`（例: `mise run tf caller-identity plan`）で個別に実行できます。最初のサンプル `caller-identity` は `aws_caller_identity` を読むだけの read-only サンプルです。サンプル一覧と共通手順は [`packages/aws/terraform/README.md`](./packages/aws/terraform/README.md) を参照してください。
 
-`packages/gc/terraform/` は Google Cloud provider のサンプルで、`google_project` data source で project `nck-sakurai` を読み、project number を `postcondition` で検証します。`tf` タスクは AWS examples 専用のため、`mise exec -- terraform -chdir=packages/gc/terraform ...` で直接実行します。手順は [`packages/gc/terraform/README.md`](./packages/gc/terraform/README.md) を参照してください。
+`packages/gc/terraform/<operation>/` に、Google Cloud 操作ごとの自己完結した Terraform サンプルを並べています。各サンプルは独立した root module です。最初のサンプル `project-info` は `google_project` data source で project `nck-sakurai` を読み、project number を `postcondition` で検証する read-only サンプルです。`tf` タスクは AWS サンプル専用のため、`mise exec -- terraform -chdir=packages/gc/terraform/<operation> ...` で直接実行します。サンプル一覧と共通手順は [`packages/gc/terraform/README.md`](./packages/gc/terraform/README.md) を参照してください。
 
 ### AWS CLI
 

@@ -27,7 +27,7 @@ done
 
 [tasks.tf]
 description = "terraform サンプルを実行 (例: mise run tf caller-identity plan)"
-run = "mise exec -- terraform -chdir=packages/aws/terraform/examples/{{arg(name='example')}} {{arg(name='command', var=true)}}"
+run = "mise exec -- terraform -chdir=packages/aws/terraform/{{arg(name='example')}} {{arg(name='command', var=true)}}"
 
 # --- git hooks ---
 
