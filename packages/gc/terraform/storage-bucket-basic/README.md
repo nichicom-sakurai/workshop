@@ -54,7 +54,16 @@ mise exec -- terraform -chdir=$D destroy   # 学習後に削除
 
 ## cleanup
 
-学習が終わったら必ず `destroy` してください（課金とリソース残留を避けるため）。
+学習が終わったら必ず bucket を削除してください（課金とリソース残留を避けるため）。
+詳細な削除手順は [`cleanup.md`](./cleanup.md) にまとめています。
+
+削除前に destroy plan を確認します。
+
+```bash
+mise exec -- terraform -chdir=packages/gc/terraform/storage-bucket-basic plan -destroy
+```
+
+確認後、同じ root module / state で `destroy` します。
 
 ```bash
 mise exec -- terraform -chdir=packages/gc/terraform/storage-bucket-basic destroy
