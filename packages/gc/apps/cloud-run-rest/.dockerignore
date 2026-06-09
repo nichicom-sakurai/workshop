@@ -1,0 +1,9 @@
+# docker build のコンテキストから実行に不要なファイルを除外します。
+# （gcloud builds submit のアップロード対象は .gcloudignore / .gitignore が決めるため、
+#  このファイルが効くのは docker build のコンテキストだけです）
+Dockerfile
+.dockerignore
+README.md
+**/node_modules
+**/.DS_Store
+.env*
