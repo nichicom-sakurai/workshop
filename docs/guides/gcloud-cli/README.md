@@ -49,6 +49,24 @@ gcloud projects describe "${PROJECT_ID}"  # project metadata を確認
 
 `gcloud projects describe "${PROJECT_ID}"` は project ID を引数で直接指定するため、default project を変更せずに対象 project の参照可否を確認できます。
 
+## API の有効状態を確認する
+
+project で有効な API (service) を確認するコマンドです。
+Terraform の [storage-api-enable](../../../packages/gc/terraform/storage-api-enable/) サンプルは `storage.googleapis.com` を Terraform で有効化しますが、現在の有効状態は `gcloud` でも確認できます。
+
+```bash
+PROJECT_ID="nck-sakurai"
+
+gcloud services list --enabled --project="${PROJECT_ID}" # 有効な API 一覧
+gcloud services list --enabled --project="${PROJECT_ID}" \
+  --filter="config.name:storage.googleapis.com"          # Cloud Storage API が有効か確認
+```
+
+`storage-api-enable` を `apply` した後にこのコマンドで `storage.googleapis.com` が一覧に出ることを確認できます。
+`disable_on_destroy = false` のため、`terraform destroy` 後も API は有効なまま一覧に残ります。
+
+> API の有効化を `gcloud` で直接行う場合は `gcloud services enable storage.googleapis.com --project="${PROJECT_ID}"` を使いますが、このリポジトリの学習では有効化は Terraform 側（`storage-api-enable`）に寄せています。
+
 ## Configuration を分ける
 
 複数の project / account を切り替える場合は named configuration を使います。
@@ -101,5 +119,6 @@ gcloud projects describe "${PROJECT_ID}"
 - [gcloud CLI overview](https://cloud.google.com/sdk/gcloud)
 - [gcloud auth login](https://cloud.google.com/sdk/gcloud/reference/auth/login)
 - [gcloud projects list](https://cloud.google.com/sdk/gcloud/reference/projects/list)
+- [gcloud services list](https://cloud.google.com/sdk/gcloud/reference/services/list)
 - [gcloud config](https://cloud.google.com/sdk/gcloud/reference/config)
 - [gcloud auth application-default login](https://cloud.google.com/sdk/gcloud/reference/auth/application-default/login)

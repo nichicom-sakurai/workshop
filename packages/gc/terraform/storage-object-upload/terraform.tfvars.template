@@ -1,0 +1,12 @@
+# Copy this file to terraform.tfvars and set your own values, then run plan/apply:
+#   cp terraform.tfvars.template terraform.tfvars
+#
+# terraform.tfvars is gitignored (it matches *.tfvars), so your real values stay
+# local and are never committed. Only this *.template file is tracked.
+
+# Use the same bucket_name you created in ../storage-bucket-basic/.
+bucket_name = "REPLACE-WITH-YOUR-STORAGE-BUCKET-BASIC-BUCKET-NAME"
+
+# Optional: object name inside the bucket. Slash creates a folder-like path in
+# the Cloud Storage UI.
+# object_name = "samples/hello.txt"

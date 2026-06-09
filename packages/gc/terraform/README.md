@@ -8,8 +8,34 @@ Google Cloud provider の認証と Terraform の基本操作を学ぶための�
 | サンプル | 種別 | 説明 |
 | --- | --- | --- |
 | [project-info](./project-info/) | read-only | `google_project` data source で project `nck-sakurai` の ID / number / 表示名を読む最小サンプル |
+| [service-accounts-list](./service-accounts-list/) | read-only | `google_service_accounts` data source で project の service account 一覧を読む |
+| [storage-api-enable](./storage-api-enable/) | mutating | `google_project_service` で `storage.googleapis.com` を有効化する（`disable_on_destroy = false`） |
+| [storage-buckets-list](./storage-buckets-list/) | read-only | `google_storage_buckets` data source で Cloud Storage bucket 一覧を読む（0 件も正常） |
+| [storage-service-account](./storage-service-account/) | read-only | `google_storage_project_service_account` data source で Cloud Storage service agent の identity を読む |
+| [storage-bucket-basic](./storage-bucket-basic/) | mutating | `google_storage_bucket` で private bucket を1つ作成し、[`cleanup.md`](./storage-bucket-basic/cleanup.md) の手順で `destroy` まで lifecycle を学ぶ |
+| [storage-object-upload](./storage-object-upload/) | mutating | `google_storage_bucket_object` で既存 bucket に local file を1つ upload し、object cleanup まで学ぶ |
 
 新しいサンプルは `terraform/` 直下にディレクトリを 1 つ足し、この表に 1 行追加します（`<operation>` は `storage-bucket-list` のような kebab-case の「対象 + 操作」）。read-only は名詞 / `*-list` / `*-read`、リソースを作成する mutating はリソース名中心で命名し、本表の「種別」列で区別します。
+
+## 学習順序
+
+read-only の基礎から、低リスクな mutating（リソース作成）へ段階的に進む構成です。
+
+1. [project-info](./project-info/) — provider 設定 / ADC / `google_project` / outputs / `postcondition` を学ぶ。
+2. [service-accounts-list](./service-accounts-list/) — list 系 data source（`google_service_accounts`）を学ぶ。
+3. [storage-api-enable](./storage-api-enable/) — `google_project_service` で API を有効化する（mutating の入口、`disable_on_destroy = false`）。
+4. [storage-buckets-list](./storage-buckets-list/) — `google_storage_buckets` で在庫を読む（空リストも正常）。
+5. [storage-service-account](./storage-service-account/) — provider 管理の service agent を data source から取得する。
+6. [storage-bucket-basic](./storage-bucket-basic/) — `plan` / `apply` / `state` / `destroy` を private bucket 1つで学ぶ。
+7. [storage-object-upload](./storage-object-upload/) — 既存 bucket に local file を object として upload し、object と bucket の cleanup 順序を学ぶ。
+
+## 種別ごとの扱い（read-only / mutating）
+
+- **read-only**: data source を読むだけで、リソースの作成・変更・削除はしません。`destroy` で消す対象もありません。
+- **mutating**: プロジェクトの状態（有効な API やリソース）を変更します。**学習後は各サンプルの README に従って `destroy` してください**。
+  - [storage-api-enable](./storage-api-enable/) は `disable_on_destroy = false` のため、`destroy` 後も API は有効なまま残ります（他のワークロードを壊さないため）。
+  - [storage-bucket-basic](./storage-bucket-basic/) は [`cleanup.md`](./storage-bucket-basic/cleanup.md) の手順で bucket を削除します。`force_destroy = false` のため、bucket 内にオブジェクトが残っていると `destroy` は失敗します。
+  - [storage-object-upload](./storage-object-upload/) は既存 bucket に object を作成します。bucket を削除する前に、このサンプルの [`cleanup.md`](./storage-object-upload/cleanup.md) で object を先に削除してください。
 
 ## 前提
 
@@ -44,5 +70,7 @@ mise exec -- terraform -chdir=packages/gc/terraform/<example> apply      # 計�
 - `.terraform.lock.hcl`: provider の選択を固定する lock file。**commit 対象**です。
 - `.terraform/`: provider plugin などの local cache。commit しません。
 - `terraform.tfstate*`: local state。commit しません。
+- `terraform.tfvars` / `*.tfvars`: 変数を渡す local 値。**commit しません**（[storage-bucket-basic](./storage-bucket-basic/) のように変数を取るサンプルで使用）。
+- `terraform.tfvars.template`: `.tfvars` の雛形。プレースホルダのみを含み、**commit 対象**です（`cp ...template ...tfvars` して自分の値を設定）。
 
-`.gitignore` はリポジトリ全体で上記 runtime ファイルを（任意のネスト深さで）無視するため、`terraform/` 配下にサンプルを増やしても gitignore の追加設定は不要です。
+`.gitignore` はリポジトリ全体で上記 runtime ファイル（`.tfvars` を含む）を（任意のネスト深さで）無視し、`*.template` だけを追跡対象に残すため、`terraform/` 配下にサンプルを増やしても gitignore の追加設定は不要です。

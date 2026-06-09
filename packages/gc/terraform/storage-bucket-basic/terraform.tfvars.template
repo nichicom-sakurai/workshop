@@ -1,0 +1,12 @@
+# Copy this file to terraform.tfvars and set your own values, then run plan/apply:
+#   cp terraform.tfvars.template terraform.tfvars
+#
+# terraform.tfvars is gitignored (it matches *.tfvars), so your real values stay
+# local and are never committed. Only this *.template file is tracked.
+
+# Bucket names are globally unique across all of Google Cloud. Replace the
+# placeholder below with your own unique, lowercase, hyphenated name.
+bucket_name = "REPLACE-WITH-A-GLOBALLY-UNIQUE-NAME"
+
+# Optional: override the default bucket location (default: ASIA-NORTHEAST1).
+# location = "ASIA-NORTHEAST1"

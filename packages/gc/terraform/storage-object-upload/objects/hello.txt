@@ -1,0 +1,3 @@
+Hello from the workshop Terraform storage-object-upload sample.
+
+This file is uploaded to an existing Cloud Storage bucket by google_storage_bucket_object.
