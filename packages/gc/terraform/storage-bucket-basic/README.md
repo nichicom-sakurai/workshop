@@ -57,6 +57,9 @@ mise exec -- terraform -chdir=$D destroy   # 学習後に削除
 学習が終わったら必ず bucket を削除してください（課金とリソース残留を避けるため）。
 詳細な削除手順は [`cleanup.md`](./cleanup.md) にまとめています。
 
+[storage-object-upload](../storage-object-upload/) を実行した場合は、先にその sample の [`cleanup.md`](../storage-object-upload/cleanup.md) で object を削除してください。
+この bucket は `force_destroy = false` のため、object が残っていると `destroy` は失敗します。
+
 削除前に destroy plan を確認します。
 
 ```bash
@@ -69,4 +72,5 @@ mise exec -- terraform -chdir=packages/gc/terraform/storage-bucket-basic plan -d
 mise exec -- terraform -chdir=packages/gc/terraform/storage-bucket-basic destroy
 ```
 
-> オブジェクトをアップロードする発展サンプルは別途扱います（`force_destroy` と cleanup の前提が変わるため）。
+> オブジェクトをアップロードする発展サンプルは [storage-object-upload](../storage-object-upload/) で扱います。
+> 実行した場合は、bucket を削除する前に object を先に削除してください。

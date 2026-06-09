@@ -12,7 +12,7 @@ Terraform は、作成時と同じ root module / state を使って削除しま�
 - bucket に object を追加していないこと
 
 `force_destroy = false` のため、bucket 内に object や cache が残っている場合、`terraform destroy` は失敗します。
-この sample は object を作らない前提です。object upload を扱う場合は、`force_destroy` と object cleanup の方針を別途決めます。
+この sample 自体は object を作りません。[storage-object-upload](../storage-object-upload/) を実行した場合は、先にその sample の [`cleanup.md`](../storage-object-upload/cleanup.md) で object を削除してください。
 
 ## 削除対象を確認する
 
@@ -74,5 +74,5 @@ gcloud storage buckets describe "gs://${BUCKET_NAME}"
 この場合は、まず「なぜ object があるのか」を確認してください。
 
 - この sample の手順だけを実行した場合: object は作られないため、手動追加や別 sample の影響を確認する
+- [storage-object-upload](../storage-object-upload/) を実行した場合: 先にその sample の `terraform destroy` で object を削除する
 - 自分で object を追加した場合: object を削除してから `terraform destroy` を再実行する
-- object upload も Terraform で扱いたい場合: `force_destroy` の扱いを含めて別 follow-up として設計する

@@ -121,6 +121,13 @@ Confidence: 86%.
      resource-creating sample.
    - Use no uploaded objects in the first version, so `force_destroy = false`
      remains safe.
+7. `storage-object-upload` (follow-up, mutating)
+   - Learn `google_storage_bucket_object` by uploading one committed local text
+     file to the bucket created by `storage-bucket-basic`.
+   - Manage only the object in this sample; the bucket remains managed by
+     `storage-bucket-basic`.
+   - Include `cleanup.md` so learners delete the object before deleting the
+     bucket.
 
 ### Proposed folder structure
 
@@ -160,10 +167,21 @@ packages/gc/
     │   ├── outputs.tf
     │   ├── providers.tf
     │   └── terraform.tf
-    └── storage-bucket-basic/
+    ├── storage-bucket-basic/
+    │   ├── cleanup.md
+    │   ├── README.md
+    │   ├── main.tf
+    │   ├── outputs.tf
+    │   ├── providers.tf
+    │   ├── terraform.tf
+    │   ├── terraform.tfvars.template
+    │   └── variables.tf
+    └── storage-object-upload/
         ├── cleanup.md
         ├── README.md
         ├── main.tf
+        ├── objects/
+        │   └── hello.txt
         ├── outputs.tf
         ├── providers.tf
         ├── terraform.tf
@@ -196,6 +214,13 @@ That lock file should be committed for every initialized sample.
     `terraform destroy` flow for deleting the bucket created by this sample.
   - Document that no separate `delete.tf` is added because Terraform deletion
     should use the same root module and state that created the bucket.
+- `packages/gc/terraform/storage-object-upload/*`
+  - Add the object upload follow-up sample.
+  - Include `objects/hello.txt` as the committed local source file.
+  - Include `terraform.tfvars.template`, not real local values.
+  - Include `cleanup.md` with the `terraform plan -destroy` and
+    `terraform destroy` flow for deleting the uploaded object before bucket
+    cleanup.
 - `docs/guides/gcloud-cli/README.md`
   - If needed, add a short `gcloud services list` / API enablement confirmation
     section that links back to the Terraform samples.
@@ -245,6 +270,18 @@ Given the bucket contains objects or caches, when the learner runs cleanup with
 `force_destroy = false`, then the cleanup doc explains that deletion may fail and
 that enabling object deletion behavior is a separate follow-up decision.
 
+Given `storage-object-upload` is applied with the `bucket_name` from
+`storage-bucket-basic`, when the learner checks Cloud Storage, then one object
+from `objects/hello.txt` exists at the configured `object_name`.
+
+Given the learner opens `storage-object-upload/cleanup.md`, when they follow the
+documented cleanup flow, then they can preview object deletion with `terraform
+plan -destroy` and delete the object with `terraform destroy`.
+
+Given both `storage-object-upload` and `storage-bucket-basic` were used, when
+the learner cleans up, then the object sample is destroyed before the bucket
+sample so `force_destroy = false` does not block bucket cleanup.
+
 Given any sample runs `terraform init`, when repository status is inspected, then
 `.terraform.lock.hcl` is trackable and `.terraform/` / `terraform.tfstate*` are
 ignored.
@@ -284,6 +321,11 @@ ignored.
     and state that created them; the cleanup file documents the command flow
     without creating a second source of truth.
   - Confidence: 84%.
+- Add `storage-object-upload` as a separate root module.
+  - Rationale: Keeping bucket creation and object upload in separate state files
+    makes the lifecycle boundary explicit: object cleanup must happen before
+    bucket cleanup when `force_destroy = false`.
+  - Confidence: 82%.
 
 ## Open Questions
 
@@ -291,9 +333,9 @@ ignored.
   `ASIA-NORTHEAST1` is a reasonable default for this local learning repo, but
   the implementation should verify the final value against the current provider
   docs and user preference.
-- Whether to add an object upload sample after `storage-bucket-basic`. That
-  should remain a separate follow-up because it changes the cleanup and
-  `force_destroy` discussion.
+- Whether to add object versioning, lifecycle rules, or multiple object upload
+  patterns after `storage-object-upload`. These remain separate follow-ups
+  because they change cleanup and retention behavior.
 
 ## Non-Goals
 
