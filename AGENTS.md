@@ -17,6 +17,7 @@ AI-agent guide for the `workshop` monorepo. For human-facing detail, see [README
 
 - `mise.toml` — tool versions (`[tools]`) + task definitions (`[tasks.*]`). **The single source of version truth.**
 - `tools/bootstrap.sh` — idempotent full setup (`set -euo pipefail`); skips gracefully when mise is absent.
+- `tools/git-hooks/commit-msg` — dependency-free bash validator for Conventional Commits (`<type>(<scope>): ...`, fixed type enum, 72-char subject; merge/autosquash skipped). Enabled via `core.hooksPath` by `mise run install-hooks` / `bs`. **scope is free-form, not enum-checked** (keeps the auto-discover model — no per-package config edits).
 - `packages/*` — the projects. Targets of `bun install` / `dev` / `dev:all`. Each is independent (no root npm workspaces). Currently `aws` and `gc`; `aws` also contains `terraform/examples/<operation>/` — one independent Terraform root module per AWS operation (first: `caller-identity`, read-only).
 - `.claude/` and `.codex/` — agent tooling for this repo; see §8.
 
@@ -27,6 +28,7 @@ mise tasks execute inside mise's resolved environment, so they are copy-paste sa
 | Purpose | Command | Notes |
 | --- | --- | --- |
 | Full setup | `mise run bs` | alias of `bootstrap`; breakdown below |
+| Enable commit hook | `mise run install-hooks` | sets `core.hooksPath=tools/git-hooks` (also run by `bs`) |
 | Run one project | `mise run dev <name>` | `<name>` is `aws` / `gc` |
 | Run all projects | `mise run dev:all` | loops over `packages/` |
 | List tasks | `mise tasks` | shows registered tasks |

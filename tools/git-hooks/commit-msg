@@ -1,0 +1,52 @@
+#!/bin/bash
+# commit-msg フック: Conventional Commits 形式を検証する (依存ゼロ・bash のみ)
+#
+# 規約 : <type>(<scope>): <説明>   — scope は任意 (enum は強制しない)
+# 制約 : 1 行目 (subject) は 72 文字以内
+# 除外 : merge / autosquash (fixup! / squash!) コミットは検証をスキップ
+#
+# 有効化: `mise run install-hooks` または `mise run bs`
+#         (git config core.hooksPath tools/git-hooks)
+set -euo pipefail
+
+msg_file="$1"
+
+# コメント行 (# 始まり) と空行を除いた最初の行 = subject
+header="$(grep -vE '^[[:space:]]*#' "${msg_file}" | grep -vE '^[[:space:]]*$' | head -n1 || true)"
+
+# merge / autosquash コミットは検証しない
+case "${header}" in
+  "Merge "* | "fixup! "* | "squash! "*)
+    exit 0
+    ;;
+esac
+
+# Conventional Commits の type 許可リスト
+types="feat|fix|docs|style|refactor|perf|test|build|chore|ci|revert"
+pattern="^(${types})(\([a-z0-9._/-]+\))?!?: .+"
+
+if ! printf '%s' "${header}" | grep -qE "${pattern}"; then
+  {
+    echo "[NG] commit message が Conventional Commits 形式ではありません。"
+    echo "     subject: ${header}"
+    echo ""
+    echo "     形式 : <type>(<scope>): <説明>   (scope は任意)"
+    echo "     type : ${types}"
+    echo "     例   : feat(aws): S3 バケット一覧タスクを追加"
+    echo "     例   : docs: README にセットアップ手順を追記"
+  } >&2
+  exit 1
+fi
+
+# subject の長さチェック (72 文字以内、マルチバイト対応)
+len="$(printf '%s' "${header}" | wc -m | tr -d '[:space:]')"
+if [[ "${len}" -gt 72 ]]; then
+  {
+    echo "[NG] subject が 72 文字を超えています (${len} 文字)。"
+    echo "     subject: ${header}"
+  } >&2
+  exit 1
+fi
+
+echo "[OK] commit message は Conventional Commits 形式です。"
+exit 0

@@ -28,3 +28,9 @@ done
 [tasks.tf]
 description = "terraform サンプルを実行 (例: mise run tf caller-identity plan)"
 run = "mise exec -- terraform -chdir=packages/aws/terraform/examples/{{arg(name='example')}} {{arg(name='command', var=true)}}"
+
+# --- git hooks ---
+
+[tasks.install-hooks]
+description = "git commit-msg フックを有効化 (core.hooksPath = tools/git-hooks)"
+run = "git config core.hooksPath tools/git-hooks"
