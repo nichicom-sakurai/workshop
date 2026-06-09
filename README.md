@@ -22,9 +22,10 @@ workshop/
 │   └── bootstrap.sh     # 全環境のセットアップスクリプト
 └── packages/            # プロジェクト群 (この配下が bootstrap / dev の対象)
     ├── aws/
-    ├── gc/
-    └── sample/
-        └── terraform/   # AWS caller identity を読む read-only Terraform サンプル
+    │   └── terraform/
+    │       └── examples/             # AWS 操作ごとの独立した Terraform サンプル
+    │           └── caller-identity/  # caller identity を読む read-only サンプル
+    └── gc/
 ```
 
 `packages/` 配下の各プロジェクトは `bun` のバージョンを root の `mise.toml` から継承します。特定プロジェクトだけ別ツール / バージョンが必要な場合は、そのフォルダに `mise.toml` を置くと差分だけ上書きできます。
@@ -62,17 +63,16 @@ eval "$(mise activate zsh)"
 | `bootstrap` (alias `bs`) | 全環境の依存セットアップ | `mise run bs` |
 
 ```bash
-mise run dev aws      # aws / gc / sample を個別実行
+mise run dev aws      # aws / gc を個別実行
 mise run dev:all      # まとめて実行
 mise tasks            # 登録済みタスク一覧
 ```
 
 ### Terraform サンプル
 
-`packages/sample/terraform/` に、AWS provider の認証と Terraform の基本操作を学ぶための read-only サンプルがあります。
-`aws_caller_identity` data source を読むだけなので、AWS リソースは作成・変更・削除しません。
+`packages/aws/terraform/examples/<operation>/` に、AWS 操作ごとの自己完結した Terraform サンプルを並べています。各サンプルは独立した root module で、`mise run tf <operation> <command>`（例: `mise run tf caller-identity plan`）で個別に実行できます。最初のサンプル `caller-identity` は `aws_caller_identity` を読むだけの read-only サンプル（AWS リソースは作成・変更・削除しません）です。
 
-手順は [`packages/sample/terraform/README.md`](./packages/sample/terraform/README.md) を参照してください。
+サンプル一覧と共通手順は [`packages/aws/terraform/README.md`](./packages/aws/terraform/README.md) を参照してください。
 
 ### AWS CLI
 

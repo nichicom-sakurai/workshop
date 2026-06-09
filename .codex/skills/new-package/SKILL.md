@@ -11,11 +11,11 @@ metadata:
 
 # new-package
 
-Scaffold a new project at `packages/<name>/` matching the repo convention (reference: `packages/aws/`).
+Scaffold a new project at `packages/<name>/` matching the repo convention (reference: `packages/gc/`).
 
 ## Steps
 
-1. Choose `<name>` (lowercase, no spaces, matching the `aws` / `gc` / `sample` style). Confirm `packages/<name>/` does not already exist.
+1. Choose `<name>` (lowercase, no spaces, matching the `aws` / `gc` style). Confirm `packages/<name>/` does not already exist.
 2. Create `packages/<name>/package.json`:
    ```json
    {

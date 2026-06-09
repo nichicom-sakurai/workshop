@@ -28,4 +28,4 @@ mise exec -- aws configure list-profiles   # 利用可能な profile 一覧
 ```
 
 > `aws sts get-caller-identity` は認証が通っているかの疎通確認に便利です。
-> `packages/sample/terraform/` の read-only Terraform サンプルと同じ認証情報で動作確認できます。
+> `packages/aws/terraform/examples/caller-identity/` の read-only Terraform サンプルと同じ認証情報で動作確認できます。

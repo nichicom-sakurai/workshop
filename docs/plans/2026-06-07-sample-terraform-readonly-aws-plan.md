@@ -1,11 +1,11 @@
 # Sample Terraform Read-only AWS Implementation Plan
 
-**Goal:** Add a read-only Terraform AWS sample under `packages/sample/terraform/`
+**Goal:** Add a read-only Terraform AWS sample under `packages/aws/terraform/`
 that teaches provider setup, authentication, state, plan/apply flow, and outputs
 without creating or changing AWS resources.
 
 **Architecture:** The sample is a small Terraform root module in
-`packages/sample/terraform/`. It uses the official AWS provider and only the
+`packages/aws/terraform/`. It uses the official AWS provider and only the
 read-only `aws_caller_identity` data source, then exposes identity values through
 outputs. Root docs and `.gitignore` are updated so the repository accurately
 describes the new Terraform sample and keeps local Terraform runtime files out
@@ -27,14 +27,14 @@ and low coordination overhead.
 
 **Files:**
 
-- Create: `packages/sample/terraform/terraform.tf`
-- Create: `packages/sample/terraform/providers.tf`
-- Create via command: `packages/sample/terraform/.terraform.lock.hcl`
+- Create: `packages/aws/terraform/terraform.tf`
+- Create: `packages/aws/terraform/providers.tf`
+- Create via command: `packages/aws/terraform/.terraform.lock.hcl`
 
 **Step 1: Write the failing check**
 
 ```bash
-test -f packages/sample/terraform/terraform.tf
+test -f packages/aws/terraform/terraform.tf
 ```
 
 **Step 2: Run check to verify it fails**
@@ -42,14 +42,14 @@ test -f packages/sample/terraform/terraform.tf
 Run:
 
 ```bash
-test -f packages/sample/terraform/terraform.tf
+test -f packages/aws/terraform/terraform.tf
 ```
 
-Expected: FAIL because `packages/sample/terraform/terraform.tf` does not exist.
+Expected: FAIL because `packages/aws/terraform/terraform.tf` does not exist.
 
 **Step 3: Write minimal implementation**
 
-Create `packages/sample/terraform/terraform.tf`:
+Create `packages/aws/terraform/terraform.tf`:
 
 ```hcl
 terraform {
@@ -64,7 +64,7 @@ terraform {
 }
 ```
 
-Create `packages/sample/terraform/providers.tf`:
+Create `packages/aws/terraform/providers.tf`:
 
 ```hcl
 provider "aws" {}
@@ -75,10 +75,10 @@ provider "aws" {}
 Run:
 
 ```bash
-mise exec -- terraform -chdir=packages/sample/terraform init
-mise exec -- terraform -chdir=packages/sample/terraform fmt -check
-mise exec -- terraform -chdir=packages/sample/terraform validate
-test -f packages/sample/terraform/.terraform.lock.hcl
+mise exec -- terraform -chdir=packages/aws/terraform init
+mise exec -- terraform -chdir=packages/aws/terraform fmt -check
+mise exec -- terraform -chdir=packages/aws/terraform validate
+test -f packages/aws/terraform/.terraform.lock.hcl
 ```
 
 Expected: PASS. `terraform init` creates `.terraform.lock.hcl`; `validate`
@@ -87,9 +87,9 @@ passes with only provider configuration.
 **Step 5: Commit**
 
 ```bash
-git add packages/sample/terraform/terraform.tf \
-  packages/sample/terraform/providers.tf \
-  packages/sample/terraform/.terraform.lock.hcl
+git add packages/aws/terraform/terraform.tf \
+  packages/aws/terraform/providers.tf \
+  packages/aws/terraform/.terraform.lock.hcl
 git commit -m "feat(sample): Terraform AWS provider 設定を追加"
 ```
 
@@ -99,13 +99,13 @@ git commit -m "feat(sample): Terraform AWS provider 設定を追加"
 
 **Files:**
 
-- Create: `packages/sample/terraform/main.tf`
-- Create: `packages/sample/terraform/outputs.tf`
+- Create: `packages/aws/terraform/main.tf`
+- Create: `packages/aws/terraform/outputs.tf`
 
 **Step 1: Write the failing check**
 
 ```bash
-test -f packages/sample/terraform/main.tf
+test -f packages/aws/terraform/main.tf
 ```
 
 **Step 2: Run check to verify it fails**
@@ -113,20 +113,20 @@ test -f packages/sample/terraform/main.tf
 Run:
 
 ```bash
-test -f packages/sample/terraform/main.tf
+test -f packages/aws/terraform/main.tf
 ```
 
-Expected: FAIL because `packages/sample/terraform/main.tf` does not exist.
+Expected: FAIL because `packages/aws/terraform/main.tf` does not exist.
 
 **Step 3: Write minimal implementation**
 
-Create `packages/sample/terraform/main.tf`:
+Create `packages/aws/terraform/main.tf`:
 
 ```hcl
 data "aws_caller_identity" "current" {}
 ```
 
-Create `packages/sample/terraform/outputs.tf`:
+Create `packages/aws/terraform/outputs.tf`:
 
 ```hcl
 output "account_id" {
@@ -150,8 +150,8 @@ output "caller_user_id" {
 Run:
 
 ```bash
-mise exec -- terraform -chdir=packages/sample/terraform fmt -check
-mise exec -- terraform -chdir=packages/sample/terraform validate
+mise exec -- terraform -chdir=packages/aws/terraform fmt -check
+mise exec -- terraform -chdir=packages/aws/terraform validate
 ```
 
 Expected: PASS.
@@ -159,8 +159,8 @@ Expected: PASS.
 If valid AWS credentials and region are available, also run:
 
 ```bash
-mise exec -- terraform -chdir=packages/sample/terraform plan
-mise exec -- terraform -chdir=packages/sample/terraform apply
+mise exec -- terraform -chdir=packages/aws/terraform plan
+mise exec -- terraform -chdir=packages/aws/terraform apply
 ```
 
 Expected: PASS. `apply` prints `account_id`, `caller_arn`, and
@@ -172,8 +172,8 @@ continue with the successful `fmt` and `validate` evidence.
 **Step 5: Commit**
 
 ```bash
-git add packages/sample/terraform/main.tf \
-  packages/sample/terraform/outputs.tf
+git add packages/aws/terraform/main.tf \
+  packages/aws/terraform/outputs.tf
 git commit -m "feat(sample): AWS caller identity サンプルを追加"
 ```
 
@@ -183,12 +183,12 @@ git commit -m "feat(sample): AWS caller identity サンプルを追加"
 
 **Files:**
 
-- Create: `packages/sample/terraform/README.md`
+- Create: `packages/aws/terraform/README.md`
 
 **Step 1: Write the failing check**
 
 ```bash
-test -f packages/sample/terraform/README.md
+test -f packages/aws/terraform/README.md
 ```
 
 **Step 2: Run check to verify it fails**
@@ -196,14 +196,14 @@ test -f packages/sample/terraform/README.md
 Run:
 
 ```bash
-test -f packages/sample/terraform/README.md
+test -f packages/aws/terraform/README.md
 ```
 
-Expected: FAIL because `packages/sample/terraform/README.md` does not exist.
+Expected: FAIL because `packages/aws/terraform/README.md` does not exist.
 
 **Step 3: Write minimal implementation**
 
-Create `packages/sample/terraform/README.md`:
+Create `packages/aws/terraform/README.md`:
 
 ````markdown
 # sample Terraform AWS read-only example
@@ -237,11 +237,11 @@ export AWS_REGION=ap-northeast-1
 ## 使い方
 
 ```bash
-mise exec -- terraform -chdir=packages/sample/terraform init
-mise exec -- terraform -chdir=packages/sample/terraform fmt -check
-mise exec -- terraform -chdir=packages/sample/terraform validate
-mise exec -- terraform -chdir=packages/sample/terraform plan
-mise exec -- terraform -chdir=packages/sample/terraform apply
+mise exec -- terraform -chdir=packages/aws/terraform init
+mise exec -- terraform -chdir=packages/aws/terraform fmt -check
+mise exec -- terraform -chdir=packages/aws/terraform validate
+mise exec -- terraform -chdir=packages/aws/terraform plan
+mise exec -- terraform -chdir=packages/aws/terraform apply
 ```
 
 `apply` が成功すると、現在の認証情報に対応する AWS account ID、caller ARN、user ID が output として表示されます。
@@ -261,7 +261,7 @@ Run:
 
 ```bash
 rg "aws_caller_identity|AWS リソースは作成|terraform apply|\\.terraform.lock.hcl" \
-  packages/sample/terraform/README.md
+  packages/aws/terraform/README.md
 ```
 
 Expected: PASS with matches for all required explanations.
@@ -269,7 +269,7 @@ Expected: PASS with matches for all required explanations.
 **Step 5: Commit**
 
 ```bash
-git add packages/sample/terraform/README.md
+git add packages/aws/terraform/README.md
 git commit -m "docs(sample): Terraform 学習手順を追加"
 ```
 
@@ -322,8 +322,8 @@ rg '^\\.terraform/$|^terraform\\.tfstate$|^terraform\\.tfstate\\.\\*$|^\\*\\.tfv
 if rg '^\\.terraform\\.lock\\.hcl$' .gitignore; then
   exit 1
 fi
-git check-ignore packages/sample/terraform/.terraform/providers || true
-git check-ignore packages/sample/terraform/terraform.tfstate
+git check-ignore packages/aws/terraform/.terraform/providers || true
+git check-ignore packages/aws/terraform/terraform.tfstate
 ```
 
 Expected: PASS. The runtime files are ignored and `.terraform.lock.hcl` is not
@@ -365,16 +365,16 @@ Expected: PASS with stale wording found, which confirms docs need updating.
 
 Modify `README.md`:
 
-- In the directory or usage section, mention that `packages/sample/terraform/`
+- In the directory or usage section, mention that `packages/aws/terraform/`
   contains the first Terraform AWS read-only sample.
-- Link to `packages/sample/terraform/README.md`.
+- Link to `packages/aws/terraform/README.md`.
 - State that it reads caller identity and does not create AWS resources.
 
 Modify `AGENTS.md`:
 
 - Update the skeleton-stage wording so it no longer claims there are no `.tf`
   files or that Terraform is unused.
-- Add a brief note that `packages/sample/terraform/` is a read-only AWS caller
+- Add a brief note that `packages/aws/terraform/` is a read-only AWS caller
   identity sample.
 - Keep the warning that no test runner / typechecker is configured.
 - Keep AI-facing instructions in English.
@@ -384,7 +384,7 @@ Modify `AGENTS.md`:
 Run:
 
 ```bash
-rg "packages/sample/terraform|caller identity|read-only|Terraform" README.md AGENTS.md
+rg "packages/aws/terraform|caller identity|read-only|Terraform" README.md AGENTS.md
 if rg 'terraform is unused|no `\\.tf` files|no real cloud / IaC code exists' AGENTS.md; then
   exit 1
 fi
@@ -407,18 +407,18 @@ git commit -m "docs: Terraform サンプルの案内を更新"
 After all tasks are complete, run:
 
 ```bash
-mise exec -- terraform -chdir=packages/sample/terraform fmt -check
-mise exec -- terraform -chdir=packages/sample/terraform validate
-rg "aws_caller_identity|caller_arn|caller_user_id" packages/sample/terraform
-rg "packages/sample/terraform|caller identity|read-only|Terraform" README.md AGENTS.md
+mise exec -- terraform -chdir=packages/aws/terraform fmt -check
+mise exec -- terraform -chdir=packages/aws/terraform validate
+rg "aws_caller_identity|caller_arn|caller_user_id" packages/aws/terraform
+rg "packages/aws/terraform|caller identity|read-only|Terraform" README.md AGENTS.md
 git status --short
 ```
 
 If valid AWS credentials and region are available, also run:
 
 ```bash
-mise exec -- terraform -chdir=packages/sample/terraform plan
-mise exec -- terraform -chdir=packages/sample/terraform apply
+mise exec -- terraform -chdir=packages/aws/terraform plan
+mise exec -- terraform -chdir=packages/aws/terraform apply
 ```
 
 Expected final state:
