@@ -1,18 +1,18 @@
 resource "google_storage_bucket" "learning" {
-  # project is intentionally omitted: it inherits the provider's `project`
-  # ("nck-sakurai"), keeping the project identity defined in exactly one place.
+  # project は意図的に省略しています。provider の `project`（"nck-sakurai"）を
+  # 継承させ、プロジェクトの指定を1か所だけに保つためです。
   name     = var.bucket_name
   location = var.location
 
-  # Private-by-default posture for a learning bucket:
-  # - uniform_bucket_level_access disables per-object ACLs (IAM-only access).
-  # - public_access_prevention = "enforced" blocks any public access.
+  # 学習用 bucket の private-by-default 設定:
+  # - uniform_bucket_level_access は per-object ACL を無効化し、IAM のみでアクセス制御します。
+  # - public_access_prevention = "enforced" は公開アクセスを一切ブロックします。
   uniform_bucket_level_access = true
   public_access_prevention    = "enforced"
 
-  # force_destroy = false (the provider default, set explicitly for clarity)
-  # means `terraform destroy` fails if the bucket still contains objects. The
-  # first bucket sample uploads no objects, so destroy is safe; a failed destroy
-  # on a non-empty bucket is a useful safety lesson rather than silent deletion.
+  # force_destroy = false（provider の default を明示）は、bucket 内にオブジェクトが
+  # 残っていると `terraform destroy` を失敗させます。最初の bucket サンプルはオブジェクトを
+  # 置かないため destroy は安全で、空でない bucket の destroy 失敗は「黙って削除される」
+  # よりも有用な安全装置として学べます。
   force_destroy = false
 }
