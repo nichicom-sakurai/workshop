@@ -1,4 +1,4 @@
-# packages/sample Terraform read-only AWS sample design
+# packages/aws Terraform read-only AWS sample design
 
 Date: 2026-06-07
 Issue URL: none
@@ -8,7 +8,7 @@ Issue URL: none
 `workshop` is a cloud / IaC learning monorepo. Tools are pinned in
 `mise.toml`, and Terraform is already available through `mise`.
 
-`packages/sample` is currently a minimal Bun package with:
+`packages/aws` is currently a minimal Bun package with:
 
 - `package.json`
 - `index.ts`
@@ -40,7 +40,7 @@ Never:
 
 Always:
 
-- Put Terraform files under `packages/sample/terraform/`.
+- Put Terraform files under `packages/aws/terraform/`.
 - Keep the sample read-only by using `data "aws_caller_identity" "current" {}`.
 - Pin the AWS provider with an explicit version constraint instead of `latest`.
 - Document that `.terraform/` and `terraform.tfstate*` are local runtime files,
@@ -59,20 +59,20 @@ Selected approach: Read-only Caller Identity Sample.
 
 Terraform root module:
 
-- `packages/sample/terraform/terraform.tf`
+- `packages/aws/terraform/terraform.tf`
   - Defines `required_version`.
   - Defines `required_providers.aws` with `source = "hashicorp/aws"` and an
     explicit version constraint.
-- `packages/sample/terraform/providers.tf`
+- `packages/aws/terraform/providers.tf`
   - Defines `provider "aws" {}`.
   - Allows credentials and region to come from normal AWS provider inputs such
     as `AWS_PROFILE`, `AWS_REGION`, `AWS_ACCESS_KEY_ID`, and
     `AWS_SECRET_ACCESS_KEY`.
-- `packages/sample/terraform/main.tf`
+- `packages/aws/terraform/main.tf`
   - Defines `data "aws_caller_identity" "current" {}` only.
-- `packages/sample/terraform/outputs.tf`
+- `packages/aws/terraform/outputs.tf`
   - Outputs account ID, caller ARN, and user ID from the data source.
-- `packages/sample/terraform/README.md`
+- `packages/aws/terraform/README.md`
   - Explains prerequisites, authentication options, and the command flow:
     `init`, `fmt`, `validate`, `plan`, `apply`, and local cleanup.
   - States that `apply` reads AWS identity data but does not create AWS
@@ -94,7 +94,7 @@ Repository documentation:
 
 ## Acceptance Criteria
 
-Given a user opens `packages/sample/terraform/README.md`, when they follow the
+Given a user opens `packages/aws/terraform/README.md`, when they follow the
 commands with valid AWS credentials, then they can run `terraform init`,
 `terraform validate`, `terraform plan`, and `terraform apply` from the sample
 directory.
@@ -119,7 +119,7 @@ that no `.tf` files exist.
   - Rationale: Best fit for first AWS/Terraform lesson because it validates
     provider configuration and authentication without AWS mutation risk.
   - Confidence: 88%.
-- Place Terraform under `packages/sample/terraform/`.
+- Place Terraform under `packages/aws/terraform/`.
   - Rationale: Keeps the existing Bun sample and the IaC sample separate while
     staying inside the requested package.
   - Confidence: 84%.
