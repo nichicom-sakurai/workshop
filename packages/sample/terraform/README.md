@@ -29,10 +29,19 @@ export AWS_REGION=ap-northeast-1
 ## 使い方
 
 ```bash
+# provider plugin を取得し作業ディレクトリを初期化 (最初に一度)
 mise exec -- terraform -chdir=packages/sample/terraform init
+
+# .tf の整形ズレを検出 (書き換えず差分の有無のみ確認)
 mise exec -- terraform -chdir=packages/sample/terraform fmt -check
+
+# 構文・設定の整合性を静的チェック
 mise exec -- terraform -chdir=packages/sample/terraform validate
+
+# 実行計画を表示 (read-only サンプルなので変更は発生しない)
 mise exec -- terraform -chdir=packages/sample/terraform plan
+
+# 計画を適用し output (account ID / ARN / user ID) を表示
 mise exec -- terraform -chdir=packages/sample/terraform apply
 ```
 
