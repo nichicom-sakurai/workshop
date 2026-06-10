@@ -1,5 +1,5 @@
 variable "artifact_zip_path" {
-  description = "Path to the AgentCore Runtime direct code deployment ZIP artifact. Build it with packages/aws/apps/agentcore-strands-basic/scripts/package.sh before running plan/apply."
+  description = "AgentCore Runtime の direct code deployment ZIP artifact への、この root module ディレクトリからの相対 path (main.tf で path.module 起点に解決します)。plan / apply の前に packages/aws/apps/agentcore-strands-basic/scripts/package.sh で作成してください。"
   type        = string
 
   validation {
@@ -9,7 +9,7 @@ variable "artifact_zip_path" {
 }
 
 variable "model_id" {
-  description = "Amazon Bedrock model ID used by the Strands agent. Set this in local terraform.tfvars; do not commit real values."
+  description = "Strands agent が使う Amazon Bedrock model ID。ローカルの terraform.tfvars に設定し、実際の値は commit しないでください。"
   type        = string
   sensitive   = true
 
@@ -20,7 +20,7 @@ variable "model_id" {
 }
 
 variable "name_prefix" {
-  description = "Lowercase prefix used for AgentCore Runtime, IAM, and S3 names."
+  description = "AgentCore Runtime / IAM / S3 の名前に使う小文字の prefix。"
   type        = string
   default     = "agentcore-basic"
 
@@ -31,7 +31,7 @@ variable "name_prefix" {
 }
 
 variable "bedrock_model_resource_arns" {
-  description = "Bedrock model resource ARNs that the runtime role can invoke. The default wildcard keeps the learning sample portable; narrow it for production."
+  description = "runtime role が invoke できる Bedrock model resource ARN (Amazon Resource Name)。default の wildcard は学習サンプルの portability のためで、production では絞り込んでください。"
   type        = list(string)
   default     = ["*"]
 
@@ -42,7 +42,7 @@ variable "bedrock_model_resource_arns" {
 }
 
 variable "tags" {
-  description = "Tags applied to resources created by this learning sample."
+  description = "この学習サンプルが作成するリソースに付与する tag。"
   type        = map(string)
   default = {
     Project   = "workshop"

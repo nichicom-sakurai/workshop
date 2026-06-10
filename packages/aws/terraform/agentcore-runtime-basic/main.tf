@@ -6,7 +6,12 @@ data "aws_region" "current" {}
 
 locals {
   artifact_bucket_name = "${var.name_prefix}-${data.aws_caller_identity.current.account_id}-${data.aws_region.current.region}"
-  artifact_key         = "agentcore-runtime/${filesha256(var.artifact_zip_path)}.zip"
+  # artifact_zip_path は root module ディレクトリからの相対 path。terraform -chdir で
+  # root module へ移動するため、file 系関数の相対 path も root module 基準で解決されます。
+  # path.module 起点で組み立てることで、-chdir やカレントディレクトリに依存しません
+  # (s3-object-upload と同じ path.module パターン)。
+  artifact_zip_file = "${path.module}/${var.artifact_zip_path}"
+  artifact_key      = "agentcore-runtime/${filesha256(local.artifact_zip_file)}.zip"
   runtime_env = {
     AWS_DEFAULT_REGION = data.aws_region.current.region
     BEDROCK_MODEL_ID   = var.model_id
@@ -39,10 +44,10 @@ resource "aws_s3_bucket_public_access_block" "artifact" {
 resource "aws_s3_object" "artifact" {
   bucket = aws_s3_bucket.artifact.id
   key    = local.artifact_key
-  source = var.artifact_zip_path
+  source = local.artifact_zip_file
 
   content_type = "application/zip"
-  etag         = filemd5(var.artifact_zip_path)
+  etag         = filemd5(local.artifact_zip_file)
   tags         = var.tags
 }
 

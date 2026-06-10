@@ -1,12 +1,23 @@
-# Copy this file to terraform.tfvars and replace the placeholder values.
-# terraform.tfvars is ignored by git.
+# このファイルを terraform.tfvars に copy し、placeholder の値を置き換えてください。
+# terraform.tfvars は git で無視されます。
 
-artifact_zip_path = "packages/aws/apps/agentcore-strands-basic/dist/agentcore-strands-basic.zip"
-model_id          = "REPLACE_WITH_BEDROCK_MODEL_ID"
+# artifact_zip_path はこの root module ディレクトリからの相対 path です
+# (terraform -chdir で root module へ移動するため)。既定値は package.sh の出力先を指します。
+artifact_zip_path = "../../apps/agentcore-strands-basic/dist/agentcore-strands-basic.zip"
 
-# Optional: change the resource name prefix if it collides in your account.
+# model_id の調べ方（例は東京リージョン ap-northeast-1）:
+#   1. 使う region で利用可能なモデル ID を一覧する（最も確実）
+#      aws bedrock list-foundation-models --region ap-northeast-1 --query "modelSummaries[].modelId" --output table
+#   2. 新しめのモデルは cross-region inference profile ID が必要なことが多い（例: apac.anthropic.claude-...）
+#      aws bedrock list-inference-profiles --region ap-northeast-1 --query "inferenceProfileSummaries[].inferenceProfileId" --output table
+#   3. console (Bedrock → Model catalog) や AWS docs でも ID を確認できる
+# 前提: Bedrock → Model access で、使うモデルへの model access を region ごとに有効化しておくこと。
+# 形式例: オンデマンド "anthropic.claude-opus-4-8" / inference profile "apac.anthropic.claude-opus-4-8"
+model_id = "REPLACE_WITH_BEDROCK_MODEL_ID"
+
+# 任意: account 内で名前が衝突する場合は resource 名の prefix を変更してください。
 # name_prefix = "agentcore-basic"
 
-# Optional: narrow this to specific Bedrock model ARNs for a stricter IAM policy.
-# The default wildcard is portable for a learning sample, not a production baseline.
+# 任意: より厳格な IAM policy にするため、特定の Bedrock model ARN (Amazon Resource Name) へ絞り込めます。
+# default の wildcard は学習サンプル向けに portable で、production の baseline ではありません。
 # bedrock_model_resource_arns = ["*"]
