@@ -12,7 +12,7 @@ bucket 自体はこの sample の管理対象ではないため削除しませ�
 ## 削除対象を確認する
 
 ```bash
-mise run tf s3-object-upload state list
+mise exec -- terraform -chdir=packages/aws/terraform/s3-object-upload state list
 ```
 
 `aws_s3_object.hello` が表示されれば、この sample の object が Terraform 管理下にあります。
@@ -20,7 +20,7 @@ mise run tf s3-object-upload state list
 ## 削除計画を確認する
 
 ```bash
-mise run tf s3-object-upload plan -destroy
+mise exec -- terraform -chdir=packages/aws/terraform/s3-object-upload plan -destroy
 ```
 
 `Plan: 0 to add, 0 to change, 1 to destroy.` のように、削除対象が object だけであることを確認します。
@@ -28,7 +28,7 @@ mise run tf s3-object-upload plan -destroy
 ## object を削除する
 
 ```bash
-mise run tf s3-object-upload destroy
+mise exec -- terraform -chdir=packages/aws/terraform/s3-object-upload destroy
 ```
 
 Terraform が確認プロンプトを出すため、plan の内容に問題がなければ `yes` と入力します。
@@ -39,7 +39,7 @@ Terraform が確認プロンプトを出すため、plan の内容に問題が�
 state に管理対象が残っていないことを確認します。
 
 ```bash
-mise run tf s3-object-upload state list
+mise exec -- terraform -chdir=packages/aws/terraform/s3-object-upload state list
 ```
 
 削除が完了していれば、`aws_s3_object.hello` は表示されません。

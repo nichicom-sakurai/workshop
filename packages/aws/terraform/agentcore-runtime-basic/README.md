@@ -29,8 +29,9 @@ packages/aws/apps/agentcore-strands-basic/scripts/package.sh
 packages/aws/apps/agentcore-strands-basic/dist/agentcore-strands-basic.zip
 ```
 
-Terraform はこの ZIP を `artifact_zip_path` で受け取り、apply 時に S3 へ upload します。
-Terraform の `apply` 中に Python dependency 解決は行いません。
+Terraform はこの ZIP を `artifact_zip_path`（この root module ディレクトリからの相対 path）で
+受け取り、apply 時に S3 へ upload します。`terraform.tfvars.template` の既定値が上記の出力先を
+指しているため、通常はそのまま利用できます。Terraform の `apply` 中に Python dependency 解決は行いません。
 
 ## 2. 変数を設定
 
@@ -44,7 +45,7 @@ cp packages/aws/terraform/agentcore-runtime-basic/terraform.tfvars.template \
 
 | 変数 | 必須 | default | 内容 |
 | --- | --- | --- | --- |
-| `artifact_zip_path` | ○ | （なし） | package script で作成した ZIP artifact path |
+| `artifact_zip_path` | ○ | （なし） | package script で作成した ZIP artifact path（この root module からの相対。template の既定値が出力先を指す） |
 | `model_id` | ○ | （なし） | Strands agent が使う Amazon Bedrock model ID |
 | `name_prefix` | | `agentcore-basic` | S3 / IAM / AgentCore の名前に使う prefix |
 | `bedrock_model_resource_arns` | | `["*"]` | runtime role に許可する Bedrock model resource ARN |
@@ -56,11 +57,11 @@ production では利用する model ARN へ絞ってください。
 ## 3. Terraform を実行
 
 ```bash
-mise run tf agentcore-runtime-basic init
-mise run tf agentcore-runtime-basic fmt -check
-mise run tf agentcore-runtime-basic validate
-mise run tf agentcore-runtime-basic plan
-mise run tf agentcore-runtime-basic apply
+mise exec -- terraform -chdir=packages/aws/terraform/agentcore-runtime-basic init
+mise exec -- terraform -chdir=packages/aws/terraform/agentcore-runtime-basic fmt -check
+mise exec -- terraform -chdir=packages/aws/terraform/agentcore-runtime-basic validate
+mise exec -- terraform -chdir=packages/aws/terraform/agentcore-runtime-basic plan
+mise exec -- terraform -chdir=packages/aws/terraform/agentcore-runtime-basic apply
 ```
 
 ## 4. Invoke
@@ -68,7 +69,7 @@ mise run tf agentcore-runtime-basic apply
 `apply` 後に `invoke_command` output を確認できます。
 
 ```bash
-mise run tf agentcore-runtime-basic output -raw invoke_command
+mise exec -- terraform -chdir=packages/aws/terraform/agentcore-runtime-basic output -raw invoke_command
 ```
 
 手動で実行する場合:

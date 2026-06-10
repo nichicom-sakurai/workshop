@@ -60,23 +60,18 @@ export AWS_REGION=ap-northeast-1
 
 `<example>` を実際のサンプル名（例: `caller-identity`）に置き換えて実行します。
 
-mise ラッパータスク（推奨・短い記法）:
+terraform を直接呼び出します（`-chdir` で対象サンプルを指定）。
 
 ```bash
-mise run tf <example> init        # provider plugin を取得し作業ディレクトリを初期化 (最初に一度)
-mise run tf <example> fmt -check  # .tf の整形ズレを検出 (書き換えず差分の有無のみ確認)
-mise run tf <example> validate    # 構文・設定の整合性を静的チェック
-mise run tf <example> plan        # 実行計画を表示
-mise run tf <example> apply       # 計画を適用し output を表示
-mise run tf <example> destroy     # mutating サンプルで作成したリソースを削除
+mise exec -- terraform -chdir=packages/aws/terraform/<example> init        # provider plugin を取得し作業ディレクトリを初期化 (最初に一度)
+mise exec -- terraform -chdir=packages/aws/terraform/<example> fmt -check  # .tf の整形ズレを検出 (書き換えず差分の有無のみ確認)
+mise exec -- terraform -chdir=packages/aws/terraform/<example> validate    # 構文・設定の整合性を静的チェック
+mise exec -- terraform -chdir=packages/aws/terraform/<example> plan        # 実行計画を表示
+mise exec -- terraform -chdir=packages/aws/terraform/<example> apply       # 計画を適用し output を表示
+mise exec -- terraform -chdir=packages/aws/terraform/<example> destroy     # mutating サンプルで作成したリソースを削除
 ```
 
-terraform を直接呼ぶ場合（同義）:
-
-```bash
-mise exec -- terraform -chdir=packages/aws/terraform/<example> init
-mise exec -- terraform -chdir=packages/aws/terraform/<example> plan
-```
+短縮形として `mise run tf <example> <command>`（例: `mise run tf caller-identity plan`）も同義で使えます。
 
 ## 各サンプルが生成するファイル
 
