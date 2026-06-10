@@ -171,11 +171,27 @@ describe("toWorkloadEstimateUsage", () => {
     ).toThrow(AdapterError);
   });
 
-  test("API 制約超過（operation > 32 文字）の usageType/operation を弾く", () => {
+  test("API 制約超過（operation > 32 文字）を弾く", () => {
     const bad = webCatalog();
     bad.services[0]!.usages[0]!.operation = "x".repeat(33);
     expect(() =>
       toWorkloadEstimateUsage([bad], { usageAccountId: PLACEHOLDER_ACCOUNT_ID }),
     ).toThrow(/operation/);
+  });
+
+  test("API 制約超過（serviceCode > 32 文字）を弾く", () => {
+    const bad = webCatalog();
+    bad.services[0]!.service_code = "x".repeat(33);
+    expect(() =>
+      toWorkloadEstimateUsage([bad], { usageAccountId: PLACEHOLDER_ACCOUNT_ID }),
+    ).toThrow(/serviceCode/);
+  });
+
+  test("API 制約超過（region prefix 適用後の usageType > 128 文字）を弾く", () => {
+    const bad = webCatalog(); // region ap-northeast-1 → APN1- prefix が付く
+    bad.services[0]!.usages[0]!.usage_type = "x".repeat(128);
+    expect(() =>
+      toWorkloadEstimateUsage([bad], { usageAccountId: PLACEHOLDER_ACCOUNT_ID }),
+    ).toThrow(/usageType/);
   });
 });
