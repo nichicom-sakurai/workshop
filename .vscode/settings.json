@@ -1,4 +1,10 @@
 {
+  "python-envs.pythonProjects": [
+    {
+      "path": "packages/aws/apps/agentcore-strands-basic",
+      "envManager": "ms-python.python:venv"
+    }
+  ],
   "cSpell.customDictionaries": {
     "app-words": {
       "name": "app-words",

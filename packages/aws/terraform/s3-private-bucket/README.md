@@ -25,7 +25,7 @@ bucket 名は S3 全体で一意である必要があります。このサンプ
 bucket 名が衝突した場合は、local な `.tfvars` を作るか `-var` で `bucket_prefix` を変えてください。`.tfvars` は gitignore 対象で、commit しません。
 
 ```bash
-mise run tf s3-private-bucket plan -var='bucket_prefix=nck-sakurai-tf-learn-01'
+mise exec -- terraform -chdir=packages/aws/terraform/s3-private-bucket plan -var='bucket_prefix=nck-sakurai-tf-learn-01'
 ```
 
 ## このサンプルが作る bucket
@@ -48,13 +48,13 @@ public access block の設定:
 ## 操作の流れ
 
 ```bash
-mise run tf s3-private-bucket init
-mise run tf s3-private-bucket fmt -check
-mise run tf s3-private-bucket validate
-mise run tf s3-private-bucket plan      # 作成内容を確認
-mise run tf s3-private-bucket apply     # bucket を1つ作成
-mise run tf s3-private-bucket state list # state 上のリソースを確認
-mise run tf s3-private-bucket destroy   # 学習後に削除
+mise exec -- terraform -chdir=packages/aws/terraform/s3-private-bucket init
+mise exec -- terraform -chdir=packages/aws/terraform/s3-private-bucket fmt -check
+mise exec -- terraform -chdir=packages/aws/terraform/s3-private-bucket validate
+mise exec -- terraform -chdir=packages/aws/terraform/s3-private-bucket plan      # 作成内容を確認
+mise exec -- terraform -chdir=packages/aws/terraform/s3-private-bucket apply     # bucket を1つ作成
+mise exec -- terraform -chdir=packages/aws/terraform/s3-private-bucket state list # state 上のリソースを確認
+mise exec -- terraform -chdir=packages/aws/terraform/s3-private-bucket destroy   # 学習後に削除
 ```
 
 ## object を追加する（発展）
@@ -77,13 +77,13 @@ bucket に object を追加する発展サンプルは [s3-object-upload](../s3-
 削除前に destroy plan を確認します。
 
 ```bash
-mise run tf s3-private-bucket plan -destroy
+mise exec -- terraform -chdir=packages/aws/terraform/s3-private-bucket plan -destroy
 ```
 
 確認後、同じ root module / state で `destroy` します。
 
 ```bash
-mise run tf s3-private-bucket destroy
+mise exec -- terraform -chdir=packages/aws/terraform/s3-private-bucket destroy
 ```
 
 このサンプルは object を作成しません。[s3-object-upload](../s3-object-upload/) を実行した場合は、bucket を削除する前にその sample の [`cleanup.md`](../s3-object-upload/cleanup.md) で object を削除してください。

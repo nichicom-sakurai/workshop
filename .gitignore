@@ -11,6 +11,17 @@ terraform.tfstate.*
 *.tfvars
 *.tfvars.json
 
+# Python local runtime files
+.venv/
+__pycache__/
+*.py[cod]
+.pytest_cache/
+
+# AgentCore direct deployment build artifacts
+packages/aws/apps/*/.build/
+packages/aws/apps/*/dist/
+*.zip
+
 # Bun lockfiles: committed once a package gains a dependency (e.g. cloud-run-rest's
 # @types/bun) so installs are repeatable; skeleton packages have none, so none to commit.
 

@@ -10,6 +10,8 @@
 | [bun](https://bun.sh/) | JavaScript / TypeScript ランタイム | mise 管理 |
 | [terraform](https://developer.hashicorp.com/terraform) | IaC | mise 管理 |
 | [aws-cli](https://docs.aws.amazon.com/cli/) | AWS 操作 CLI（[基本コマンド](./docs/guides/aws-cli/README.md)） | mise 管理 |
+| [python](https://www.python.org/) | AgentCore Runtime direct code deployment 用 app | mise 管理 |
+| [uv](https://docs.astral.sh/uv/) | Python 依存 lock / package 生成 | mise 管理 |
 
 > バージョンは [`mise.toml`](./mise.toml) で固定管理しています（README には転記しません）。
 
@@ -23,9 +25,12 @@ workshop/
 │   └── git-hooks/       # git フック (commit-msg: Conventional Commits 検証)
 └── packages/            # プロジェクト群 (この配下が bootstrap の対象。dev / dev:all は直下のプロジェクトのみ)
     ├── aws/
+    │   ├── apps/
+    │   │   └── agentcore-strands-basic/   # AgentCore Runtime に deploy する Python + Strands Agents app
     │   ├── cost-estimator/           # 見積もり専用 catalog + bcm-pricing-calculator API adapter
     │   └── terraform/
     │       ├── README.md             # サンプル一覧と共通手順
+    │       ├── agentcore-runtime-basic/  # AgentCore Runtime + Strands Agents app を deploy する mutating サンプル
     │       ├── caller-identity/      # AWS 操作ごとの独立した read-only サンプル (caller identity を読む)
     │       ├── s3-private-bucket/    # private S3 bucket を作成し destroy まで学ぶ mutating サンプル
     │       └── s3-object-upload/     # 既存 S3 bucket に object を upload する mutating サンプル
@@ -92,6 +97,8 @@ mise tasks            # 登録済みタスク一覧
 - [AWS CLI 基本コマンド](./docs/guides/aws-cli/README.md)
 - [AWS CLI 認証情報の設定](./docs/guides/aws-cli-credentials/README.md)
 - [IAM ユーザー作成とアクセスキー取得手順](./docs/guides/aws-iam-user-creation/README.md)
+- [AWS 課金・コストの確認](./docs/guides/aws-billing/README.md)
+- [AgentCore Runtime sample が作る AWS リソース](./docs/guides/agentcore-runtime-resources/README.md)
 - [gcloud CLI 基本コマンド](./docs/guides/gcloud-cli/README.md)
 
 ## プロジェクトの追加

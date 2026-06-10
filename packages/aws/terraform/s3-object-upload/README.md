@@ -38,12 +38,12 @@ bucket 自体はこのサンプルでは削除しません。bucket を削除す
 ## 操作の流れ
 
 ```bash
-mise run tf s3-object-upload init
-mise run tf s3-object-upload fmt -check
-mise run tf s3-object-upload validate
-mise run tf s3-object-upload plan      # upload する object を確認
-mise run tf s3-object-upload apply     # object を1つ作成
-mise run tf s3-object-upload state list # state 上の object を確認
+mise exec -- terraform -chdir=packages/aws/terraform/s3-object-upload init
+mise exec -- terraform -chdir=packages/aws/terraform/s3-object-upload fmt -check
+mise exec -- terraform -chdir=packages/aws/terraform/s3-object-upload validate
+mise exec -- terraform -chdir=packages/aws/terraform/s3-object-upload plan      # upload する object を確認
+mise exec -- terraform -chdir=packages/aws/terraform/s3-object-upload apply     # object を1つ作成
+mise exec -- terraform -chdir=packages/aws/terraform/s3-object-upload state list # state 上の object を確認
 ```
 
 学習後は [`cleanup.md`](./cleanup.md) の手順で object を削除します。
@@ -63,8 +63,8 @@ mise run tf s3-object-upload state list # state 上の object を確認
 bucket を削除する前に、この sample の object を削除します。
 
 ```bash
-mise run tf s3-object-upload plan -destroy
-mise run tf s3-object-upload destroy
+mise exec -- terraform -chdir=packages/aws/terraform/s3-object-upload plan -destroy
+mise exec -- terraform -chdir=packages/aws/terraform/s3-object-upload destroy
 ```
 
 その後、bucket が空になった状態で [s3-private-bucket の cleanup](../s3-private-bucket/) を実行します。

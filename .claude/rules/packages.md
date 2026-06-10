@@ -16,3 +16,13 @@ Each project under `packages/<name>/` is an independent, private package — the
 - `bun` is mise-managed and not on PATH; call it as `mise exec -- bun ...` (mise tasks already wrap it).
 - No repo-wide test / lint / typecheck task is configured yet (though `cloud-run-rest` can be type-checked with `bunx tsc --noEmit`). If you add a repo-wide one, wire it into `package.json` scripts, `mise.toml` tasks, and `AGENTS.md` together.
 - Add a project-local `mise.toml` only when the package needs a tool/version different from root; then run `mise trust`.
+
+## Python nested apps
+
+Some nested apps are Python instead of Bun (first: `packages/aws/apps/agentcore-strands-basic/`). Keep them self-contained and provider-scoped — a future Google Cloud Python app belongs at `packages/gc/apps/<app>/`, mirroring the AWS one.
+
+- Each Python app owns its own `pyproject.toml` + `uv.lock` + `.venv/` (managed by [uv](https://docs.astral.sh/uv/)); `.venv/` is gitignored. Pin exact dependency versions (`==`), per the repo-wide version-pinning rule.
+- **Name the virtualenv `.venv`** (not `venv` or a custom name). The VS Code Python Environments extension auto-discovers `./**/.venv`, so a correctly-named venv is found without any per-project interpreter path.
+- Register each Python app in the committed `.vscode/settings.json` under `python-envs.pythonProjects` (`{ "path": "...", "envManager": "ms-python.python:venv" }`). This is portable — it stores a relative path + env-manager type, never a machine-specific interpreter path. Do **not** add per-project `python.defaultInterpreterPath` lines: that setting takes a single path and does not scale to multiple Python apps.
+- Pylance resolves one interpreter per workspace folder, so in this single-root workspace only one Python app's imports resolve at a time — fine when working on one app. If you ever need several Python apps resolved simultaneously, switch to a multi-root `.code-workspace` (one folder per app); defer that until actually needed.
+- Not picked up by `dev:all`; bootstrap's recursive `find` runs in them but `bun install` is a no-op (no `package.json`). Build / test via uv — see the app's README.
