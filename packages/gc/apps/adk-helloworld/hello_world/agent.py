@@ -13,9 +13,12 @@ ADK の約束ごと（重要・忘れないように）:
     `.env` に書いた環境変数で切り替わる（コードは共通）。
 """
 
-# google.adk.agents.Agent: 「LLM を使うエージェント」の本体クラス。
+# Agent: 「LLM を使うエージェント」の本体クラス（実体は LlmAgent の別名）。
 # name / model / instruction などを渡して、振る舞いを宣言的に定義する。
-from google.adk.agents import Agent
+# 公式 quickstart と同じく、トップレベルの google.adk から import する（最短・正準形）。
+# 同じ Agent は `from google.adk.agents import Agent` でも取得でき、その agents
+# サブモジュールには LoopAgent / SequentialAgent / ParallelAgent など他の型もある。
+from google.adk import Agent
 
 # root_agent: ADK が探す「入口のエージェント」。この変数名は ADK の規約で固定。
 root_agent = Agent(
