@@ -13,11 +13,13 @@ deploy するアプリ本体は [packages/gc/apps/cloud-run-rest/](../../apps/cl
 ## 前提（API の有効化）
 
 storage 系で API 有効化を [storage-api-enable](../storage-api-enable/) という専用サンプルに分離したのと同じ方針で、
-このサンプルの root module は API を有効化しません。次の3つの API が有効である必要があります。
+このサンプルの root module は API を有効化しません。前提となる次の3つの API（`run.googleapis.com` /
+`artifactregistry.googleapis.com` / `cloudbuild.googleapis.com`）は、専用サンプル
+[cloud-run-api-enable](../cloud-run-api-enable/) で Terraform 管理します。**このサンプルの前に** apply してください。
 
 ```bash
-gcloud services enable --project nck-sakurai \
-  run.googleapis.com artifactregistry.googleapis.com cloudbuild.googleapis.com
+mise exec -- terraform -chdir=packages/gc/terraform/cloud-run-api-enable init
+mise exec -- terraform -chdir=packages/gc/terraform/cloud-run-api-enable apply
 ```
 
 ## 全体の流れ（2段階 apply）

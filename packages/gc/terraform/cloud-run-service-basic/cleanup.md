@@ -76,9 +76,10 @@ gcloud artifacts repositories list --project nck-sakurai --location=asia-northea
 
 ## Terraform 管理外に残るもの
 
-README の前提で有効化した3つの API（`run.googleapis.com` / `artifactregistry.googleapis.com` /
-`cloudbuild.googleapis.com`）は destroy 後も有効なまま残ります（他のワークロードを壊さないため、
-このサンプルでは無効化しません）。
+前提として [cloud-run-api-enable](../cloud-run-api-enable/) で有効化した3つの API（`run.googleapis.com` /
+`artifactregistry.googleapis.com` / `cloudbuild.googleapis.com`）は、そちらが `disable_on_destroy = false`
+のため、このサンプルの destroy 後も（cloud-run-api-enable 側の destroy 後も）有効なまま残ります
+（他のワークロードを壊さないため）。
 
 `gcloud builds submit` の初回実行時に自動作成された Cloud Build の staging bucket
 （`nck-sakurai_cloudbuild`）は **Terraform 管理外のため destroy では消えません**。

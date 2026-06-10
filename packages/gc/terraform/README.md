@@ -14,6 +14,7 @@ Google Cloud provider の認証と Terraform の基本操作を学ぶための�
 | [storage-service-account](./storage-service-account/) | read-only | `google_storage_project_service_account` data source で Cloud Storage service agent の identity を読む |
 | [storage-bucket-basic](./storage-bucket-basic/) | mutating | `google_storage_bucket` で private bucket を1つ作成し、[`cleanup.md`](./storage-bucket-basic/cleanup.md) の手順で `destroy` まで lifecycle を学ぶ |
 | [storage-object-upload](./storage-object-upload/) | mutating | `google_storage_bucket_object` で既存 bucket に local file を1つ upload し、object cleanup まで学ぶ |
+| [cloud-run-api-enable](./cloud-run-api-enable/) | mutating | `google_project_service` を `for_each` で回し、Cloud Run 一式の3 API（`run` / `artifactregistry` / `cloudbuild`）を有効化する（`disable_on_destroy = false`） |
 | [cloud-run-service-basic](./cloud-run-service-basic/) | mutating | Artifact Registry repository と private な Cloud Run service を作成し、[apps/cloud-run-rest](../apps/cloud-run-rest/) の image を deploy する（image の build / push は `gcloud builds submit`） |
 
 新しいサンプルは `terraform/` 直下にディレクトリを 1 つ足し、この表に 1 行追加します（`<operation>` は `storage-bucket-list` のような kebab-case の「対象 + 操作」）。read-only は名詞 / `*-list` / `*-read`、リソースを作成する mutating はリソース名中心で命名し、本表の「種別」列で区別します。
@@ -29,7 +30,8 @@ read-only の基礎から、低リスクな mutating（リソース作成）へ�
 5. [storage-service-account](./storage-service-account/) — provider 管理の service agent を data source から取得する。
 6. [storage-bucket-basic](./storage-bucket-basic/) — `plan` / `apply` / `state` / `destroy` を private bucket 1つで学ぶ。
 7. [storage-object-upload](./storage-object-upload/) — 既存 bucket に local file を object として upload し、object と bucket の cleanup 順序を学ぶ。
-8. [cloud-run-service-basic](./cloud-run-service-basic/) — Artifact Registry + Cloud Run で「Terraform の外で image を push する」2段階 apply と、private service の認証付き動作確認を学ぶ。
+8. [cloud-run-api-enable](./cloud-run-api-enable/) — `google_project_service` を `for_each` で複数 API に展開し、Cloud Run 一式の前提 API をまとめて有効化する。
+9. [cloud-run-service-basic](./cloud-run-service-basic/) — Artifact Registry + Cloud Run で「Terraform の外で image を push する」2段階 apply と、private service の認証付き動作確認を学ぶ。
 
 ## 種別ごとの扱い（read-only / mutating）
 
@@ -38,6 +40,7 @@ read-only の基礎から、低リスクな mutating（リソース作成）へ�
   - [storage-api-enable](./storage-api-enable/) は `disable_on_destroy = false` のため、`destroy` 後も API は有効なまま残ります（他のワークロードを壊さないため）。
   - [storage-bucket-basic](./storage-bucket-basic/) は [`cleanup.md`](./storage-bucket-basic/cleanup.md) の手順で bucket を削除します。`force_destroy = false` のため、bucket 内にオブジェクトが残っていると `destroy` は失敗します。
   - [storage-object-upload](./storage-object-upload/) は既存 bucket に object を作成します。bucket を削除する前に、このサンプルの [`cleanup.md`](./storage-object-upload/cleanup.md) で object を先に削除してください。
+  - [cloud-run-api-enable](./cloud-run-api-enable/) は `disable_on_destroy = false` のため、`destroy` 後も3つの API は有効なまま残ります（[cloud-run-service-basic](./cloud-run-service-basic/) の前提）。
   - [cloud-run-service-basic](./cloud-run-service-basic/) は [`cleanup.md`](./cloud-run-service-basic/cleanup.md) の手順で service と repository を削除します。repository の削除は **push 済みの image ごと**消えます。Cloud Build の staging bucket は Terraform 管理外のため残ります（同 cleanup.md 参照）。
 
 ## 前提
