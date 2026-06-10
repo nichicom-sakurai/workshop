@@ -9,8 +9,8 @@ AI-agent guide for the `workshop` monorepo. For human-facing detail, see [README
 ## TL;DR (read first)
 
 - **Cloud / IaC learning monorepo.** Independent projects live in `packages/<name>/`. Tool versions are centrally pinned by [mise](https://mise.jdx.dev/) in `mise.toml`.
-- **Learning skeleton + Terraform samples.** Each of `packages/aws/` and `packages/gc/` keeps its `package.json` + `index.ts` skeleton (`console.log("Hello from <name>")`) and adds self-contained Terraform samples under `packages/<provider>/terraform/<operation>/`. AWS starts with `caller-identity` (read-only), `s3-private-bucket` (mutating), and `s3-object-upload` (mutating); Google Cloud starts with `project-info` and expands through storage learning samples.
-- **[WARNING] no test / lint / typecheck / tsconfig.** Terraform exists as learning samples with local state only; no remote backend is configured. See "Gotchas".
+- **Learning skeleton + Terraform samples.** Each of `packages/aws/` and `packages/gc/` keeps its `package.json` + `index.ts` skeleton (`console.log("Hello from <name>")`) and adds self-contained Terraform samples under `packages/<provider>/terraform/<operation>/`. AWS starts with `caller-identity` (read-only), `s3-private-bucket` (mutating), and `s3-object-upload` (mutating); Google Cloud starts with `project-info`, expands through storage learning samples, and adds a Cloud Run deploy sample (`cloud-run-service-basic`) backed by a nested app under `packages/gc/apps/`.
+- **[WARNING] no repo-wide test / lint / typecheck.** Only `packages/gc/apps/cloud-run-rest/` carries a `tsconfig.json` (+ `@types/bun`) for `bunx tsc --noEmit`; everything else runs untyped on Bun. Terraform exists as learning samples with local state only; no remote backend is configured. See "Gotchas".
 - Drive everything through mise tasks (`mise run ...`). A bare `bun` is not on PATH, but the tasks wrap it (`mise exec -- bun`), so `mise run` works as-is.
 
 ## 1. Orientation (layout)
@@ -18,7 +18,8 @@ AI-agent guide for the `workshop` monorepo. For human-facing detail, see [README
 - `mise.toml` — tool versions (`[tools]`) + task definitions (`[tasks.*]`). **The single source of version truth.**
 - `tools/bootstrap.sh` — idempotent full setup (`set -euo pipefail`); skips gracefully when mise is absent.
 - `tools/git-hooks/commit-msg` — dependency-free bash validator for Conventional Commits (`<type>(<scope>): ...`, fixed type enum, 72-char subject; merge/autosquash skipped). Enabled via `core.hooksPath` by `mise run install-hooks` / `bs`. **scope is free-form, not enum-checked** (keeps the auto-discover model — no per-package config edits).
-- `packages/*` — the projects. Targets of `bun install` / `dev` / `dev:all`. Each is independent (no root npm workspaces). Currently `aws` and `gc`; each contains `terraform/<operation>/` — one independent Terraform root module per cloud operation. AWS includes `caller-identity` (read-only), `s3-private-bucket` (mutating), and `s3-object-upload` (mutating); Google Cloud includes `project-info` and storage learning samples.
+- `packages/*` — the projects. Targets of `bun install` / `dev` / `dev:all`. Each is independent (no root npm workspaces). Currently `aws` and `gc`; each contains `terraform/<operation>/` — one independent Terraform root module per cloud operation. AWS includes `caller-identity` (read-only), `s3-private-bucket` (mutating), and `s3-object-upload` (mutating); Google Cloud includes `project-info`, storage learning samples, and `cloud-run-service-basic` (mutating, deploys the nested app below).
+- `packages/gc/apps/<app>/` — deployable app code used by Terraform samples (first: `cloud-run-rest`, a Bun REST service — zero **runtime** deps, with `@types/bun` as a dev-only type dependency — plus a Dockerfile for Cloud Run). Nested apps use `src/index.ts` as the entry point and are **not** picked up by `dev:all` (its loop covers `packages/*/` only; `dev <name>` is documented for top-level packages); bootstrap's recursive `find` still runs `bun install` in them (a real install for `cloud-run-rest`, fetching `@types/bun`; a no-op for dependency-free apps).
 - `.claude/` and `.codex/` — agent tooling for this repo; see §8.
 
 ## 2. Run
@@ -60,7 +61,7 @@ Terraform learning samples:
 - `packages/aws/terraform/<operation>/` — each AWS operation is a self-contained, independent root module (own state) placed directly under `terraform/`. Current samples include `caller-identity` (read-only, uses `data "aws_caller_identity" "current" {}` only), `s3-private-bucket` (mutating, creates a private S3 bucket and public access block), and `s3-object-upload` (mutating, uploads a local file to an existing S3 bucket).
   - Run via the `tf` task: `mise run tf <operation> <command>` (e.g. `mise run tf caller-identity plan`), or directly `mise exec -- terraform -chdir=packages/aws/terraform/<operation> ...`.
   - Add one: create `<operation>/` under `terraform/` (copy `terraform.tf` / `providers.tf` so it stays self-contained), then add a row to `packages/aws/terraform/README.md` (the shared-workflow index).
-- `packages/gc/terraform/<operation>/` — each Google Cloud operation is a self-contained, independent root module (own state) placed directly under `terraform/`. First sample: `project-info`, which reads `data "google_project" "current"` with a `postcondition` asserting the project number for `nck-sakurai`.
+- `packages/gc/terraform/<operation>/` — each Google Cloud operation is a self-contained, independent root module (own state) placed directly under `terraform/`. First sample: `project-info`, which reads `data "google_project" "current"` with a `postcondition` asserting the project number for `nck-sakurai`. API enablement is factored into dedicated `*-api-enable` samples (`storage-api-enable` for one API; `cloud-run-api-enable` enables the `run` / `artifactregistry` / `cloudbuild` trio via `google_project_service` with `for_each`), each `disable_on_destroy = false` so cleanup never turns an API off. `cloud-run-service-basic` (mutating) creates an Artifact Registry repository + a private Cloud Run v2 service (its prerequisite APIs come from `cloud-run-api-enable`, applied first); the container image is built/pushed via `gcloud builds submit` (not Terraform), so its README documents a two-stage apply (`-target` the repository first).
   - Not covered by the `tf` task (which targets AWS samples); run directly with `mise exec -- terraform -chdir=packages/gc/terraform/<operation> ...`.
   - Add one: create `<operation>/` under `terraform/` (copy `terraform.tf` / `providers.tf` so it stays self-contained), then add a row to `packages/gc/terraform/README.md` (the shared-workflow index).
 - read-only samples do not create, update, or destroy resources. mutating samples are marked in each Terraform README and must document cleanup / `destroy`. Credentials come from each provider's standard mechanism (AWS env / profile; Google ADC) — never hardcoded.
@@ -73,14 +74,15 @@ Terraform learning samples:
 - Integration: `mise run dev:all` runs all projects (aws / gc) without crashing.
 - Version pinning: `mise current` matches `mise.toml` `[tools]`.
 - Environment problems: delegate to the `env-doctor` agent (mise / bun / trust / run / git checks).
-- [Recommended · not set up yet] typecheck / lint / test / formatter are all **undecided**. If you add one (e.g. `bun test` with `*.test.ts`, or `tsc --noEmit` after adding a `tsconfig.json`), wire it into `packages/*/package.json` scripts, `mise.toml` tasks, and this doc **together**. **This is a recommendation, not a command that works today.**
+- `packages/gc/apps/cloud-run-rest/` has a `tsconfig.json` + `@types/bun`, so `mise exec -- bunx tsc --noEmit` (run from that dir) typechecks it today. No repo-wide typecheck task is wired into `mise.toml` yet.
+- [Recommended · not set up yet] a repo-wide typecheck / lint / test / formatter is still **undecided**. If you add one (e.g. `bun test` with `*.test.ts`, or a root `tsc --noEmit`), wire it into `packages/*/package.json` scripts, `mise.toml` tasks, and this doc **together**. **This is a recommendation, not a command that works today.**
 
 Note: skeleton packages have no dependencies, so `bun install` creates no `node_modules/` — its absence is not an error.
 
 ## 5. Conventions (internalize before acting)
 
 - [OK] Pin exact tool versions in `mise.toml`. [NG] `latest` / `any`, or hardcoding version numbers in docs/scripts. Check with `mise current`.
-- [OK] Versions live **only** in `mise.toml` — this doc never spells out a version number.
+- [OK] Versions live **only** in `mise.toml` — this doc never spells out a version number. Exception: a `Dockerfile` base image can't read `mise.toml`, so it pins the same version explicitly (e.g. `packages/gc/apps/cloud-run-rest/Dockerfile` ↔ `[tools]` `bun`) — update both together.
 - [OK] `mise trust` any new `mise.toml` / `.mise.toml` before use (bootstrap auto-trusts; do it yourself for manually created ones).
 - [OK] Shell scripts: `set -euo pipefail`, quote every variable (`"${var}"`), status via `[OK]` / `[NG]` / `[WARNING]` / `[INFO]` markers, no decorative emoji.
 - [OK] Secrets: never hardcode. Templates use a `.template` suffix; machine-specific values go in `.local` files or env vars.
@@ -93,7 +95,7 @@ Note: skeleton packages have no dependencies, so `bun install` creates no `node_
 - **git is initialized.** Branches / commits / PRs apply. Follow the global conventions: branch `{prefix}/GH-{issue}` when an issue exists, otherwise `{prefix}/{kebab-case-description}`; commit `{type}({scope}): {Japanese description}`.
 - **`bun: command not found` (exit 127).** Shell not activated — use `mise exec -- bun ...` or `eval "$(mise activate zsh)"`. Does not affect `mise run dev` / `dev:all`.
 - **Terraform samples include read-only and mutating examples.** `packages/aws/terraform/<operation>/` and `packages/gc/terraform/<operation>/` hold one independent root module per cloud operation. Mutating samples follow the same flat `terraform/<operation>/` layout — distinguished by the README's 種別 column, not a separate tree — and must include cleanup / `destroy` guidance. No remote backend is configured, and bootstrap does no provisioning.
-- **No Bun lockfile / tsconfig.** Neither `bun.lock` nor `tsconfig.json` is committed; bun runs TypeScript / ESM natively, so `index.ts` runs directly. There is no typecheck step — don't assume one exists. Terraform's `.terraform.lock.hcl` is committed for provider repeatability.
+- **Lockfile / tsconfig: skeleton packages have neither; `cloud-run-rest` has both.** Skeleton packages have no deps (no `bun.lock`) and bun runs TypeScript / ESM natively without a `tsconfig.json`, so `index.ts` runs directly with no typecheck step. The exception is `packages/gc/apps/cloud-run-rest/`: it carries `@types/bun`, a committed `bun.lock` (repeatable installs, like Terraform's committed `.terraform.lock.hcl`), and a `tsconfig.json` enabling `bunx tsc --noEmit`. Don't assume a repo-wide typecheck exists.
 
 ## 7. Troubleshooting (symptom -> fix)
 

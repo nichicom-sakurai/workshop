@@ -11,7 +11,8 @@ terraform.tfstate.*
 *.tfvars
 *.tfvars.json
 
-# Bun lockfiles are intentionally not committed yet (skeleton stage); revisit later.
+# Bun lockfiles: committed once a package gains a dependency (e.g. cloud-run-rest's
+# @types/bun) so installs are repeatable; skeleton packages have none, so none to commit.
 
 # mise machine-local overrides
 mise.local.toml

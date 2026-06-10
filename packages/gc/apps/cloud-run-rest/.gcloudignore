@@ -1,0 +1,11 @@
+# gcloud builds submit が staging bucket（nck-sakurai_cloudbuild）へアップロードする
+# ソースから、build に不要なファイルを除外します（.dockerignore と対で管理）。
+# このファイルがないと、ディレクトリ内のすべてのファイルがアップロードされます。
+# Dockerfile と .dockerignore は Cloud Build の docker build ステップで必要なため
+# 除外しません。
+.gcloudignore
+.git
+README.md
+**/node_modules
+**/.DS_Store
+.env*

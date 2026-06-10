@@ -21,7 +21,7 @@ workshop/
 ├── tools/
 │   ├── bootstrap.sh     # 全環境のセットアップスクリプト
 │   └── git-hooks/       # git フック (commit-msg: Conventional Commits 検証)
-└── packages/            # プロジェクト群 (この配下が bootstrap / dev の対象)
+└── packages/            # プロジェクト群 (この配下が bootstrap の対象。dev / dev:all は直下のプロジェクトのみ)
     ├── aws/
     │   └── terraform/
     │       ├── README.md             # サンプル一覧と共通手順
@@ -29,9 +29,12 @@ workshop/
     │       ├── s3-private-bucket/    # private S3 bucket を作成し destroy まで学ぶ mutating サンプル
     │       └── s3-object-upload/     # 既存 S3 bucket に object を upload する mutating サンプル
     └── gc/
+        ├── apps/
+        │   └── cloud-run-rest/       # Cloud Run に deploy する最小の Bun REST service (Dockerfile 付き)
         └── terraform/
             ├── README.md             # サンプル一覧と共通手順
-            └── project-info/         # Google Cloud 操作ごとの独立した read-only サンプル (project nck-sakurai を読む)
+            ├── project-info/         # Google Cloud 操作ごとの独立した read-only サンプル (project nck-sakurai を読む)
+            └── cloud-run-service-basic/  # Artifact Registry + private Cloud Run service を作る mutating サンプル
 ```
 
 `packages/` 配下の各プロジェクトは `bun` のバージョンを root の `mise.toml` から継承します。特定プロジェクトだけ別ツール / バージョンが必要な場合は、そのフォルダに `mise.toml` を置くと差分だけ上書きできます。
