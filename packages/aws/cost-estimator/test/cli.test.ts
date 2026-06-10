@@ -79,6 +79,27 @@ describe("--help", () => {
   });
 });
 
+describe("入力エラーは stack trace を出さず clean に終了する", () => {
+  test("不正な --account-id は exit 2 + 引数エラー（stack trace なし）", async () => {
+    const { exitCode, stderr } = await runCli(["--account-id", "123"]);
+    expect(exitCode).toBe(2);
+    expect(stderr).toContain("引数エラー");
+    expect(stderr).not.toContain("at ");
+  });
+
+  test("非数値の --batch-size は exit 2 + 引数エラー", async () => {
+    const { exitCode, stderr } = await runCli(["--batch-size", "abc"]);
+    expect(exitCode).toBe(2);
+    expect(stderr).toContain("引数エラー");
+    expect(stderr).not.toContain("at ");
+  });
+
+  test("範囲外の --batch-size（0）は exit 2", async () => {
+    const { exitCode } = await runCli(["--batch-size", "0"]);
+    expect(exitCode).toBe(2);
+  });
+});
+
 describe("--submit の引数検証（実 API は叩かない）", () => {
   test("workload-estimate-id 無しの --submit は exit 非 0 でエラー", async () => {
     const { exitCode, stderr } = await runCli(["--submit"]);

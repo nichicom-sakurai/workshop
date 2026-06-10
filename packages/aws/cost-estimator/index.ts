@@ -9,8 +9,8 @@
  * AWS_ESTIMATE_ACCOUNT_ID env / placeholder の順で解決する。
  */
 import { parseArgs } from "node:util";
-import { loadAllCatalogs } from "./src/catalog";
-import { PLACEHOLDER_ACCOUNT_ID, toWorkloadEstimateUsage } from "./src/adapter";
+import { CatalogValidationError, loadAllCatalogs } from "./src/catalog";
+import { AdapterError, PLACEHOLDER_ACCOUNT_ID, toWorkloadEstimateUsage } from "./src/adapter";
 import { buildSubmitCommands, submitBatches } from "./src/submit";
 import type { Catalog } from "./src/types";
 
@@ -65,7 +65,11 @@ function parseCliArgs(argv: string[]): CliOptions | "help" {
 
   let batchSize: number | undefined;
   if (values["batch-size"] !== undefined) {
-    batchSize = Number(values["batch-size"]);
+    const raw = values["batch-size"];
+    if (!/^\d+$/.test(raw)) {
+      throw new Error(`--batch-size は正の整数である必要があります: ${raw}`);
+    }
+    batchSize = Number(raw);
   }
 
   return {
@@ -104,15 +108,29 @@ async function main(): Promise<number> {
     return 0;
   }
 
-  let catalogs = await loadAllCatalogs();
-  if (options.excludeNeedsResearch) {
-    catalogs = dropNeedsResearch(catalogs);
+  let result;
+  try {
+    let catalogs = await loadAllCatalogs();
+    if (options.excludeNeedsResearch) {
+      catalogs = dropNeedsResearch(catalogs);
+    }
+    result = toWorkloadEstimateUsage(catalogs, {
+      usageAccountId: options.accountId,
+      batchSize: options.batchSize,
+    });
+  } catch (err) {
+    // 入力（--account-id / --batch-size）由来のエラーは引数エラーとして exit 2。
+    if (err instanceof AdapterError) {
+      console.error(`引数エラー: ${err.message}`);
+      return 2;
+    }
+    // catalog 自体の不整合はデータエラーとして exit 1。
+    if (err instanceof CatalogValidationError) {
+      console.error(`catalog エラー: ${err.message}`);
+      return 1;
+    }
+    throw err;
   }
-
-  const result = toWorkloadEstimateUsage(catalogs, {
-    usageAccountId: options.accountId,
-    batchSize: options.batchSize,
-  });
 
   if (!options.submit) {
     const doc = {
@@ -131,6 +149,11 @@ async function main(): Promise<number> {
   if (!options.workloadEstimateId) {
     console.error("--submit には --workload-estimate-id <uuid> が必要です");
     return 2;
+  }
+
+  if (result.summary.totalEntries === 0) {
+    console.error("[WARNING] 送信対象の entry がありません（フィルタで全て除外された可能性があります）。送信を中止します。");
+    return 1;
   }
 
   const needsResearch = result.summary.byMappingStatus.needs_research;
