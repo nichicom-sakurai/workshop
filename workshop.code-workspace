@@ -1,8 +1,0 @@
-{
-  "folders": [
-    { "name": "root", "path": "." },
-    { "path": "packages/gc/apps/adk-helloworld" },
-    { "path": "packages/aws/apps/agentcore-strands-basic" }
-  ],
-  "settings": {}
-}
