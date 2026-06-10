@@ -42,7 +42,8 @@ const ACCOUNT_ID_RE = /^\d{12}$/;
 /**
  * AWS 課金リージョンコード（usageType の region prefix）。
  * us-east-1 は prefix を持たない（usageType は無印）。
- * 出典: AWS Cost and Usage Report のリージョンコード慣例（best-effort、要検証）。
+ * 出典: AWS Region billing codes（公式）
+ *   https://docs.aws.amazon.com/global-infrastructure/latest/regions/aws-region-billing-codes.html
  */
 const REGION_BILLING_PREFIX: Record<string, string> = {
   "us-east-1": "",
@@ -51,7 +52,7 @@ const REGION_BILLING_PREFIX: Record<string, string> = {
   "us-west-2": "USW2",
   "ca-central-1": "CAN1",
   "sa-east-1": "SAE1",
-  "eu-west-1": "EUW1",
+  "eu-west-1": "EU", // eu-west-1 (Ireland) は数値サフィックス無しの例外
   "eu-west-2": "EUW2",
   "eu-west-3": "EUW3",
   "eu-central-1": "EUC1",

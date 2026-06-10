@@ -61,6 +61,11 @@ describe("regionBillingPrefix / applyRegionPrefix", () => {
     );
   });
 
+  test("eu-west-1 は数値サフィックス無しの EU（公式 billing code の例外）", () => {
+    expect(regionBillingPrefix("eu-west-1")).toBe("EU");
+    expect(applyRegionPrefix("BoxUsage:t3.micro", "eu-west-1")).toBe("EU-BoxUsage:t3.micro");
+  });
+
   test("未知のリージョンは AdapterError", () => {
     expect(() => regionBillingPrefix("moon-base-1")).toThrow(AdapterError);
   });

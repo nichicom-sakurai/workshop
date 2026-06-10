@@ -59,9 +59,11 @@ adapter が生成する usage entry は `BatchCreateWorkloadEstimateUsage` の `
 ## region prefix
 
 ほぼすべての `usageType` は region で prefix が変わります。`us-east-1` は **prefix なし**、
-それ以外は課金リージョンコード（`APN1-` / `USW2-` / `EUW1-` など）を前置します。
+それ以外は課金リージョンコード（`APN1-` / `USW2-` / `EU-`(eu-west-1) など）を前置します。
 catalog は core 値を保持し、adapter（`src/adapter.ts` の `REGION_BILLING_PREFIX`）が
-`region` から prefix を適用します（対応表は best-effort、要検証）。
+`region` から prefix を適用します。対応表は
+[AWS Region billing codes](https://docs.aws.amazon.com/global-infrastructure/latest/regions/aws-region-billing-codes.html)
+（公式）に基づきます。`eu-west-1` は数値サフィックス無しの `EU` が正で、注意が必要です。
 
 ## カテゴリ別 mapping（概要）
 
@@ -87,7 +89,7 @@ catalog は core 値を保持し、adapter（`src/adapter.ts` の `REGION_BILLIN
 段階的検証の残課題です。`--submit` の前に、対象 account / region の実 CUR や Price List API で
 確定してください。
 
-- region prefix 対応表（`REGION_BILLING_PREFIX`）は慣例ベースで、全リージョン網羅・正確性は未保証。
+- region prefix 対応表（`REGION_BILLING_PREFIX`）は公式 [AWS Region billing codes](https://docs.aws.amazon.com/global-infrastructure/latest/regions/aws-region-billing-codes.html) に照合済みだが、全リージョンは網羅していない（未収録のリージョンは adapter が明示エラーにする）。
 - ELBv2 の `serviceCode`（`AWSELB`）と operation（`LoadBalancing:Application`）は確度中・推定。
 - EC2/EBS/S3 の operation（`RunInstances:NNNN`, `CreateVolume-Gp3`, storage/egress の帰属）は慣例値で、
   Price List API / 実 CUR と未照合。
