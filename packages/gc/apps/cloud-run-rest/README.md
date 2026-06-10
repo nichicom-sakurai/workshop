@@ -1,7 +1,8 @@
 # cloud-run-rest
 
 Cloud Run の [container contract](https://docs.cloud.google.com/run/docs/container-contract) を学ぶための、最小の Bun/TypeScript REST service です。
-依存パッケージはゼロで、Bun 組み込みの `Bun.serve` だけで動きます。
+ランタイム依存パッケージはゼロで、Bun 組み込みの `Bun.serve` だけで動きます。
+型定義のみ dev 依存として `@types/bun` を持ち、エディタと `bunx tsc --noEmit` で型チェックできます。
 
 このアプリを private Cloud Run service として deploy する Terraform サンプルは
 [../../terraform/cloud-run-service-basic/](../../terraform/cloud-run-service-basic/) にあります。
@@ -11,7 +12,9 @@ Cloud Run の [container contract](https://docs.cloud.google.com/run/docs/contai
 | ファイル | 内容 |
 | --- | --- |
 | `src/index.ts` | REST service 本体。`GET /` → 200 JSON、それ以外 → 404 |
-| `package.json` | 依存ゼロ。`scripts.start` でエントリポイントを起動 |
+| `package.json` | ランタイム依存ゼロ。dev 依存は型定義 `@types/bun` のみ。`scripts.start` でエントリポイントを起動 |
+| `tsconfig.json` | Bun 向けの最小型チェック設定（`bunx tsc --noEmit` 用、ビルドには未使用） |
+| `bun.lock` | `@types/bun` の解決を固定する lockfile（再現可能な install のためコミット） |
 | `Dockerfile` | `oven/bun` ベースの single-stage イメージ定義 |
 | `.dockerignore` | docker build コンテキストから実行に不要なファイルを除外 |
 | `.gcloudignore` | `gcloud builds submit` のアップロード対象から不要なファイルを除外 |
