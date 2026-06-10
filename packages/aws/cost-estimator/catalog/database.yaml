@@ -1,0 +1,31 @@
+# database カテゴリ: Amazon RDS の主要課金軸（instance / storage / backup）。
+# RDS は engine を operation コード（CreateDBInstance:NNNN）で表す（:0002 = MySQL）。
+# usageType は region prefix なしの core 値。storage / backup の operation は instance の
+# engine operation を継承する推定値のため、usageType が判明していても schema_only とする。
+category: database
+description: Amazon RDS の主要課金軸（instance / storage / backup）
+region: ap-northeast-1
+services:
+  - id: rds
+    service: Amazon RDS
+    service_code: AmazonRDS
+    usages:
+      - billing_axis: Single-AZ on-demand DB instance hours (MySQL, db.t3.micro)
+        usage_type: InstanceUsage:db.t3.micro
+        operation: CreateDBInstance:0002 # :0002 = MySQL
+        unit: Hrs
+        amount: 730
+        mapping_status: mapped
+      - billing_axis: provisioned gp3 storage, Single-AZ (GB-month)
+        # usageType は CUR 由来で確からしいが operation の engine 継承は推定（schema_only）。
+        usage_type: RDS:GP3-Storage
+        operation: CreateDBInstance:0002
+        unit: GB-Mo
+        amount: 20
+        mapping_status: schema_only
+      - billing_axis: charged backup storage beyond free allocation (GB-month)
+        usage_type: RDS:ChargedBackupUsage
+        operation: CreateDBInstance:0002
+        unit: GB-Mo
+        amount: 20
+        mapping_status: schema_only

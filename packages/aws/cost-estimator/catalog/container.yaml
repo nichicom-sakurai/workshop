@@ -1,0 +1,31 @@
+# container カテゴリ: Amazon ECS on AWS Fargate の vCPU / memory / 稼働時間。
+# Fargate は「割当 vCPU x 稼働時間」と「割当メモリ GB x 稼働時間」で課金される。
+# amount は 0.25 vCPU / 0.5 GB のタスクを約 730 時間/月 稼働させた場合の例。
+# ephemeral storage の usageType は権威ある出典が無く推定のため needs_research。
+category: container
+description: Amazon ECS on AWS Fargate の vCPU / memory / 稼働時間
+region: ap-northeast-1
+services:
+  - id: fargate
+    service: Amazon ECS on AWS Fargate
+    service_code: AmazonECS
+    usages:
+      - billing_axis: Fargate vCPU-hours (allocated vCPU x running time)
+        usage_type: Fargate-vCPU-Hours:perCPU
+        operation: FargateTask
+        unit: Hrs
+        amount: 182.5 # 0.25 vCPU x 730h
+        mapping_status: mapped
+      - billing_axis: Fargate memory GB-hours (allocated GB x running time)
+        usage_type: Fargate-GB-Hours
+        operation: FargateTask
+        unit: Hrs
+        amount: 365 # 0.5 GB x 730h
+        mapping_status: mapped
+      - billing_axis: ephemeral storage GB-hours above the 20 GB free baseline
+        # usageType / operation とも権威ある出典が無い推定値（要検証）。
+        usage_type: Fargate-EphemeralStorage-GB-Hours
+        operation: FargateTask
+        unit: Hrs
+        amount: 0 # 既定 20 GB は無料のため例では 0
+        mapping_status: needs_research
