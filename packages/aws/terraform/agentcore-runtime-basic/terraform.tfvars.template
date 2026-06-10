@@ -1,0 +1,12 @@
+# Copy this file to terraform.tfvars and replace the placeholder values.
+# terraform.tfvars is ignored by git.
+
+artifact_zip_path = "packages/aws/apps/agentcore-strands-basic/dist/agentcore-strands-basic.zip"
+model_id          = "REPLACE_WITH_BEDROCK_MODEL_ID"
+
+# Optional: change the resource name prefix if it collides in your account.
+# name_prefix = "agentcore-basic"
+
+# Optional: narrow this to specific Bedrock model ARNs for a stricter IAM policy.
+# The default wildcard is portable for a learning sample, not a production baseline.
+# bedrock_model_resource_arns = ["*"]
