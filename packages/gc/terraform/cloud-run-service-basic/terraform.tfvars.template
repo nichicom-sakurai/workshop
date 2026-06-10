@@ -1,0 +1,15 @@
+# Copy this file to terraform.tfvars and set your own values, then run plan/apply:
+#   cp terraform.tfvars.template terraform.tfvars
+#
+# terraform.tfvars is gitignored (it matches *.tfvars), so your real values stay
+# local and are never committed. Only this *.template file is tracked.
+
+# Set the exact image URI you passed to `gcloud builds submit --tag`.
+# Use a unique lowercase tag such as the short git SHA (`git rev-parse --short HEAD`);
+# `latest` is rejected by the variable validation, and so is this uppercase placeholder.
+image = "asia-northeast1-docker.pkg.dev/nck-sakurai/cloud-run-rest/cloud-run-rest:REPLACE-WITH-SHORT-GIT-SHA"
+
+# The following have defaults. Uncomment only if you want to override them.
+# region        = "asia-northeast1"
+# repository_id = "cloud-run-rest"
+# service_name  = "cloud-run-rest"
