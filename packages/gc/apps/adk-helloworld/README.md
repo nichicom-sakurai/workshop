@@ -81,7 +81,7 @@ GOOGLE_CLOUD_LOCATION=us-central1
 ```
 
 - API key は不要で、認証は Application Default Credentials (ADC) を使います。事前に `gcloud auth application-default login` を実行しておきます。
-- 対象プロジェクトで Vertex AI API が有効である必要があります。
+- 対象プロジェクトで Vertex AI API を有効化しておきます（`gcloud services enable aiplatform.googleapis.com --project=your-gcp-project-id`）。Terraform で API 有効化を学ぶ場合は、この repo の `packages/gc/terraform/<op>-api-enable/`（`google_project_service`）パターンが参考になります。
 - 以降の `adk run` / `adk web` のコマンドは Gemini API key 方式と同じです。
 
 ## Cloud Run へ deploy（`adk deploy cloud_run`）
@@ -91,7 +91,7 @@ ADK には Cloud Run へ直接 deploy するコマンドが用意されていま
 ```bash
 export GOOGLE_CLOUD_PROJECT="your-gcp-project-id"
 export GOOGLE_CLOUD_LOCATION="us-central1"
-export GOOGLE_GENAI_USE_VERTEXAI=True
+export GOOGLE_GENAI_USE_VERTEXAI=TRUE
 
 mise exec -- uv run --directory packages/gc/apps/adk-helloworld --locked \
   adk deploy cloud_run \
