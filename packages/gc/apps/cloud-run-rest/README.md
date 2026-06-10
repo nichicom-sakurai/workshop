@@ -14,6 +14,7 @@ Cloud Run の [container contract](https://docs.cloud.google.com/run/docs/contai
 | `package.json` | 依存ゼロ。`scripts.start` でエントリポイントを起動 |
 | `Dockerfile` | `oven/bun` ベースの single-stage イメージ定義 |
 | `.dockerignore` | docker build コンテキストから実行に不要なファイルを除外 |
+| `.gcloudignore` | `gcloud builds submit` のアップロード対象から不要なファイルを除外 |
 
 > この repo のトップレベル package（`packages/<name>/`）は `index.ts` を直下に置く規約ですが、
 > このアプリは `packages/gc/apps/` 配下の nested app のため `src/index.ts` をエントリポイントにしています。
@@ -79,7 +80,7 @@ gcloud builds submit --project nck-sakurai \
 
 - `--project` を明示しているのは、build の実行先が gcloud の active config に依存するためです（image パスの project と食い違うと push が失敗します）。
 
-- ソースとしてアップロードされるのは**このディレクトリ配下のみ**です（repository 全体は送られません）。誤解を避けるため SOURCE の `.` を明示しています。
+- ソースとしてアップロードされるのは**このディレクトリ配下のみ**です（repository 全体は送られません）。誤解を避けるため SOURCE の `.` を明示しています。アップロードから除外するファイルは [`.gcloudignore`](./.gcloudignore) が決めます（docker build コンテキストの除外を決める `.dockerignore` とは別の機構です）。
 - tag には `latest` ではなく short git SHA など一意な値を使います。どの commit の image か追跡でき、Terraform 側の変数 validation も `latest` を拒否します。
 - 初回実行時に Cloud Build 用の staging bucket（`nck-sakurai_cloudbuild`）が自動作成されます。中身は自動削除されないため、不要になったら手動で掃除してください。
 

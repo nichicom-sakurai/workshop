@@ -3,6 +3,7 @@
 #  このファイルが効くのは docker build のコンテキストだけです）
 Dockerfile
 .dockerignore
+.gcloudignore
 README.md
 **/node_modules
 **/.DS_Store
