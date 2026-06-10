@@ -105,7 +105,13 @@ function parseService(source: string, raw: unknown, idx: number): CatalogService
     fail(where, "課金サービスは usages を 1 件以上持つ必要があります（無料なら no_direct_charge: true）");
   }
 
-  return { id, service, service_code, no_direct_charge, usages };
+  return {
+    id,
+    service,
+    service_code,
+    usages,
+    ...(no_direct_charge !== undefined && { no_direct_charge }),
+  };
 }
 
 /** 任意の値（YAML パース結果）を検証済み Catalog に変換する。不正なら投げる。 */

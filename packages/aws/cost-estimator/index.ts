@@ -74,11 +74,13 @@ function parseCliArgs(argv: string[]): CliOptions | "help" {
 
   return {
     accountId,
-    batchSize,
     excludeNeedsResearch: values["exclude-needs-research"] ?? false,
     submit: values.submit ?? false,
-    workloadEstimateId: values["workload-estimate-id"],
-    clientToken: values["client-token"],
+    ...(batchSize !== undefined && { batchSize }),
+    ...(values["workload-estimate-id"] !== undefined && {
+      workloadEstimateId: values["workload-estimate-id"],
+    }),
+    ...(values["client-token"] !== undefined && { clientToken: values["client-token"] }),
   };
 }
 
@@ -116,7 +118,7 @@ async function main(): Promise<number> {
     }
     result = toWorkloadEstimateUsage(catalogs, {
       usageAccountId: options.accountId,
-      batchSize: options.batchSize,
+      ...(options.batchSize !== undefined && { batchSize: options.batchSize }),
     });
   } catch (err) {
     // 入力（--account-id / --batch-size）由来のエラーは引数エラーとして exit 2。
@@ -166,7 +168,7 @@ async function main(): Promise<number> {
   let commands;
   try {
     commands = buildSubmitCommands(result.batches, options.workloadEstimateId, {
-      clientToken: options.clientToken,
+      ...(options.clientToken !== undefined && { clientToken: options.clientToken }),
     });
   } catch (err) {
     console.error(`送信コマンド生成エラー: ${(err as Error).message}`);

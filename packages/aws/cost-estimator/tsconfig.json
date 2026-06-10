@@ -11,6 +11,7 @@
     "moduleDetection": "force",
     "noEmit": true,
     "strict": true,
+    "exactOptionalPropertyTypes": true,
     "skipLibCheck": true,
     "types": ["bun"]
   }
