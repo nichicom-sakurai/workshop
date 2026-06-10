@@ -55,9 +55,11 @@ data "aws_iam_policy_document" "runtime" {
   statement {
     sid    = "InvokeBedrockModel"
     effect = "Allow"
+    # Converse / ConverseStream は API オペレーション名で、専用の IAM action を持ちません。
+    # それぞれ bedrock:InvokeModel / bedrock:InvokeModelWithResponseStream で認可されます
+    # (AWS Service Authorization Reference)。bedrock:Converse / bedrock:ConverseStream という
+    # IAM action は存在しない (IAM policy validator が Invalid Action とする) ため指定しません。
     actions = [
-      "bedrock:Converse",
-      "bedrock:ConverseStream",
       "bedrock:InvokeModel",
       "bedrock:InvokeModelWithResponseStream",
     ]
