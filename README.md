@@ -36,6 +36,7 @@ workshop/
     │       └── s3-object-upload/     # 既存 S3 bucket に object を upload する mutating サンプル
     └── gc/
         ├── apps/
+        │   ├── adk-helloworld/       # Google ADK の最小 HelloWorld agent (Gemini API key 方式でローカル実行する Python app)
         │   └── cloud-run-rest/       # Cloud Run に deploy する最小の Bun REST service (Dockerfile 付き)
         └── terraform/
             ├── README.md             # サンプル一覧と共通手順
