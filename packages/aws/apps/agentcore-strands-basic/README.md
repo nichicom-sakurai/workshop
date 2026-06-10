@@ -14,3 +14,26 @@ This nested app is not run by `mise run dev:all`.
 ```bash
 mise exec -- uv lock --directory packages/aws/apps/agentcore-strands-basic --check
 ```
+
+## Run tests
+
+```bash
+mise exec -- uv run --directory packages/aws/apps/agentcore-strands-basic --locked \
+  python -m unittest discover -s tests
+```
+
+## Package for AgentCore Runtime
+
+Build the ZIP artifact before running Terraform:
+
+```bash
+packages/aws/apps/agentcore-strands-basic/scripts/package.sh
+```
+
+The script creates:
+
+```text
+packages/aws/apps/agentcore-strands-basic/dist/agentcore-strands-basic.zip
+```
+
+Pass that path to the Terraform sample as `artifact_zip_path`.
