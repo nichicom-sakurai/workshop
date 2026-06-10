@@ -97,6 +97,8 @@ mise tasks            # 登録済みタスク一覧
 - [AWS CLI 基本コマンド](./docs/guides/aws-cli/README.md)
 - [AWS CLI 認証情報の設定](./docs/guides/aws-cli-credentials/README.md)
 - [IAM ユーザー作成とアクセスキー取得手順](./docs/guides/aws-iam-user-creation/README.md)
+- [AWS 課金・コストの確認](./docs/guides/aws-billing/README.md)
+- [AgentCore Runtime sample が作る AWS リソース](./docs/guides/agentcore-runtime-resources/README.md)
 - [gcloud CLI 基本コマンド](./docs/guides/gcloud-cli/README.md)
 
 ## プロジェクトの追加
