@@ -3,6 +3,10 @@
     {
       "path": "packages/aws/apps/agentcore-strands-basic",
       "envManager": "ms-python.python:venv"
+    },
+    {
+      "path": "packages/gc/apps/adk-helloworld",
+      "envManager": "ms-python.python:venv"
     }
   ],
   "cSpell.customDictionaries": {
