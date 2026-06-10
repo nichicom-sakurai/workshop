@@ -39,11 +39,10 @@ mise exec -- uv run --directory packages/gc/apps/adk-helloworld --locked \
 
 VS Code で `from google.adk import Agent` などに「インポートを解決できません」と警告が出ることがあります。これは **import の書き方の誤りではなく**、Pylance が参照する Python interpreter がこの app の `.venv` を指していないことが原因です（`adk run` やテストは `uv run` 経由で `.venv` を使うため正しく動きます）。
 
-この repo は single-root workspace で、Pylance は workspace 全体で interpreter を 1 つだけ選びます。Python app が複数あるため（本 app と `packages/aws/apps/agentcore-strands-basic/`）、選択中の interpreter 次第でどちらか一方の import しか解決しません。解消するには interpreter をこの app の `.venv` に切り替えます（`.venv` はテスト実行で作成済み。無ければ上の「テストの実行」を一度回す）。
+この repo には複数の Python app があり（本 app と `packages/aws/apps/agentcore-strands-basic/`）、フォルダを直接開く single-root では Pylance が workspace 全体で interpreter を 1 つだけ選ぶため、片方の import しか解決しません。これを避けるため、各 Python app を独立フォルダとして開く multi-root workspace ファイル [`workshop.code-workspace`](../../../../workshop.code-workspace) を用意しています。
 
-- コマンドパレット（`Cmd/Ctrl+Shift+P`）→ `Python: Select Interpreter` → `packages/gc/apps/adk-helloworld/.venv/bin/python`
-
-> 複数の Python app を同時に解決させたい場合は、各 app を 1 フォルダとする multi-root `.code-workspace` への移行が選択肢です（現状は 1 app ずつの作業で足りるため未導入）。
+- 推奨: VS Code で `File → Open Workspace from File…` → リポジトリ直下の `workshop.code-workspace` を開く。各 app フォルダで `.venv` が自動検出され、adk-helloworld と agentcore-strands-basic の import が同時に解決します（`.venv` はテスト実行で作成済み。無ければ上の「テストの実行」を一度回す）。
+- 代替（フォルダを直接開いている場合）: `Cmd/Ctrl+Shift+P` → `Python: Select Interpreter` → `packages/gc/apps/adk-helloworld/.venv/bin/python`（ただし他の Python app とは交互の切り替えが必要）。
 
 ## ローカル実行（Gemini API key 方式・主手順）
 

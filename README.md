@@ -71,6 +71,10 @@ activate しておくと `mise exec -- ` を付けずに `bun` を直接呼べ�
 eval "$(mise activate zsh)"
 ```
 
+### VS Code（Python app の編集）
+
+`apps/` 配下には Python app が複数あります（`adk-helloworld` / `agentcore-strands-basic`）。フォルダを直接開くと Pylance は interpreter を 1 つしか選べず片方の import しか解決しないため、複数を同時に解決させるにはリポジトリ直下の [`workshop.code-workspace`](./workshop.code-workspace) を `File → Open Workspace from File…` で開きます。各 app の `.venv`（その app の uv コマンドを一度実行すると生成。詳細は各 app の README）が自動検出されます。
+
 ## 使い方
 
 | タスク | 用途 | 例 |
