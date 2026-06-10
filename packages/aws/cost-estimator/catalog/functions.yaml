@@ -1,0 +1,27 @@
+# functions カテゴリ: AWS Lambda の request 数 / 実行時間 / memory。
+# Lambda は「リクエスト数」と「GB-second（割当メモリ GB x 実行時間 s）」で課金される。
+# GB-second が実行時間と memory の両方を内包するため、request と GB-second の 2 軸で
+# request / 実行時間 / memory をすべて表現できる。
+# Lambda の CUR usageType 文字列は公式 pricing ページに記載が無く（CUR 知識ベース）、
+# また base 行の operation は CUR 上で空のことが多いため、operation は空文字とし
+# 2 軸とも schema_only とする。
+category: functions
+description: AWS Lambda の request 数 / 実行時間 / memory
+region: ap-northeast-1
+services:
+  - id: lambda
+    service: AWS Lambda
+    service_code: AWSLambda
+    usages:
+      - billing_axis: number of requests (invocations)
+        usage_type: Request
+        operation: "" # Lambda の base 行は CUR 上 operation が空のことが多い
+        unit: Requests
+        amount: 1000000 # 100 万リクエスト/月
+        mapping_status: schema_only
+      - billing_axis: compute duration = memory (GB) x execution time (s)
+        usage_type: Lambda-GB-Second
+        operation: ""
+        unit: GB-Second
+        amount: 25000 # 例: 0.125 GB(128MB) x 0.2s x 100 万リクエスト
+        mapping_status: schema_only

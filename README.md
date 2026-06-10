@@ -23,6 +23,7 @@ workshop/
 │   └── git-hooks/       # git フック (commit-msg: Conventional Commits 検証)
 └── packages/            # プロジェクト群 (この配下が bootstrap の対象。dev / dev:all は直下のプロジェクトのみ)
     ├── aws/
+    │   ├── cost-estimator/           # 見積もり専用 catalog + bcm-pricing-calculator API adapter
     │   └── terraform/
     │       ├── README.md             # サンプル一覧と共通手順
     │       ├── caller-identity/      # AWS 操作ごとの独立した read-only サンプル (caller identity を読む)

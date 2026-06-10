@@ -1,0 +1,36 @@
+# iam カテゴリ: IAM 本体（直接課金なし）と、課金対象 addon の IAM Access Analyzer を分離する。
+# - IAM 本体は no_direct_charge: true（usages は空）。adapter は payload から除外し summary に記録する。
+# - IAM Access Analyzer は機能ごとに課金される。operation は usageType 駆動のため空文字。
+#   internal access analysis は usageType が未検証のため needs_research。
+category: iam
+description: IAM 本体（無料）と課金 addon の IAM Access Analyzer を分離する
+region: ap-northeast-1
+services:
+  - id: iam
+    service: AWS Identity and Access Management (IAM)
+    service_code: AWSIdentityAndAccessManagement
+    no_direct_charge: true
+    usages: []
+  - id: iam-access-analyzer
+    service: AWS IAM Access Analyzer
+    service_code: AWSIAMAccessAnalyzer
+    usages:
+      - billing_axis: unused access analysis (per monitored IAM role/user per month)
+        usage_type: AccessFinding-Monitored-IAM-Resources
+        operation: ""
+        unit: Resources
+        amount: 50
+        mapping_status: mapped
+      - billing_axis: custom policy checks (per Access Analyzer check API call)
+        usage_type: CustomCheck-API-Requests
+        operation: ""
+        unit: Requests
+        amount: 1000
+        mapping_status: mapped
+      - billing_axis: internal access analysis (per monitored AWS resource per Region per month)
+        # 新しい課金軸で usageType が CUR リファレンスに未掲載のため要検証。
+        usage_type: InternalAccess-Monitored-Resources
+        operation: ""
+        unit: Resources
+        amount: 0
+        mapping_status: needs_research

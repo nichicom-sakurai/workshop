@@ -1,0 +1,78 @@
+# web カテゴリ: Web 配信レイヤの代表サービス（EC2 / ALB / S3）の月額見積もり入力。
+# usage_type は region prefix を含まない core 値で記述し、adapter が region から
+# prefix（ap-northeast-1 → APN1-）を付与する。amount は代表的なサンプル使用量であり
+# 実使用量ではない。mapping_status の意味は catalog/README.md を参照。
+category: web
+description: Web 配信レイヤの代表サービス（EC2 / ALB / S3）
+region: ap-northeast-1
+services:
+  - id: ec2
+    service: Amazon EC2
+    service_code: AmazonEC2
+    usages:
+      - billing_axis: on-demand instance hours (t3.micro, Linux/UNIX, shared tenancy)
+        usage_type: BoxUsage:t3.micro
+        operation: RunInstances
+        unit: Hrs
+        amount: 730 # 1 インスタンス x 約 730 時間/月
+        mapping_status: mapped
+      - billing_axis: EBS gp3 provisioned storage (GB-month)
+        usage_type: EBS:VolumeUsage.gp3
+        operation: CreateVolume-Gp3
+        unit: GB-Mo
+        amount: 30
+        mapping_status: mapped
+      - billing_axis: data transfer out to internet (egress)
+        # egress 行の operation 帰属は CUR 上で空のこともあり不確実（schema_only）。
+        usage_type: DataTransfer-Out-Bytes
+        operation: RunInstances
+        unit: GB
+        amount: 100
+        mapping_status: schema_only
+  - id: alb
+    service: Application Load Balancer (ELBv2)
+    # serviceCode AWSELB は Classic/v2 共用で確信度が中程度、operation は推定値のため
+    # usageType の確度に関わらず triple 全体としては schema_only とする。
+    service_code: AWSELB
+    usages:
+      - billing_axis: load balancer running time (per-hour)
+        usage_type: LoadBalancerUsage
+        operation: LoadBalancing:Application
+        unit: Hrs
+        amount: 730
+        mapping_status: schema_only
+      - billing_axis: Load Balancer Capacity Units (LCU-hours)
+        usage_type: LCUUsage
+        operation: LoadBalancing:Application
+        unit: LCU-Hrs
+        amount: 730
+        mapping_status: schema_only
+  - id: s3
+    service: Amazon S3
+    service_code: AmazonS3
+    usages:
+      - billing_axis: S3 Standard storage (GB-month)
+        usage_type: TimedStorage-ByteHrs
+        operation: StandardStorage
+        unit: GB-Mo
+        amount: 50
+        mapping_status: mapped
+      - billing_axis: PUT/COPY/POST/LIST requests (Tier1)
+        usage_type: Requests-Tier1
+        operation: PutObject
+        unit: Requests
+        amount: 100000
+        mapping_status: mapped
+      - billing_axis: GET and other non-Tier1 requests (Tier2)
+        usage_type: Requests-Tier2
+        operation: GetObject
+        unit: Requests
+        amount: 1000000
+        mapping_status: mapped
+      - billing_axis: data transfer out to internet (egress)
+        # egress の operation 帰属（GetObject / 空）が不確実なため schema_only。
+        usage_type: DataTransfer-Out-Bytes
+        operation: GetObject
+        unit: GB
+        amount: 50
+        mapping_status: schema_only
