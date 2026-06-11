@@ -22,9 +22,10 @@ mkdir -p "${STAGE_DIR}"
 
 # 1) ローカル run と共通の agent パッケージ。ローカル runtime/secret 由来のものは
 #    archive に含めない: .env*(secret/template)、.adk/(adk run/web のセッション
-#    store)、__pycache__/、*.pyc。
+#    store)、__pycache__/、*.pyc。.env* の除去は将来 subpackage が独自 .env を
+#    持っても漏らさないよう再帰的にする(defense-in-depth)。
 cp -R "${APP_DIR}/hello_world" "${STAGE_DIR}/hello_world"
-find "${STAGE_DIR}/hello_world" -maxdepth 1 -name '.env*' -delete
+find "${STAGE_DIR}/hello_world" -type f -name '.env*' -delete
 find "${STAGE_DIR}/hello_world" -type d -name '.adk' -prune -exec rm -rf {} +
 find "${STAGE_DIR}/hello_world" -type d -name '__pycache__' -prune -exec rm -rf {} +
 find "${STAGE_DIR}/hello_world" -type f -name '*.py[co]' -delete
