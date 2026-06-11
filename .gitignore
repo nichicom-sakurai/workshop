@@ -17,6 +17,9 @@ __pycache__/
 *.py[cod]
 .pytest_cache/
 
+# Google ADK local session/runtime store (created by adk run / adk web)
+.adk/
+
 # AgentCore direct deployment build artifacts
 packages/aws/apps/*/.build/
 packages/aws/apps/*/dist/
