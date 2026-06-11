@@ -1,0 +1,127 @@
+<!doctype html>
+<html lang="ja">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>OpenAI Agents チャット</title>
+    <style>
+      body {
+        font-family: system-ui, -apple-system, sans-serif;
+        max-width: 680px;
+        margin: 0 auto;
+        padding: 1rem;
+        color: #1a1a1a;
+      }
+      h1 {
+        font-size: 1.2rem;
+      }
+      #log {
+        border: 1px solid #ddd;
+        border-radius: 8px;
+        padding: 1rem;
+        height: 60vh;
+        overflow-y: auto;
+        background: #fafafa;
+      }
+      .msg {
+        margin: 0.5rem 0;
+        white-space: pre-wrap;
+        line-height: 1.5;
+      }
+      .role {
+        font-weight: 600;
+        margin-right: 0.4rem;
+      }
+      .user .role {
+        color: #1a7a4a;
+      }
+      .assistant .role {
+        color: #1a4aa7;
+      }
+      form {
+        display: flex;
+        gap: 0.5rem;
+        margin-top: 0.75rem;
+      }
+      input {
+        flex: 1;
+        padding: 0.5rem 0.7rem;
+        font-size: 1rem;
+        border: 1px solid #ccc;
+        border-radius: 6px;
+      }
+      button {
+        padding: 0.5rem 0.9rem;
+        font-size: 1rem;
+        border: 1px solid #ccc;
+        border-radius: 6px;
+        background: #fff;
+        cursor: pointer;
+      }
+    </style>
+  </head>
+  <body>
+    <h1>OpenAI Agents チャット</h1>
+    <div id="log"></div>
+    <form id="form">
+      <input id="input" autocomplete="off" placeholder="メッセージを入力…" autofocus />
+      <button type="submit">送信</button>
+      <button type="button" id="reset">クリア</button>
+    </form>
+    <script>
+      const log = document.getElementById("log");
+      const form = document.getElementById("form");
+      const input = document.getElementById("input");
+
+      function add(role, text) {
+        const div = document.createElement("div");
+        div.className = "msg " + role;
+        const label = document.createElement("span");
+        label.className = "role";
+        label.textContent = role === "user" ? "You:" : "AI:";
+        const body = document.createElement("span");
+        body.textContent = text;
+        div.append(label, body);
+        log.appendChild(div);
+        log.scrollTop = log.scrollHeight;
+        return body;
+      }
+
+      form.addEventListener("submit", async (event) => {
+        event.preventDefault();
+        const text = input.value.trim();
+        if (!text) return;
+        input.value = "";
+        add("user", text);
+        const out = add("assistant", "");
+        try {
+          const res = await fetch("/api/chat", {
+            method: "POST",
+            headers: { "content-type": "application/json" },
+            body: JSON.stringify({ message: text }),
+          });
+          if (!res.ok || !res.body) {
+            out.textContent = "[エラー] HTTP " + res.status;
+            return;
+          }
+          const reader = res.body.getReader();
+          const decoder = new TextDecoder();
+          while (true) {
+            const { done, value } = await reader.read();
+            if (done) break;
+            out.textContent += decoder.decode(value, { stream: true });
+            log.scrollTop = log.scrollHeight;
+          }
+        } catch (err) {
+          out.textContent = "[エラー] " + (err && err.message ? err.message : err);
+        }
+      });
+
+      document.getElementById("reset").addEventListener("click", async () => {
+        await fetch("/api/reset", { method: "POST" });
+        log.innerHTML = "";
+        input.focus();
+      });
+    </script>
+  </body>
+</html>

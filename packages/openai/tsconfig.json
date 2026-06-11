@@ -1,0 +1,18 @@
+{
+  // Bun 向けの最小設定。Bun は TS を直接実行するためビルドには使わず、
+  // エディタの型チェックと `bunx tsc --noEmit` でのみ参照されます。
+  // moduleDetection: "force" で各ファイルを module 扱いにし、top-level await を許可します
+  // (index.ts は静的 import を持たず動的 import のみのため、これが無いと TS1375 になる)。
+  // types に "bun" を指定すると、bun-types が内包する Node 互換グローバル（process など）が解決されます。
+  "compilerOptions": {
+    "lib": ["ESNext"],
+    "target": "ESNext",
+    "module": "ESNext",
+    "moduleResolution": "bundler",
+    "moduleDetection": "force",
+    "noEmit": true,
+    "strict": true,
+    "skipLibCheck": true,
+    "types": ["bun"]
+  }
+}
