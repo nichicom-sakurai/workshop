@@ -1,0 +1,12 @@
+# Vertex AI Agent Engine (reasoning engine) runtime の依存。
+# package-agent-engine.sh が source archive の root にこのファイルを置き、
+# Terraform の python_spec.requirements_file = "requirements.txt" がこれを読む。
+#
+# バージョンは厳密 pin（repo 全体の「latest/any 禁止」方針）。
+# - google-adk: ローカル run と同じ pin。pyproject.toml の dependencies と
+#   一致させる（ズレは tests/test_agent_engine_packaging.py が検出する）。
+# - google-cloud-aiplatform[agent_engines]: vertexai.agent_engines.AdkApp と
+#   Agent Engine runtime の補助依存（cloudpickle / opentelemetry など）を提供する。
+#   extra 名は metadata 上 "agent-engines"（PEP 685 で agent_engines と等価）。
+google-adk==2.2.0
+google-cloud-aiplatform[agent_engines]==1.157.0
