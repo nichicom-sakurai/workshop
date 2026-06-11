@@ -4,7 +4,7 @@
       "hooks": [
         {
           "type": "command",
-          "command": "printf '%s\\n' '[workshop] Drive tasks via mise. bun is mise-managed and not on PATH — use `mise run dev <name>` (runnable apps under apps/), or `mise exec -- bun ...` for manual bun. terraform samples live under packages/aws/terraform/ (run: mise run tf <op> <cmd>). See AGENTS.md.'",
+          "command": "printf '%s\\n' '[workshop] Drive tasks via mise. bun is mise-managed and not on PATH — use `mise run dev <name>` (runnable apps under apps/), or `mise exec -- bun ...` for manual bun. terraform samples live under terraform/aws/ (run: mise run tf <op> <cmd>). See AGENTS.md.'",
           "timeout": 10
         }
       ]

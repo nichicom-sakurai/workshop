@@ -8,7 +8,7 @@ argument-hint: "<name>"
 
 Scaffold a new runnable app at `apps/<name>/` matching the repo convention (reference: `apps/openai/`).
 
-> Runnable / deployable code lives under `apps/`. The provider packages `packages/aws/` and `packages/gc/` are Terraform-sample containers (no runnable Bun entry point) — a new Terraform sample instead goes under `packages/<provider>/terraform/<operation>/`.
+> Runnable / deployable code lives under `apps/`. The provider Terraform-sample roots are `terraform/aws/` and `terraform/gc/` (no runnable Bun entry point) — a new Terraform sample instead goes under `terraform/<provider>/<operation>/`.
 
 ## Steps
 
@@ -29,7 +29,7 @@ Scaffold a new runnable app at `apps/<name>/` matching the repo convention (refe
 
 ## Notes
 
-- Do **not** edit `mise.toml` tasks — `dev` / `chat` / `web` resolve `<name>` (a dir with `package.json`) from `packages/` then `apps/`, and bootstrap auto-detects new dirs. There is no `dev:all`.
+- Do **not** edit `mise.toml` tasks — `dev` / `chat` / `web` resolve `<name>` (a dir with `package.json`) from `apps/`, and bootstrap auto-detects new dirs. There is no `dev:all`.
 - Add a project-local `mise.toml` (+ `mise trust`) only if this app needs a tool/version different from root.
 - Tool versions live in `mise.toml`, never in `package.json` (beyond the package's own `version`).
 
