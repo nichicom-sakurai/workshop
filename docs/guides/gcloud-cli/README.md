@@ -7,7 +7,7 @@
 
 - Google Cloud CLI がインストールされていること
 - Google Cloud の対象プロジェクトを参照できる Google account があること
-- `packages/gc/terraform/project-info/` を動かす場合は、Project ID `nck-sakurai` を参照できること
+- `terraform/gc/project-info/` を動かす場合は、Project ID `nck-sakurai` を参照できること
 
 > [WARNING] `gcloud auth login` で CLI にログインできても、その account に対象 project の IAM 権限がなければ project は表示・参照できません。
 > 認証成功と project 権限は分けて確認します。
@@ -52,7 +52,7 @@ gcloud projects describe "${PROJECT_ID}"  # project metadata を確認
 ## API の有効状態を確認する
 
 project で有効な API (service) を確認するコマンドです。
-Terraform の [storage-api-enable](../../../packages/gc/terraform/storage-api-enable/) サンプルは `storage.googleapis.com` を Terraform で有効化しますが、現在の有効状態は `gcloud` でも確認できます。
+Terraform の [storage-api-enable](../../../terraform/gc/storage-api-enable/) サンプルは `storage.googleapis.com` を Terraform で有効化しますが、現在の有効状態は `gcloud` でも確認できます。
 
 ```bash
 PROJECT_ID="nck-sakurai"

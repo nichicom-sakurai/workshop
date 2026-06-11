@@ -1,8 +1,8 @@
 # Move deployable apps to root-level `apps/` — Implementation Plan
 
-**Goal:** Relocate the three deployable apps from `packages/<provider>/apps/` to a flat root-level `apps/<app>/`, updating every living reference, in a single PR.
+**Goal:** Relocate the three deployable apps from `terraform/<provider>/apps/` to a flat root-level `apps/<app>/`, updating every living reference, in a single PR.
 
-**Architecture:** `git mv` each app to `apps/`, then fix references concern-by-concern (build mechanism → Terraform relative paths → app docs → AI docs → human docs). `bootstrap.sh` is generalized to scan `packages` + `apps`. Historical `docs/plans/2026-06-10-*` and `packages/aws/cost-estimator/` are untouched.
+**Architecture:** `git mv` each app to `apps/`, then fix references concern-by-concern (build mechanism → Terraform relative paths → app docs → AI docs → human docs). `bootstrap.sh` is generalized to scan `packages` + `apps`. Historical `docs/plans/2026-06-10-*` and `terraform/aws/cost-estimator/` are untouched.
 
 **Tech Stack:** Bun + TypeScript, Python 3.13 + uv, Terraform, mise task runner. No repo-wide unit-test runner — **verification gates are grep / build / type-check / `terraform validate` / `uv unittest`**, not literal failing unit tests. Each task below uses a "Verify" step in place of the usual TDD "write failing test" step.
 
@@ -20,10 +20,10 @@
 
 ```
 apps/
-├── agentcore-strands-basic/   (from packages/aws/apps/)
-├── adk-helloworld/            (from packages/gc/apps/)
-└── cloud-run-rest/            (from packages/gc/apps/)
-packages/
+├── agentcore-strands-basic/   (from terraform/aws/apps/)
+├── adk-helloworld/            (from terraform/gc/apps/)
+└── cloud-run-rest/            (from terraform/gc/apps/)
+terraform/
 ├── aws/   { index.ts, package.json, cost-estimator/, terraform/ }
 ├── gc/    { index.ts, package.json, terraform/ }
 └── openai/
@@ -33,10 +33,10 @@ packages/
 
 | Location | depth from root | old → new |
 | --- | --- | --- |
-| Terraform **module** dir `packages/<p>/terraform/<op>/*` | 4 | `../../apps/` → `../../../../apps/` |
-| `packages/gc/terraform/README.md` | 3 | `../apps/` → `../../../apps/` |
-| from-repo-root command/path strings (any file) | — | `packages/aws/apps/` and `packages/gc/apps/` → `apps/` |
-| `docs/guides/*/README.md` links | — | `../../../packages/aws/apps/` → `../../../apps/` |
+| Terraform **module** dir `terraform/<p>/<op>/*` | 4 | `../../apps/` → `../../../../apps/` |
+| `terraform/gc/README.md` | 3 | `../apps/` → `../../../apps/` |
+| from-repo-root command/path strings (any file) | — | `terraform/aws/apps/` and `terraform/gc/apps/` → `apps/` |
+| `docs/guides/*/README.md` links | — | `../../../terraform/aws/apps/` → `../../../apps/` |
 
 ---
 
@@ -74,24 +74,24 @@ One logical change: relocate the directories. Preserve the real local secret `ap
 
 **Files:**
 
-- Move: `packages/aws/apps/agentcore-strands-basic/` → `apps/agentcore-strands-basic/`
-- Move: `packages/gc/apps/adk-helloworld/` → `apps/adk-helloworld/`
-- Move: `packages/gc/apps/cloud-run-rest/` → `apps/cloud-run-rest/`
+- Move: `terraform/aws/apps/agentcore-strands-basic/` → `apps/agentcore-strands-basic/`
+- Move: `terraform/gc/apps/adk-helloworld/` → `apps/adk-helloworld/`
+- Move: `terraform/gc/apps/cloud-run-rest/` → `apps/cloud-run-rest/`
 
 **Step 1: Remove stale gitignored env dirs (they hold absolute paths / are regenerable)**
 
 `.venv` (Python) embeds absolute paths and breaks on move; `node_modules` is reinstalled by bootstrap. `.env` is NOT removed — it must travel with the app.
 
 ```bash
-rm -rf packages/aws/apps/agentcore-strands-basic/.venv \
-       packages/aws/apps/agentcore-strands-basic/.build \
-       packages/aws/apps/agentcore-strands-basic/dist \
-       packages/gc/apps/adk-helloworld/.venv \
-       packages/gc/apps/adk-helloworld/.build \
-       packages/gc/apps/cloud-run-rest/node_modules
-find packages/aws/apps packages/gc/apps -name __pycache__ -type d -prune -exec rm -rf {} + 2>/dev/null || true
-find packages/aws/apps packages/gc/apps -name .adk -type d -prune -exec rm -rf {} + 2>/dev/null || true
-find packages/aws/apps packages/gc/apps -name .DS_Store -delete 2>/dev/null || true
+rm -rf terraform/aws/apps/agentcore-strands-basic/.venv \
+       terraform/aws/apps/agentcore-strands-basic/.build \
+       terraform/aws/apps/agentcore-strands-basic/dist \
+       terraform/gc/apps/adk-helloworld/.venv \
+       terraform/gc/apps/adk-helloworld/.build \
+       terraform/gc/apps/cloud-run-rest/node_modules
+find terraform/aws/apps terraform/gc/apps -name __pycache__ -type d -prune -exec rm -rf {} + 2>/dev/null || true
+find terraform/aws/apps terraform/gc/apps -name .adk -type d -prune -exec rm -rf {} + 2>/dev/null || true
+find terraform/aws/apps terraform/gc/apps -name .DS_Store -delete 2>/dev/null || true
 ```
 
 (`.adk/` is a regenerable local ADK session store; removing it keeps Step 3's "discard stale gitignored state" intent symmetric. `.env` is deliberately NOT removed.)
@@ -100,18 +100,18 @@ find packages/aws/apps packages/gc/apps -name .DS_Store -delete 2>/dev/null || t
 
 ```bash
 mkdir -p apps
-git mv packages/aws/apps/agentcore-strands-basic apps/agentcore-strands-basic
-git mv packages/gc/apps/adk-helloworld          apps/adk-helloworld
-git mv packages/gc/apps/cloud-run-rest          apps/cloud-run-rest
+git mv terraform/aws/apps/agentcore-strands-basic apps/agentcore-strands-basic
+git mv terraform/gc/apps/adk-helloworld          apps/adk-helloworld
+git mv terraform/gc/apps/cloud-run-rest          apps/cloud-run-rest
 ```
 
 **Step 3: Reconcile leftovers (git mv on a dir does not always carry untracked files like `.env`)**
 
 ```bash
 # If the source dirs still exist, move any remaining (untracked) files, e.g. hello_world/.env
-for src in packages/aws/apps/agentcore-strands-basic \
-           packages/gc/apps/adk-helloworld \
-           packages/gc/apps/cloud-run-rest; do
+for src in terraform/aws/apps/agentcore-strands-basic \
+           terraform/gc/apps/adk-helloworld \
+           terraform/gc/apps/cloud-run-rest; do
   if [ -e "$src" ]; then
     dest="apps/$(basename "$src")"
     cp -a "$src/." "$dest/"   # carry over any untracked leftovers (.env etc.)
@@ -119,14 +119,14 @@ for src in packages/aws/apps/agentcore-strands-basic \
   fi
 done
 # Old parent dirs must be gone
-rmdir packages/aws/apps packages/gc/apps 2>/dev/null || true
+rmdir terraform/aws/apps terraform/gc/apps 2>/dev/null || true
 ```
 
 **Step 4: Verify the move**
 
 ```bash
 test -d apps/agentcore-strands-basic && test -d apps/adk-helloworld && test -d apps/cloud-run-rest && echo "[OK] moved"
-test ! -e packages/aws/apps && test ! -e packages/gc/apps && echo "[OK] old gone"
+test ! -e terraform/aws/apps && test ! -e terraform/gc/apps && echo "[OK] old gone"
 test -f apps/adk-helloworld/hello_world/.env && echo "[OK] .env preserved" || echo "[INFO] no local .env (fine if never created)"
 git status --porcelain | grep -E '^R' | head
 ```
@@ -165,10 +165,10 @@ with:
 PROJECTS_DIRS=("packages" "apps")
 ```
 
-Replace the entire `packages/*` bootstrap block (from `echo "[INFO] ${PROJECTS_DIR}/* bootstrap: Start"` through its closing `fi`) with:
+Replace the entire `terraform/*` bootstrap block (from `echo "[INFO] ${PROJECTS_DIR}/* bootstrap: Start"` through its closing `fi`) with:
 
 ```bash
-echo "[INFO] packages/* and apps/* bootstrap: Start"
+echo "[INFO] terraform/* and apps/* bootstrap: Start"
 if ! type mise >/dev/null 2>&1; then
   echo "[WARNING] Skip bootstrap because mise could not be found."
 else
@@ -194,7 +194,7 @@ else
         (cd "$dir" && mise exec -- bun install)
       done
   done
-  echo "[OK] packages/* and apps/* bootstrap: Success"
+  echo "[OK] terraform/* and apps/* bootstrap: Success"
 fi
 ```
 
@@ -204,8 +204,8 @@ Replace:
 
 ```
 # AgentCore direct deployment build artifacts
-packages/aws/apps/*/.build/
-packages/aws/apps/*/dist/
+terraform/aws/apps/*/.build/
+terraform/aws/apps/*/dist/
 *.zip
 ```
 
@@ -221,14 +221,14 @@ apps/*/dist/
 And delete the now-redundant block:
 
 ```
-# Agent Engine source archive build artifacts (packages/gc/apps/*/scripts/package-agent-engine.sh)
-packages/gc/apps/*/.build/
+# Agent Engine source archive build artifacts (terraform/gc/apps/*/scripts/package-agent-engine.sh)
+terraform/gc/apps/*/.build/
 ```
 
 **Step 3: `.vscode/settings.json` — update python project paths**
 
-- `"path": "packages/aws/apps/agentcore-strands-basic"` → `"path": "apps/agentcore-strands-basic"`
-- `"path": "packages/gc/apps/adk-helloworld"` → `"path": "apps/adk-helloworld"`
+- `"path": "terraform/aws/apps/agentcore-strands-basic"` → `"path": "apps/agentcore-strands-basic"`
+- `"path": "terraform/gc/apps/adk-helloworld"` → `"path": "apps/adk-helloworld"`
 
 **Step 4: Verify**
 
@@ -255,27 +255,27 @@ git commit -m "build: bootstrap を packages+apps 走査へ一般化し ignore/v
 
 **Files (module dirs, depth 4 → `../../apps` becomes `../../../../apps`):**
 
-- `packages/aws/terraform/agentcore-runtime-basic/`: `terraform.tfvars.template`, `README.md`, `variables.tf`
-- `packages/gc/terraform/adk-agent-engine-basic/`: `variables.tf`, `terraform.tfvars.template`, `README.md`, `cleanup.md`
-- `packages/gc/terraform/cloud-run-service-basic/`: `README.md`
-- `packages/gc/terraform/README.md` (depth 3 → `../apps` becomes `../../../apps`)
+- `terraform/aws/agentcore-runtime-basic/`: `terraform.tfvars.template`, `README.md`, `variables.tf`
+- `terraform/gc/adk-agent-engine-basic/`: `variables.tf`, `terraform.tfvars.template`, `README.md`, `cleanup.md`
+- `terraform/gc/cloud-run-service-basic/`: `README.md`
+- `terraform/gc/README.md` (depth 3 → `../apps` becomes `../../../apps`)
 
 **Step 1: AWS `agentcore-runtime-basic`**
 
 - `terraform.tfvars.template`: `../../apps/agentcore-strands-basic/dist/agentcore-strands-basic.zip` → `../../../../apps/agentcore-strands-basic/dist/agentcore-strands-basic.zip`
-- `README.md` (line ~18 link): `../../apps/agentcore-strands-basic/` → `../../../../apps/agentcore-strands-basic/`; and the from-root command `packages/aws/apps/agentcore-strands-basic/scripts/package.sh` → `apps/agentcore-strands-basic/scripts/package.sh`; `packages/aws/apps/agentcore-strands-basic/dist/...` → `apps/agentcore-strands-basic/dist/...`
-- `variables.tf` (description prose): `packages/aws/apps/agentcore-strands-basic/scripts/package.sh` → `apps/agentcore-strands-basic/scripts/package.sh`
+- `README.md` (line ~18 link): `../../apps/agentcore-strands-basic/` → `../../../../apps/agentcore-strands-basic/`; and the from-root command `terraform/aws/apps/agentcore-strands-basic/scripts/package.sh` → `apps/agentcore-strands-basic/scripts/package.sh`; `terraform/aws/apps/agentcore-strands-basic/dist/...` → `apps/agentcore-strands-basic/dist/...`
+- `variables.tf` (description prose): `terraform/aws/apps/agentcore-strands-basic/scripts/package.sh` → `apps/agentcore-strands-basic/scripts/package.sh`
 
 **Step 2: GC `adk-agent-engine-basic`**
 
 - `variables.tf` default: `../../apps/adk-helloworld/.build/source.tar.gz` → `../../../../apps/adk-helloworld/.build/source.tar.gz`
 - `terraform.tfvars.template`: same `../../apps/...` → `../../../../apps/...`
-- `README.md`: link target `../../apps/adk-helloworld/` → `../../../../apps/adk-helloworld/`; table default `../../apps/adk-helloworld/.build/source.tar.gz` → `../../../../apps/...`; from-root command `bash packages/gc/apps/adk-helloworld/scripts/package-agent-engine.sh` → `bash apps/adk-helloworld/scripts/package-agent-engine.sh`
-- `cleanup.md`: `packages/gc/apps/adk-helloworld/.build/source.tar.gz` → `apps/adk-helloworld/.build/source.tar.gz`; `bash packages/gc/apps/adk-helloworld/scripts/...` → `bash apps/adk-helloworld/scripts/...`; `rm -rf packages/gc/apps/adk-helloworld/.build` → `rm -rf apps/adk-helloworld/.build`
+- `README.md`: link target `../../apps/adk-helloworld/` → `../../../../apps/adk-helloworld/`; table default `../../apps/adk-helloworld/.build/source.tar.gz` → `../../../../apps/...`; from-root command `bash terraform/gc/apps/adk-helloworld/scripts/package-agent-engine.sh` → `bash apps/adk-helloworld/scripts/package-agent-engine.sh`
+- `cleanup.md`: `terraform/gc/apps/adk-helloworld/.build/source.tar.gz` → `apps/adk-helloworld/.build/source.tar.gz`; `bash terraform/gc/apps/adk-helloworld/scripts/...` → `bash apps/adk-helloworld/scripts/...`; `rm -rf terraform/gc/apps/adk-helloworld/.build` → `rm -rf apps/adk-helloworld/.build`
 
 **Step 3: GC `cloud-run-service-basic`**
 
-- `README.md`: link label `[packages/gc/apps/cloud-run-rest/]` → `[apps/cloud-run-rest/]` with target `../../apps/cloud-run-rest/` → `../../../../apps/cloud-run-rest/`; `(cd packages/gc/apps/cloud-run-rest && ...)` → `(cd apps/cloud-run-rest && ...)`; `[アプリ側 README](../../apps/cloud-run-rest/README.md)` → `../../../../apps/cloud-run-rest/README.md`
+- `README.md`: link label `[terraform/gc/apps/cloud-run-rest/]` → `[apps/cloud-run-rest/]` with target `../../apps/cloud-run-rest/` → `../../../../apps/cloud-run-rest/`; `(cd terraform/gc/apps/cloud-run-rest && ...)` → `(cd apps/cloud-run-rest && ...)`; `[アプリ側 README](../../apps/cloud-run-rest/README.md)` → `../../../../apps/cloud-run-rest/README.md`
 
 **Step 4: GC `terraform/README.md` (depth 3)**
 
@@ -285,25 +285,25 @@ git commit -m "build: bootstrap を packages+apps 走査へ一般化し ignore/v
 **Step 4b: path-vs-identifier checks (expected: NO edit)**
 
 ```bash
-grep -n "\.\./\.\./apps\|packages/.*/apps" packages/gc/terraform/adk-agent-engine-basic/main.tf \
-  packages/gc/terraform/cloud-run-service-basic/variables.tf \
-  packages/gc/terraform/cloud-run-service-basic/terraform.tfvars.template
+grep -n "\.\./\.\./apps\|terraform/.*/apps" terraform/gc/adk-agent-engine-basic/main.tf \
+  terraform/gc/cloud-run-service-basic/variables.tf \
+  terraform/gc/cloud-run-service-basic/terraform.tfvars.template
 ```
 Expected: no path matches — the `adk-helloworld` / `cloud-run-rest` strings there are identifiers (reasoning-engine `display_name`, Artifact Registry image name), **not** filesystem paths. If a match IS a relative path, apply the same `../../apps` → `../../../../apps` rule; otherwise leave unchanged.
 
 **Step 5: Verify (path resolution is the real gate)**
 
 ```bash
-test -d packages/aws/terraform/agentcore-runtime-basic/../../../../apps/agentcore-strands-basic && echo "[OK] aws path"
-test -d packages/gc/terraform/adk-agent-engine-basic/../../../../apps/adk-helloworld && echo "[OK] adk path"
-test -d packages/gc/terraform/cloud-run-service-basic/../../../../apps/cloud-run-rest && echo "[OK] crun path"
+test -d terraform/aws/agentcore-runtime-basic/../../../../apps/agentcore-strands-basic && echo "[OK] aws path"
+test -d terraform/gc/adk-agent-engine-basic/../../../../apps/adk-helloworld && echo "[OK] adk path"
+test -d terraform/gc/cloud-run-service-basic/../../../../apps/cloud-run-rest && echo "[OK] crun path"
 # Catch half-applied label+target edits: no un-bumped depth-2 (module) / depth-1 (terraform/README) link
 # or var value may remain. These literals are NOT substrings of the corrected ../../../../ and ../../../ forms.
 grep -rn -e '"\.\./\.\./apps/' -e '](\.\./\.\./apps/' -e '](\.\./apps/' \
-  packages/aws/terraform packages/gc/terraform && echo "[NG] un-bumped path" || echo "[OK] no depth-2/1 residual"
-for m in packages/aws/terraform/agentcore-runtime-basic \
-         packages/gc/terraform/adk-agent-engine-basic \
-         packages/gc/terraform/cloud-run-service-basic; do
+  terraform/aws/terraform terraform/gc/terraform && echo "[NG] un-bumped path" || echo "[OK] no depth-2/1 residual"
+for m in terraform/aws/agentcore-runtime-basic \
+         terraform/gc/adk-agent-engine-basic \
+         terraform/gc/cloud-run-service-basic; do
   mise exec -- terraform -chdir="$m" init -backend=false >/dev/null 2>&1
   mise exec -- terraform -chdir="$m" validate
 done
@@ -313,7 +313,7 @@ Expected: three `[OK] ... path` lines; three `Success! The configuration is vali
 **Step 6: Commit**
 
 ```bash
-git add packages/aws/terraform packages/gc/terraform
+git add terraform/aws/terraform terraform/gc/terraform
 git commit -m "refactor(terraform): app への相対パスを root apps/ へ更新"
 ```
 
@@ -321,34 +321,34 @@ git commit -m "refactor(terraform): app への相対パスを root apps/ へ更�
 
 ### Task 5: Update app-internal docs / tests / scripts
 
-These are from-repo-root path strings inside the moved apps: replace `packages/aws/apps/` and `packages/gc/apps/` with `apps/`.
+These are from-repo-root path strings inside the moved apps: replace `terraform/aws/apps/` and `terraform/gc/apps/` with `apps/`.
 
 **Files:**
 
 - `apps/agentcore-strands-basic/README.md`, `apps/agentcore-strands-basic/tests/test_main.py` (docstring)
-- `apps/adk-helloworld/README.md`, `apps/adk-helloworld/tests/test_agent.py`, `apps/adk-helloworld/tests/test_agent_engine_packaging.py` (docstrings), `apps/adk-helloworld/scripts/package-agent-engine.sh` (comment line: `packages/gc/apps/*/.build/` → `apps/*/.build/`)
-- `apps/cloud-run-rest/README.md` (path commands + reword the "nested app under `packages/gc/apps/`" note → "root-level app under `apps/`")
+- `apps/adk-helloworld/README.md`, `apps/adk-helloworld/tests/test_agent.py`, `apps/adk-helloworld/tests/test_agent_engine_packaging.py` (docstrings), `apps/adk-helloworld/scripts/package-agent-engine.sh` (comment line: `terraform/gc/apps/*/.build/` → `apps/*/.build/`)
+- `apps/cloud-run-rest/README.md` (path commands + reword the "nested app under `terraform/gc/apps/`" note → "root-level app under `apps/`")
 
 **Step 1: Mechanical path replacement inside the moved apps**
 
 ```bash
-grep -rln -e "packages/aws/apps/" -e "packages/gc/apps/" apps/ \
+grep -rln -e "terraform/aws/apps/" -e "terraform/gc/apps/" apps/ \
   | while read -r f; do
-      sed -i '' -e 's#packages/aws/apps/#apps/#g' -e 's#packages/gc/apps/#apps/#g' "$f"
+      sed -i '' -e 's#terraform/aws/apps/#apps/#g' -e 's#terraform/gc/apps/#apps/#g' "$f"
     done
 ```
 
 **Step 2: Reword the cloud-run-rest nested-app note**
 
 In `apps/cloud-run-rest/README.md`, change:
-`> このアプリは \`packages/gc/apps/\` 配下の nested app のため \`src/index.ts\` をエントリポイントにしています。`
+`> このアプリは \`terraform/gc/apps/\` 配下の nested app のため \`src/index.ts\` をエントリポイントにしています。`
 →
 `> このアプリは root の \`apps/\` 配下のアプリのため \`src/index.ts\` をエントリポイントにしています。`
 
 **Step 3: path-vs-identifier check for the AWS package script (expected: NO edit)**
 
 ```bash
-grep -n "packages/.*/apps\|\.\./\.\./apps" apps/agentcore-strands-basic/scripts/package.sh
+grep -n "terraform/.*/apps\|\.\./\.\./apps" apps/agentcore-strands-basic/scripts/package.sh
 ```
 Expected: no match — `agentcore-strands-basic.zip` there is an output filename, not a path.
 
@@ -358,7 +358,7 @@ Expected: no match — `agentcore-strands-basic.zip` there is an output filename
 rm -rf apps/agentcore-strands-basic/.venv apps/adk-helloworld/.venv   # force clean uv recreate
 mise exec -- uv run --directory apps/agentcore-strands-basic --locked python -m unittest discover -s tests
 mise exec -- uv run --directory apps/adk-helloworld --locked python -m unittest discover -s tests
-grep -rn -e "packages/aws/apps" -e "packages/gc/apps" apps/ && echo "[NG] residual" || echo "[OK] no residual in apps/"
+grep -rn -e "terraform/aws/apps" -e "terraform/gc/apps" apps/ && echo "[NG] residual" || echo "[OK] no residual in apps/"
 ```
 Expected: both unittest suites pass (adk includes `test_agent_engine_packaging.py`); `[OK] no residual in apps/`.
 
@@ -384,26 +384,26 @@ git commit -m "docs(apps): app README・テスト・スクリプトの参照を 
 **Step 1: Mechanical path replacement**
 
 ```bash
-sed -i '' -e 's#packages/aws/apps/#apps/#g' -e 's#packages/gc/apps/#apps/#g' \
+sed -i '' -e 's#terraform/aws/apps/#apps/#g' -e 's#terraform/gc/apps/#apps/#g' \
   AGENTS.md .claude/rules/packages.md .claude/rules/mise.md
 ```
 
 **Step 2: Conceptual rewrites in `AGENTS.md`** (paths alone are not enough — the narrative claims provider-nesting)
 
-- §1 Orientation: merge the two app bullets (formerly `packages/aws/apps/<app>/` and `packages/gc/apps/<app>/`) into one root-`apps/` bullet, e.g.:
-  `- \`apps/<app>/\` — deployable / runnable app code, decoupled from any single provider. Today: \`agentcore-strands-basic\` (Python/uv, AWS AgentCore Runtime ZIP), \`adk-helloworld\` (Python/uv, Google ADK; local run + Agent Engine archive), \`cloud-run-rest\` (Bun, Cloud Run). Not picked up by \`dev:all\` (which loops \`packages/*\` only); bootstrap scans \`apps/\` too (real \`bun install\` for \`cloud-run-rest\`).`
-- Replace any remaining "nested app(s)" / "nested under `packages/<provider>/apps/`" / "provider-scoped" phrasing with the flat root-`apps/` model.
-- Update the `packages/*` description so it no longer says the provider packages "contain `apps/`".
+- §1 Orientation: merge the two app bullets (formerly `terraform/aws/apps/<app>/` and `terraform/gc/apps/<app>/`) into one root-`apps/` bullet, e.g.:
+  `- \`apps/<app>/\` — deployable / runnable app code, decoupled from any single provider. Today: \`agentcore-strands-basic\` (Python/uv, AWS AgentCore Runtime ZIP), \`adk-helloworld\` (Python/uv, Google ADK; local run + Agent Engine archive), \`cloud-run-rest\` (Bun, Cloud Run). Not picked up by \`dev:all\` (which loops \`terraform/*\` only); bootstrap scans \`apps/\` too (real \`bun install\` for \`cloud-run-rest\`).`
+- Replace any remaining "nested app(s)" / "nested under `terraform/<provider>/apps/`" / "provider-scoped" phrasing with the flat root-`apps/` model.
+- Update the `terraform/*` description so it no longer says the provider packages "contain `apps/`".
 
 **Step 3: Conceptual rewrite in `.claude/rules/packages.md`**
 
-- Replace the "Nested apps (`packages/<name>/apps/<app>/`, e.g. `packages/gc/apps/cloud-run-rest/`)" sentence with: apps live at root `apps/<app>/`, decoupled from providers; entry point `src/index.ts` (Bun) or package module (Python); not in `dev:all`; bootstrap scans them.
+- Replace the "Nested apps (`terraform/<name>/apps/<app>/`, e.g. `terraform/gc/apps/cloud-run-rest/`)" sentence with: apps live at root `apps/<app>/`, decoupled from providers; entry point `src/index.ts` (Bun) or package module (Python); not in `dev:all`; bootstrap scans them.
 - In "## Python nested apps": drop "provider-scoped" guidance; a new Python app belongs at `apps/<app>/`.
 
 **Step 4: Verify**
 
 ```bash
-grep -rn -e "packages/aws/apps" -e "packages/gc/apps" AGENTS.md .claude/ && echo "[NG] residual path" || echo "[OK] no path residual"
+grep -rn -e "terraform/aws/apps" -e "terraform/gc/apps" AGENTS.md .claude/ && echo "[NG] residual path" || echo "[OK] no path residual"
 grep -rn -e "provider-scoped" -e "[Nn]ested app" -e "nested under" AGENTS.md .claude/ && echo "[NG] concept residual" || echo "[OK] no concept residual"
 test "$(readlink CLAUDE.md)" = "AGENTS.md" && echo "[OK] symlink intact"
 ```
@@ -428,14 +428,14 @@ git commit -m "docs: AGENTS と .claude/rules を root apps/ 構成へ更新"
 
 **Step 1: `README.md` — rewrite the directory tree** (lines ~26–47)
 
-Move the apps out of each provider into a new top-level `apps/` block and adjust the `packages/` comment:
+Move the apps out of each provider into a new top-level `apps/` block and adjust the `terraform/` comment:
 
 ```text
 ├── apps/                # デプロイ対象アプリ群 (bootstrap の対象。dev / dev:all の対象外)
 │   ├── agentcore-strands-basic/   # AgentCore Runtime に deploy する Python + Strands Agents app
 │   ├── adk-helloworld/            # Google ADK の最小 HelloWorld agent (ローカル実行 + Agent Engine deploy 用 source archive 生成)
 │   └── cloud-run-rest/            # Cloud Run に deploy する最小の Bun REST service (Dockerfile 付き)
-└── packages/            # プロジェクト群 (bootstrap の対象。dev / dev:all は直下のプロジェクトのみ)
+└── terraform/            # プロジェクト群 (bootstrap の対象。dev / dev:all は直下のプロジェクトのみ)
     ├── aws/
     │   ├── cost-estimator/           # 見積もり専用 catalog + bcm-pricing-calculator API adapter
     │   └── terraform/
@@ -453,13 +453,13 @@ Move the apps out of each provider into a new top-level `apps/` block and adjust
     └── openai/              # OpenAI Agents SDK (TypeScript) の最小 HelloWorld サンプル (Agent + run、key 未設定時は案内して exit 0)
 ```
 
-(Note: `apps/` sorts before `tools/`? Keep the existing top-level order readable — place `apps/` after `tools/` and before `packages/` as shown. The `└──`/`├──` glyphs must stay consistent: `apps/` uses `├──`, `packages/` is the last top-level entry with `└──`.)
+(Note: `apps/` sorts before `tools/`? Keep the existing top-level order readable — place `apps/` after `tools/` and before `terraform/` as shown. The `└──`/`├──` glyphs must stay consistent: `apps/` uses `├──`, `terraform/` is the last top-level entry with `└──`.)
 
 **Step 2: `docs/guides/*/README.md` — fix relative links**
 
 ```bash
-sed -i '' -e 's#\.\./\.\./\.\./packages/aws/apps/#../../../apps/#g' \
-  -e 's#packages/aws/apps/#apps/#g' \
+sed -i '' -e 's#\.\./\.\./\.\./terraform/aws/apps/#../../../apps/#g' \
+  -e 's#terraform/aws/apps/#apps/#g' \
   docs/guides/agentcore-runtime-resources/README.md docs/guides/aws-billing/README.md
 ```
 
@@ -467,7 +467,7 @@ sed -i '' -e 's#\.\./\.\./\.\./packages/aws/apps/#../../../apps/#g' \
 
 ```bash
 grep -rn --exclude-dir=node_modules --exclude-dir=.venv --exclude-dir=.git --exclude-dir=.terraform \
-  -e "packages/aws/apps" -e "packages/gc/apps" . | grep -v "docs/plans/" && echo "[NG] residual" || echo "[OK] clean"
+  -e "terraform/aws/apps" -e "terraform/gc/apps" . | grep -v "docs/plans/" && echo "[NG] residual" || echo "[OK] clean"
 ```
 Expected: `[OK] clean` (only `docs/plans/*` describe the before→after, intentionally).
 
@@ -489,11 +489,11 @@ No new commit (verification only); fix-up commits if any gate fails.
 ```bash
 # AC1 move complete
 find apps -maxdepth 1 -type d
-test ! -e packages/aws/apps && test ! -e packages/gc/apps && echo "[OK] AC1"
+test ! -e terraform/aws/apps && test ! -e terraform/gc/apps && echo "[OK] AC1"
 
 # AC2 no residual paths (exclude planning docs)
 grep -rn --exclude-dir=node_modules --exclude-dir=.venv --exclude-dir=.git --exclude-dir=.terraform \
-  -e "packages/aws/apps" -e "packages/gc/apps" . | grep -v "docs/plans/" || echo "[OK] AC2 paths"
+  -e "terraform/aws/apps" -e "terraform/gc/apps" . | grep -v "docs/plans/" || echo "[OK] AC2 paths"
 
 # AC2b no residual concepts (AGENTS.md:12 uses lowercase "nested" — must include [Nn]ested app)
 grep -rn --exclude-dir=node_modules --exclude-dir=.venv --exclude-dir=.git \
@@ -510,9 +510,9 @@ mise exec -- uv run --directory apps/agentcore-strands-basic --locked python -m 
 mise exec -- uv run --directory apps/adk-helloworld --locked python -m unittest discover -s tests && echo "[OK] AC5"
 
 # AC6 terraform validate (+ path resolution)
-for m in packages/aws/terraform/agentcore-runtime-basic \
-         packages/gc/terraform/adk-agent-engine-basic \
-         packages/gc/terraform/cloud-run-service-basic; do
+for m in terraform/aws/agentcore-runtime-basic \
+         terraform/gc/adk-agent-engine-basic \
+         terraform/gc/cloud-run-service-basic; do
   mise exec -- terraform -chdir="$m" init -backend=false >/dev/null 2>&1
   mise exec -- terraform -chdir="$m" validate
 done
@@ -529,7 +529,7 @@ Live local Terraform state may carry the old `../../apps/...` artifact path in a
 git status --porcelain
 git log --oneline feature/apps-root-migration ^main
 ```
-Expected: clean tree; 7 commits (Tasks 1–7). `packages/aws/cost-estimator/` and `docs/plans/2026-06-10-*` untouched.
+Expected: clean tree; 7 commits (Tasks 1–7). `terraform/aws/cost-estimator/` and `docs/plans/2026-06-10-*` untouched.
 
 ---
 
@@ -537,9 +537,9 @@ Expected: clean tree; 7 commits (Tasks 1–7). `packages/aws/cost-estimator/` an
 
 - Rename apps or change any package `name`.
 - Add mise tasks, an `apps/README.md`, or new tooling.
-- Touch `packages/aws/cost-estimator/`.
+- Touch `terraform/aws/cost-estimator/`.
 - Rewrite historical `docs/plans/2026-06-10-*`.
-- Edit `mise.toml` (no app references; `dev`/`dev:all`/`tf` target `packages/*` only — confirmed).
+- Edit `mise.toml` (no app references; `dev`/`dev:all`/`tf` target `terraform/*` only — confirmed).
 
 ## Verification Gate Summary
 

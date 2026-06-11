@@ -1,6 +1,6 @@
 # AgentCore Runtime sample が作る AWS リソース
 
-Terraform サンプル [`agentcore-runtime-basic`](../../../packages/aws/terraform/agentcore-runtime-basic/README.md) を
+Terraform サンプル [`agentcore-runtime-basic`](../../../terraform/aws/agentcore-runtime-basic/README.md) を
 apply すると、AWS 上に **7つのリソース**が作られます。このドキュメントは、Terraform を
 まだ触ったことがない人向けに「**何が・なぜ作られ・どう繋がるか**」を解説します。
 個々のコマンド手順は sample の README に任せ、ここでは全体像の理解に集中します。
@@ -127,14 +127,14 @@ flowchart TB
 
 依存関係（例: ロールができてから Runtime を作る）は Terraform が自動で解決するので、
 順番を気にする必要はありません。実際のコマンドは
-[sample の README](../../../packages/aws/terraform/agentcore-runtime-basic/README.md) を参照してください。
+[sample の README](../../../terraform/aws/agentcore-runtime-basic/README.md) を参照してください。
 
 ## 6. コストと削除
 
 このサンプルは **mutating（リソースを実際に作る）** な学習用です。AgentCore Runtime と
 Bedrock のモデル呼び出しは利用量に応じて課金される可能性があります。
 
-- **削除手順**: [`agentcore-runtime-basic/cleanup.md`](../../../packages/aws/terraform/agentcore-runtime-basic/cleanup.md) に従って `destroy` してください。
+- **削除手順**: [`agentcore-runtime-basic/cleanup.md`](../../../terraform/aws/agentcore-runtime-basic/cleanup.md) に従って `destroy` してください。
 - **料金の確認**: [AWS 課金・コストの確認](../aws-billing/README.md) で利用額を確認できます。
 
 学習が終わったら早めに削除し、想定外の課金を防ぎましょう。

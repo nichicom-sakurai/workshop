@@ -26,7 +26,7 @@ apps/*/dist/
 *.zip
 
 # Bun lockfiles: committed once a package gains a dependency (e.g. cloud-run-rest's
-# @types/bun) so installs are repeatable; skeleton packages have none, so none to commit.
+# @types/bun) so installs are repeatable; Terraform-only provider samples have no Bun project, so none to commit.
 
 # mise machine-local overrides
 mise.local.toml

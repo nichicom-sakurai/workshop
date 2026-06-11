@@ -3,7 +3,7 @@
 [Google Agent Development Kit (ADK)](https://adk.dev/) を学ぶための、最小の Python HelloWorld agent です。
 `hello_world/agent.py` が `root_agent` を 1 つ公開するだけのサンプルで、まず **Gemini API key 方式**でローカル実行（`adk run` / `adk web`）を学び、その後 **Vertex AI 方式**や **Cloud Run deploy** へ発展できる構成にしています。
 
-この nested app は `mise run dev:all` の対象外です（`dev:all` は `packages/` 直下のみを走査します）。
+このアプリは Python アプリ（`package.json` を持たない）のため `mise run dev` では起動しません。実行は `adk run` / `adk web`（後述）で行います。
 
 ## ファイル構成
 
@@ -86,7 +86,7 @@ GOOGLE_CLOUD_LOCATION=us-central1
 ```
 
 - API key は不要で、認証は Application Default Credentials (ADC) を使います。事前に `gcloud auth application-default login` を実行しておきます。
-- 対象プロジェクトで Vertex AI API を有効化しておきます（`gcloud services enable aiplatform.googleapis.com --project=your-gcp-project-id`）。Terraform で API 有効化を学ぶ場合は、この repo の `packages/gc/terraform/<op>-api-enable/`（`google_project_service`）パターンが参考になります。
+- 対象プロジェクトで Vertex AI API を有効化しておきます（`gcloud services enable aiplatform.googleapis.com --project=your-gcp-project-id`）。Terraform で API 有効化を学ぶ場合は、この repo の `terraform/gc/<op>-api-enable/`（`google_project_service`）パターンが参考になります。
 - 以降の `adk run` / `adk web` のコマンドは Gemini API key 方式と同じです。
 
 ## Cloud Run へ deploy（`adk deploy cloud_run`）
@@ -121,7 +121,7 @@ mise exec -- uv run --directory apps/adk-helloworld --locked \
 
 Cloud Run だけでなく、**Vertex AI Agent Engine（API 名: Reasoning Engine）**へ Terraform で deploy する
 学習サンプルも用意しています。deploy 本体（`google_vertex_ai_reasoning_engine` の作成）は
-[packages/gc/terraform/adk-agent-engine-basic](../../terraform/adk-agent-engine-basic/) 側にあり、
+[terraform/gc/adk-agent-engine-basic](../../terraform/gc/adk-agent-engine-basic/) 側にあり、
 このアプリ側は **deploy に渡す source archive の生成**を担当します
 （**infrastructure は Terraform、artifact 生成は script** という責務分離）。
 
@@ -151,12 +151,12 @@ script は `.env*` / `.adk/` / `__pycache__` などローカル runtime/secret �
 
 生成した archive を読んで Agent Engine を作成する Terraform の手順（前提 API の有効化、`init` / `fmt` /
 `validate` / `plan` / `apply`、cleanup）は
-[adk-agent-engine-basic の README](../../terraform/adk-agent-engine-basic/README.md) を参照してください。
+[adk-agent-engine-basic の README](../../terraform/gc/adk-agent-engine-basic/README.md) を参照してください。
 
 > Agent Engine 用 `requirements.txt` の `google-adk` は `pyproject.toml` の pin と一致させます。
 > ズレは `tests/test_agent_engine_packaging.py` が検出します。
 
 ## バージョンの注意
 
-依存バージョン（`google-adk` / Python）は `pyproject.toml` と root の [`mise.toml`](../../../../mise.toml)（`[tools]` の `python`）で固定しています。更新するときは `pyproject.toml` の pin と `uv.lock` を合わせて更新してください（`uv lock`）。
+依存バージョン（`google-adk` / Python）は `pyproject.toml` と root の [`mise.toml`](../../mise.toml)（`[tools]` の `python`）で固定しています。更新するときは `pyproject.toml` の pin と `uv.lock` を合わせて更新してください（`uv lock`）。
 Agent Engine 用の依存（`agent-engine/requirements.txt`）も `google-adk` を合わせて更新します。

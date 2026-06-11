@@ -1,13 +1,13 @@
-# packages/aws Terraform learning design
+# terraform/aws Terraform learning design
 
 Date: 2026-06-09
 Issue URL: https://github.com/nichicom-sakurai/workshop/issues/7
 
 ## Context
 
-`workshop` is a cloud / IaC learning monorepo. `packages/aws` currently has a
+`workshop` is a cloud / IaC learning monorepo. `terraform/aws` currently has a
 minimal Bun skeleton and an AWS Terraform sample collection under
-`packages/aws/terraform/`.
+`terraform/aws/`.
 
 The existing AWS Terraform sample is:
 
@@ -15,7 +15,7 @@ The existing AWS Terraform sample is:
   current AWS account ID, caller ARN, and user ID.
 
 The existing local convention is to place each Terraform exercise directly under
-`packages/aws/terraform/<operation>/` as an independent root module. This keeps
+`terraform/aws/<operation>/` as an independent root module. This keeps
 state separated by exercise and allows each sample to be initialized, planned,
 applied, and destroyed independently.
 
@@ -40,7 +40,7 @@ Never:
 Always:
 
 - Keep each learning exercise as a self-contained root module.
-- Add every new sample to `packages/aws/terraform/README.md`.
+- Add every new sample to `terraform/aws/README.md`.
 - Mark mutating samples clearly in the sample table and in the sample README.
 - Include `destroy` guidance for every mutating sample.
 - Use standard AWS provider credential resolution through environment variables,
@@ -60,7 +60,7 @@ Ask first:
 
 ### Stage 0: Existing Foundation
 
-Path: `packages/aws/terraform/caller-identity/`
+Path: `terraform/aws/caller-identity/`
 
 Purpose:
 
@@ -71,7 +71,7 @@ Purpose:
 
 ### Stage 1: Resource Lifecycle
 
-Path: `packages/aws/terraform/s3-private-bucket/`
+Path: `terraform/aws/s3-private-bucket/`
 
 Purpose:
 
@@ -83,7 +83,7 @@ Purpose:
 Expected files:
 
 ```text
-packages/aws/terraform/s3-private-bucket/
+terraform/aws/s3-private-bucket/
 ├── terraform.tf
 ├── providers.tf
 ├── variables.tf
@@ -123,7 +123,7 @@ different `bucket_prefix` without committing local `.tfvars`.
 
 ### Stage 2: Object Lifecycle
 
-Path: `packages/aws/terraform/s3-object/`
+Path: `terraform/aws/s3-object/`
 
 Purpose:
 
@@ -142,7 +142,7 @@ Recommended scope:
 
 ### Stage 3: IAM Policy Document Composition
 
-Path: `packages/aws/terraform/iam-policy-document/`
+Path: `terraform/aws/iam-policy-document/`
 
 Purpose:
 
@@ -158,7 +158,7 @@ Recommended scope:
 
 ### Stage 4: S3 Bucket Policy
 
-Path: `packages/aws/terraform/s3-bucket-policy/`
+Path: `terraform/aws/s3-bucket-policy/`
 
 Purpose:
 
@@ -178,7 +178,7 @@ Recommended scope:
 The Terraform learning area should keep the current flat operation layout:
 
 ```text
-packages/aws/
+terraform/aws/
 ├── index.ts
 ├── package.json
 └── terraform/
@@ -191,7 +191,7 @@ packages/aws/
 ```
 
 Do not introduce a nested service layout such as
-`packages/aws/terraform/s3/bucket/` yet. The flat layout is easier to scan, keeps
+`terraform/aws/s3/bucket/` yet. The flat layout is easier to scan, keeps
 state isolation obvious, and matches the existing `tf` task:
 
 ```bash
@@ -204,8 +204,8 @@ Selected approach: staged independent root modules.
 
 Immediate implementation target:
 
-- Add `packages/aws/terraform/s3-private-bucket/`.
-- Update `packages/aws/terraform/README.md` with the new mutating sample row and
+- Add `terraform/aws/s3-private-bucket/`.
+- Update `terraform/aws/README.md` with the new mutating sample row and
   a short roadmap.
 - Update root `README.md` only if its directory tree needs to mention the new
   sample explicitly.
@@ -221,7 +221,7 @@ Follow-up targets:
 
 ## Acceptance Criteria
 
-Given a contributor reads `packages/aws/terraform/README.md`, when they inspect
+Given a contributor reads `terraform/aws/README.md`, when they inspect
 the sample table, then `s3-private-bucket` is listed as a mutating sample and the
 later learning order is understandable.
 
@@ -273,7 +273,7 @@ ignored.
   `random` provider?
 - Should `s3-object` use `force_destroy = true` for convenience, or keep the
   safer default and teach manual cleanup?
-- Should the roadmap be kept only in `packages/aws/terraform/README.md`, or also
+- Should the roadmap be kept only in `terraform/aws/README.md`, or also
   mirrored in the root `README.md` tree as examples are added?
 
 ## Non-Goals
@@ -283,7 +283,7 @@ ignored.
 - Adding remote backend, workspaces, Terraform Cloud, or CI.
 - Creating public buckets or cross-account policies.
 - Managing IAM users, roles, or permission boundaries.
-- Changing `packages/gc`.
+- Changing `terraform/gc`.
 
 ## References
 

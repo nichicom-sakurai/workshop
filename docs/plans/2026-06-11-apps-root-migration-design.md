@@ -8,9 +8,9 @@ Issue URL: none
 `workshop` is a cloud / IaC learning monorepo. Today, deployable app code that
 backs the Terraform learning samples lives **nested under each provider package**:
 
-- `packages/aws/apps/agentcore-strands-basic/` — Python / uv, AgentCore Runtime ZIP artifact.
-- `packages/gc/apps/cloud-run-rest/` — Bun REST service, Cloud Run image.
-- `packages/gc/apps/adk-helloworld/` — Python / uv, Agent Engine inline-source archive.
+- `terraform/aws/apps/agentcore-strands-basic/` — Python / uv, AgentCore Runtime ZIP artifact.
+- `terraform/gc/apps/cloud-run-rest/` — Bun REST service, Cloud Run image.
+- `terraform/gc/apps/adk-helloworld/` — Python / uv, Agent Engine inline-source archive.
 
 This nesting encodes a **provider-scoped ownership model** (an app belongs to one
 cloud provider), stated explicitly in `AGENTS.md` and `.claude/rules/packages.md`
@@ -18,8 +18,8 @@ cloud provider), stated explicitly in `AGENTS.md` and `.claude/rules/packages.md
 
 The selected direction is to **drop that provider coupling** and relocate all
 deployable apps to a single **flat, root-level `apps/`** directory, making `apps/`
-a first-class top-level concept alongside `packages/` (the established
-Turborepo / Nx style `apps/` + `packages/` split). The directory-level ownership
+a first-class top-level concept alongside `terraform/` (the established
+Turborepo / Nx style `apps/` + `terraform/` split). The directory-level ownership
 link to a provider is removed; the *functional* dependency (a provider Terraform
 module reads its app's build artifact) is inherent and remains, expressed via a
 longer relative path.
@@ -28,10 +28,10 @@ Target layout:
 
 ```
 apps/
-├── agentcore-strands-basic/   (from packages/aws/apps/)
-├── cloud-run-rest/            (from packages/gc/apps/)
-└── adk-helloworld/            (from packages/gc/apps/)
-packages/
+├── agentcore-strands-basic/   (from terraform/aws/apps/)
+├── cloud-run-rest/            (from terraform/gc/apps/)
+└── adk-helloworld/            (from terraform/gc/apps/)
+terraform/
 ├── aws/   { index.ts, package.json, terraform/, cost-estimator/ }
 ├── gc/    { index.ts, package.json, terraform/ }
 └── openai/
@@ -57,7 +57,7 @@ Key facts established during exploration:
   (`../../apps/...`) resolved from the module dir. A root-level `apps/` is 4
   levels up from each module dir, so the path becomes `../../../../apps/...`.
 - `mise.toml` has **no** app references (`dev:all` / `dev` / `chat` / `web` target
-  `packages/*` top-level only; `tf` targets `packages/aws/terraform/`). No
+  `terraform/*` top-level only; `tf` targets `terraform/aws/`). No
   `mise.toml` change is required.
 - `.codex/` has no app references.
 - Live **local** Terraform state exists (`agentcore-runtime-basic/`
@@ -74,7 +74,7 @@ Key facts established during exploration:
 
 - Rewrite historical plan/design docs (`docs/plans/2026-06-10-*`) to the new path.
 - Rename any app directory or change any package's `name` field.
-- Touch `packages/aws/cost-estimator/` (not an app; out of scope).
+- Touch `terraform/aws/cost-estimator/` (not an app; out of scope).
 - Commit gitignored local state (`terraform.tfvars`, `terraform.tfstate*`).
 - Hardcode versions or secrets while editing.
 
@@ -96,10 +96,10 @@ Key facts established during exploration:
 
 ### 1. Directory moves (`git mv`)
 
-- `packages/aws/apps/agentcore-strands-basic/` → `apps/agentcore-strands-basic/`
-- `packages/gc/apps/cloud-run-rest/` → `apps/cloud-run-rest/`
-- `packages/gc/apps/adk-helloworld/` → `apps/adk-helloworld/`
-- Resulting empty `packages/aws/apps/` and `packages/gc/apps/` disappear (git
+- `terraform/aws/apps/agentcore-strands-basic/` → `apps/agentcore-strands-basic/`
+- `terraform/gc/apps/cloud-run-rest/` → `apps/cloud-run-rest/`
+- `terraform/gc/apps/adk-helloworld/` → `apps/adk-helloworld/`
+- Resulting empty `terraform/aws/apps/` and `terraform/gc/apps/` disappear (git
   does not track empty dirs).
 
 ### 2. Build mechanism
@@ -108,58 +108,58 @@ Key facts established during exploration:
   `("packages" "apps")` (skip a dir that does not exist). Preserves
   auto-discovery; restores `bun install` for `cloud-run-rest`.
 - `.gitignore` — replace the provider-specific patterns with flat ones:
-  - `packages/aws/apps/*/.build/` + `packages/gc/apps/*/.build/` → `apps/*/.build/`
-  - `packages/aws/apps/*/dist/` → `apps/*/dist/`
+  - `terraform/aws/apps/*/.build/` + `terraform/gc/apps/*/.build/` → `apps/*/.build/`
+  - `terraform/aws/apps/*/dist/` → `apps/*/dist/`
   - update the accompanying comments.
 - `.vscode/settings.json` — `python-envs.pythonProjects` paths:
-  - `packages/aws/apps/agentcore-strands-basic` → `apps/agentcore-strands-basic`
-  - `packages/gc/apps/adk-helloworld` → `apps/adk-helloworld`
+  - `terraform/aws/apps/agentcore-strands-basic` → `apps/agentcore-strands-basic`
+  - `terraform/gc/apps/adk-helloworld` → `apps/adk-helloworld`
 
 ### 3. Terraform relative paths (`../../apps/` → `../../../../apps/`)
 
-- AWS `packages/aws/terraform/agentcore-runtime-basic/`:
+- AWS `terraform/aws/agentcore-runtime-basic/`:
   `variables.tf` (description), `terraform.tfvars.template`, `README.md`.
-- GC `packages/gc/terraform/adk-agent-engine-basic/`:
+- GC `terraform/gc/adk-agent-engine-basic/`:
   `variables.tf` (`default`), `terraform.tfvars.template`, `README.md`,
   `cleanup.md`, and `main.tf` **iff** it holds a path (verify: may be a
   `display_name` identifier, not a path → then no edit).
-- GC `packages/gc/terraform/cloud-run-service-basic/`:
-  `README.md` path commands (`cd packages/gc/apps/cloud-run-rest`,
+- GC `terraform/gc/cloud-run-service-basic/`:
+  `README.md` path commands (`cd terraform/gc/apps/cloud-run-rest`,
   `../../apps/cloud-run-rest/` links); `variables.tf` /
   `terraform.tfvars.template` **only if** they hold a path (verify: likely the
   Artifact Registry image identifier `cloud-run-rest`, not a path → then no edit).
-- GC `packages/gc/terraform/README.md` — `../apps/...` index links →
+- GC `terraform/gc/README.md` — `../apps/...` index links →
   `../../apps/...`.
 
 ### 4. App-internal docs / tests / scripts
 
 - `apps/agentcore-strands-basic/README.md`, `tests/test_main.py` (docstring
-  `--directory packages/aws/apps/...` → `--directory apps/...`),
+  `--directory terraform/aws/apps/...` → `--directory apps/...`),
   `scripts/package.sh` (verify: `agentcore-strands-basic.zip` is an output
   filename, not a path → likely no edit).
 - `apps/adk-helloworld/README.md`, `tests/test_agent.py`,
   `tests/test_agent_engine_packaging.py` (docstrings), `scripts/package-agent-engine.sh`
-  (comment referencing the gitignore path `packages/gc/apps/*/.build/`).
-- `apps/cloud-run-rest/README.md` (`cd packages/gc/apps/cloud-run-rest` →
-  `cd apps/cloud-run-rest`; the "nested app under `packages/gc/apps/`" note →
+  (comment referencing the gitignore path `terraform/gc/apps/*/.build/`).
+- `apps/cloud-run-rest/README.md` (`cd terraform/gc/apps/cloud-run-rest` →
+  `cd apps/cloud-run-rest`; the "nested app under `terraform/gc/apps/`" note →
   reword to "root-level app under `apps/`").
 
 ### 5. AI / human docs
 
 - `AGENTS.md` — rewrite the structural narrative: apps are no longer "nested
-  under `packages/<provider>/apps/`" and no longer "provider-scoped"; they live
+  under `terraform/<provider>/apps/`" and no longer "provider-scoped"; they live
   flat under root `apps/`. Update every path string (TL;DR, Orientation, Verify,
   Gotchas). This is the largest single doc change.
 - `.claude/rules/packages.md` — replace the "Nested apps
-  (`packages/<name>/apps/<app>/`)" and "provider-scoped" language with the flat
+  (`terraform/<name>/apps/<app>/`)" and "provider-scoped" language with the flat
   `apps/<app>/` model; update the Python-apps section.
-- `.claude/rules/mise.md` — `packages/gc/apps/cloud-run-rest/Dockerfile` →
+- `.claude/rules/mise.md` — `terraform/gc/apps/cloud-run-rest/Dockerfile` →
   `apps/cloud-run-rest/Dockerfile`.
 - `README.md` (top-level, Japanese) — the structure tree at lines 28–40 (apps
   under each provider) → a root `apps/` block; keep half-width spacing rules.
 - `docs/guides/agentcore-runtime-resources/README.md` and
   `docs/guides/aws-billing/README.md` — relative links
-  `../../../packages/aws/apps/agentcore-strands-basic/...` →
+  `../../../terraform/aws/apps/agentcore-strands-basic/...` →
   `../../../apps/agentcore-strands-basic/...` (recompute depth per file).
 
 ### Estimated blast radius
@@ -173,13 +173,13 @@ and the `cost-estimator` module are untouched.
    - Given the repo after the change,
    - When `find apps -maxdepth 1 -type d` is run,
    - Then `apps/agentcore-strands-basic`, `apps/cloud-run-rest`, and
-     `apps/adk-helloworld` exist, and `packages/aws/apps` /
-     `packages/gc/apps` no longer exist.
+     `apps/adk-helloworld` exist, and `terraform/aws/apps` /
+     `terraform/gc/apps` no longer exist.
 
 2. **No residual references (paths)**
    - Given the change,
    - When `grep -rn --exclude-dir=node_modules --exclude-dir=.venv
-     --exclude-dir=.git -e "packages/aws/apps" -e "packages/gc/apps" .` is run,
+     --exclude-dir=.git -e "terraform/aws/apps" -e "terraform/gc/apps" .` is run,
    - Then only historical files under `docs/plans/2026-06-10-*` (and gitignored
      local `.terraform`/state) match — zero living references remain.
 
@@ -244,7 +244,7 @@ and the `cost-estimator` module are untouched.
 
 - Renaming apps or changing any package `name`.
 - Adding mise tasks, a root `apps/README.md`, or any new tooling surface.
-- Moving or changing `packages/aws/cost-estimator/`.
+- Moving or changing `terraform/aws/cost-estimator/`.
 - Rewriting historical plan/design docs.
 - Re-applying or migrating live Terraform state. (Operational note: the user
   updates their own gitignored `terraform.tfvars` path after the move; `destroy`

@@ -13,7 +13,7 @@ Run these checks and report each as `[OK]` / `[NG]` / `[WARNING]` with the evide
 2. **Repo trusted** — `mise current` (or `mise trust --show`). If untrusted: `mise trust`.
 3. **Pinned tools resolve** — `mise exec -- bun --version` and `mise exec -- terraform version`; compare `mise current` against `mise.toml [tools]`.
 4. **bun on bare PATH** — `command -v bun`. Expected ABSENT unless the shell is activated; this is normal. Remind that commands must use `mise exec -- bun`, `mise run`, or `eval "$(mise activate zsh)"`.
-5. **Project run** — for each `packages/*`, confirm `mise run dev <name>` runs (skeletons print `Hello from <name>`). Note: packages with no dependencies have no `node_modules/` — absence is not an error.
+5. **App run** — for each runnable app under `apps/*` (those with a `package.json`), confirm `mise run dev <name>` runs (e.g. `mise run dev openai` prints its guidance). Note: the provider Terraform-sample roots `terraform/aws/` and `terraform/gc/` are Terraform-only (no `package.json`) and are not runnable — that is expected.
 6. **git** — `git rev-parse --is-inside-work-tree`. Currently expected to FAIL (repo not initialized). Flag `[WARNING] git uninitialized`; do not run git workflows until `git init`.
 
 Finish with a one-line verdict (READY / NEEDS ACTION) and an ordered fix list. Keep output concise and scannable.

@@ -2,7 +2,7 @@
 
 **Goal:** Add a Terraform-first Amazon Bedrock AgentCore Runtime learning sample that deploys a small Strands Agents + Amazon Bedrock LLM agent with direct code deployment.
 
-**Architecture:** The sample is split into a Python app package under `packages/aws/apps/agentcore-strands-basic/` and a Terraform root module under `packages/aws/terraform/agentcore-runtime-basic/`. The learner builds a ZIP artifact explicitly, then Terraform uploads it to S3 and creates IAM, AgentCore Runtime, and an endpoint. Terraform does not resolve Python dependencies during `apply`.
+**Architecture:** The sample is split into a Python app package under `terraform/aws/apps/agentcore-strands-basic/` and a Terraform root module under `terraform/aws/agentcore-runtime-basic/`. The learner builds a ZIP artifact explicitly, then Terraform uploads it to S3 and creates IAM, AgentCore Runtime, and an endpoint. Terraform does not resolve Python dependencies during `apply`.
 
 **Tech Stack:** mise, Python 3.13, uv, unittest, shell, Terraform, AWS provider, AWS CLI, Amazon Bedrock AgentCore, Strands Agents.
 
@@ -34,9 +34,9 @@ Expected: FAIL or missing entries for `python` and `uv`.
 Run:
 
 ```bash
-git check-ignore packages/aws/apps/agentcore-strands-basic/dist/agentcore-strands-basic.zip \
-  packages/aws/apps/agentcore-strands-basic/.venv \
-  packages/aws/apps/agentcore-strands-basic/.build
+git check-ignore terraform/aws/apps/agentcore-strands-basic/dist/agentcore-strands-basic.zip \
+  terraform/aws/apps/agentcore-strands-basic/.venv \
+  terraform/aws/apps/agentcore-strands-basic/.build
 ```
 
 Expected: FAIL because these paths are not ignored yet.
@@ -65,8 +65,8 @@ __pycache__/
 .pytest_cache/
 
 # AgentCore direct deployment build artifacts
-packages/aws/apps/*/.build/
-packages/aws/apps/*/dist/
+terraform/aws/apps/*/.build/
+terraform/aws/apps/*/dist/
 *.zip
 ```
 
@@ -77,9 +77,9 @@ Run:
 ```bash
 mise install
 mise current python uv
-git check-ignore packages/aws/apps/agentcore-strands-basic/dist/agentcore-strands-basic.zip \
-  packages/aws/apps/agentcore-strands-basic/.venv \
-  packages/aws/apps/agentcore-strands-basic/.build
+git check-ignore terraform/aws/apps/agentcore-strands-basic/dist/agentcore-strands-basic.zip \
+  terraform/aws/apps/agentcore-strands-basic/.venv \
+  terraform/aws/apps/agentcore-strands-basic/.build
 ```
 
 Expected: PASS. `mise current` shows `python 3.13.13` and `uv 0.11.19`; `git check-ignore` prints the ignored paths.
@@ -97,23 +97,23 @@ git commit -m "chore(aws): AgentCore 用 Python ツールを固定"
 
 **Files:**
 
-- Create: `packages/aws/apps/agentcore-strands-basic/pyproject.toml`
-- Create: `packages/aws/apps/agentcore-strands-basic/README.md`
-- Create: `packages/aws/apps/agentcore-strands-basic/uv.lock`
+- Create: `terraform/aws/apps/agentcore-strands-basic/pyproject.toml`
+- Create: `terraform/aws/apps/agentcore-strands-basic/README.md`
+- Create: `terraform/aws/apps/agentcore-strands-basic/uv.lock`
 
 **Step 1: Write the failing check**
 
 Run:
 
 ```bash
-mise exec -- uv lock --directory packages/aws/apps/agentcore-strands-basic --check
+mise exec -- uv lock --directory terraform/aws/apps/agentcore-strands-basic --check
 ```
 
 Expected: FAIL because the Python project does not exist yet.
 
 **Step 2: Write minimal implementation**
 
-Create `packages/aws/apps/agentcore-strands-basic/pyproject.toml`:
+Create `terraform/aws/apps/agentcore-strands-basic/pyproject.toml`:
 
 ```toml
 [project]
@@ -131,7 +131,7 @@ dependencies = [
 package = false
 ```
 
-Create `packages/aws/apps/agentcore-strands-basic/README.md`:
+Create `terraform/aws/apps/agentcore-strands-basic/README.md`:
 
 ````markdown
 # agentcore-strands-basic
@@ -148,14 +148,14 @@ This nested app is not run by `mise run dev:all`.
 ## Verify dependencies
 
 ```bash
-mise exec -- uv lock --directory packages/aws/apps/agentcore-strands-basic --check
+mise exec -- uv lock --directory terraform/aws/apps/agentcore-strands-basic --check
 ```
 ````
 
 Generate `uv.lock`:
 
 ```bash
-mise exec -- uv lock --directory packages/aws/apps/agentcore-strands-basic
+mise exec -- uv lock --directory terraform/aws/apps/agentcore-strands-basic
 ```
 
 **Step 3: Run checks to verify**
@@ -163,7 +163,7 @@ mise exec -- uv lock --directory packages/aws/apps/agentcore-strands-basic
 Run:
 
 ```bash
-mise exec -- uv lock --directory packages/aws/apps/agentcore-strands-basic --check
+mise exec -- uv lock --directory terraform/aws/apps/agentcore-strands-basic --check
 ```
 
 Expected: PASS.
@@ -171,9 +171,9 @@ Expected: PASS.
 **Step 4: Commit**
 
 ```bash
-git add packages/aws/apps/agentcore-strands-basic/pyproject.toml \
-  packages/aws/apps/agentcore-strands-basic/README.md \
-  packages/aws/apps/agentcore-strands-basic/uv.lock
+git add terraform/aws/apps/agentcore-strands-basic/pyproject.toml \
+  terraform/aws/apps/agentcore-strands-basic/README.md \
+  terraform/aws/apps/agentcore-strands-basic/uv.lock
 git commit -m "feat(aws): AgentCore Strands app の依存を追加"
 ```
 
@@ -183,12 +183,12 @@ git commit -m "feat(aws): AgentCore Strands app の依存を追加"
 
 **Files:**
 
-- Create: `packages/aws/apps/agentcore-strands-basic/main.py`
-- Create: `packages/aws/apps/agentcore-strands-basic/tests/test_main.py`
+- Create: `terraform/aws/apps/agentcore-strands-basic/main.py`
+- Create: `terraform/aws/apps/agentcore-strands-basic/tests/test_main.py`
 
 **Step 1: Write the failing test**
 
-Create `packages/aws/apps/agentcore-strands-basic/tests/test_main.py`:
+Create `terraform/aws/apps/agentcore-strands-basic/tests/test_main.py`:
 
 ```python
 import os
@@ -245,7 +245,7 @@ if __name__ == "__main__":
 Run:
 
 ```bash
-mise exec -- uv run --directory packages/aws/apps/agentcore-strands-basic --locked \
+mise exec -- uv run --directory terraform/aws/apps/agentcore-strands-basic --locked \
   python -m unittest discover -s tests
 ```
 
@@ -253,7 +253,7 @@ Expected: FAIL with `ModuleNotFoundError: No module named 'main'`.
 
 **Step 3: Write minimal implementation**
 
-Create `packages/aws/apps/agentcore-strands-basic/main.py`:
+Create `terraform/aws/apps/agentcore-strands-basic/main.py`:
 
 ```python
 import os
@@ -324,7 +324,7 @@ if __name__ == "__main__":
 Run:
 
 ```bash
-mise exec -- uv run --directory packages/aws/apps/agentcore-strands-basic --locked \
+mise exec -- uv run --directory terraform/aws/apps/agentcore-strands-basic --locked \
   python -m unittest discover -s tests
 ```
 
@@ -333,8 +333,8 @@ Expected: PASS.
 **Step 5: Commit**
 
 ```bash
-git add packages/aws/apps/agentcore-strands-basic/main.py \
-  packages/aws/apps/agentcore-strands-basic/tests/test_main.py
+git add terraform/aws/apps/agentcore-strands-basic/main.py \
+  terraform/aws/apps/agentcore-strands-basic/tests/test_main.py
 git commit -m "feat(aws): AgentCore Strands app を追加"
 ```
 
@@ -344,22 +344,22 @@ git commit -m "feat(aws): AgentCore Strands app を追加"
 
 **Files:**
 
-- Create: `packages/aws/apps/agentcore-strands-basic/scripts/package.sh`
-- Modify: `packages/aws/apps/agentcore-strands-basic/README.md`
+- Create: `terraform/aws/apps/agentcore-strands-basic/scripts/package.sh`
+- Modify: `terraform/aws/apps/agentcore-strands-basic/README.md`
 
 **Step 1: Write the failing check**
 
 Run:
 
 ```bash
-bash -n packages/aws/apps/agentcore-strands-basic/scripts/package.sh
+bash -n terraform/aws/apps/agentcore-strands-basic/scripts/package.sh
 ```
 
 Expected: FAIL because the script does not exist.
 
 **Step 2: Write minimal implementation**
 
-Create `packages/aws/apps/agentcore-strands-basic/scripts/package.sh`:
+Create `terraform/aws/apps/agentcore-strands-basic/scripts/package.sh`:
 
 ```bash
 #!/usr/bin/env bash
@@ -398,7 +398,7 @@ find "${build_dir}" -type f -name "*.pyc" -delete
 echo "${artifact_path}"
 ```
 
-Update `packages/aws/apps/agentcore-strands-basic/README.md`:
+Update `terraform/aws/apps/agentcore-strands-basic/README.md`:
 
 ````markdown
 ## Package
@@ -406,11 +406,11 @@ Update `packages/aws/apps/agentcore-strands-basic/README.md`:
 Build the ZIP artifact before running Terraform:
 
 ```bash
-packages/aws/apps/agentcore-strands-basic/scripts/package.sh
+terraform/aws/apps/agentcore-strands-basic/scripts/package.sh
 ```
 
 The script prints the generated ZIP path. Copy that value into
-`packages/aws/terraform/agentcore-runtime-basic/terraform.tfvars` as
+`terraform/aws/agentcore-runtime-basic/terraform.tfvars` as
 `artifact_zip_path`.
 ````
 
@@ -419,18 +419,18 @@ The script prints the generated ZIP path. Copy that value into
 Run:
 
 ```bash
-bash -n packages/aws/apps/agentcore-strands-basic/scripts/package.sh
-packages/aws/apps/agentcore-strands-basic/scripts/package.sh
-test -f packages/aws/apps/agentcore-strands-basic/dist/agentcore-strands-basic.zip
+bash -n terraform/aws/apps/agentcore-strands-basic/scripts/package.sh
+terraform/aws/apps/agentcore-strands-basic/scripts/package.sh
+test -f terraform/aws/apps/agentcore-strands-basic/dist/agentcore-strands-basic.zip
 ```
 
-Expected: PASS. The package script prints `packages/aws/apps/agentcore-strands-basic/dist/agentcore-strands-basic.zip`.
+Expected: PASS. The package script prints `terraform/aws/apps/agentcore-strands-basic/dist/agentcore-strands-basic.zip`.
 
 **Step 4: Commit**
 
 ```bash
-git add packages/aws/apps/agentcore-strands-basic/scripts/package.sh \
-  packages/aws/apps/agentcore-strands-basic/README.md
+git add terraform/aws/apps/agentcore-strands-basic/scripts/package.sh \
+  terraform/aws/apps/agentcore-strands-basic/README.md
 git commit -m "feat(aws): AgentCore direct deploy package を生成"
 ```
 
@@ -440,9 +440,9 @@ git commit -m "feat(aws): AgentCore direct deploy package を生成"
 
 **Files:**
 
-- Create: `packages/aws/terraform/agentcore-runtime-basic/terraform.tf`
-- Create: `packages/aws/terraform/agentcore-runtime-basic/providers.tf`
-- Create: `packages/aws/terraform/agentcore-runtime-basic/variables.tf`
+- Create: `terraform/aws/agentcore-runtime-basic/terraform.tf`
+- Create: `terraform/aws/agentcore-runtime-basic/providers.tf`
+- Create: `terraform/aws/agentcore-runtime-basic/variables.tf`
 
 **Step 1: Write the failing check**
 
@@ -457,7 +457,7 @@ Expected: FAIL because the Terraform root module does not exist.
 
 **Step 2: Write minimal implementation**
 
-Create `packages/aws/terraform/agentcore-runtime-basic/terraform.tf`:
+Create `terraform/aws/agentcore-runtime-basic/terraform.tf`:
 
 ```hcl
 # Provider requirements:
@@ -474,7 +474,7 @@ terraform {
 }
 ```
 
-Create `packages/aws/terraform/agentcore-runtime-basic/providers.tf`:
+Create `terraform/aws/agentcore-runtime-basic/providers.tf`:
 
 ```hcl
 # Provider configuration:
@@ -483,7 +483,7 @@ Create `packages/aws/terraform/agentcore-runtime-basic/providers.tf`:
 provider "aws" {}
 ```
 
-Create `packages/aws/terraform/agentcore-runtime-basic/variables.tf`:
+Create `terraform/aws/agentcore-runtime-basic/variables.tf`:
 
 ```hcl
 variable "name_prefix" {
@@ -498,7 +498,7 @@ variable "name_prefix" {
 }
 
 variable "artifact_zip_path" {
-  description = "Path to the ZIP artifact generated by packages/aws/apps/agentcore-strands-basic/scripts/package.sh."
+  description = "Path to the ZIP artifact generated by terraform/aws/apps/agentcore-strands-basic/scripts/package.sh."
   type        = string
 
   validation {
@@ -554,10 +554,10 @@ Expected: PASS. Commit the generated `.terraform.lock.hcl`.
 **Step 4: Commit**
 
 ```bash
-git add packages/aws/terraform/agentcore-runtime-basic/terraform.tf \
-  packages/aws/terraform/agentcore-runtime-basic/providers.tf \
-  packages/aws/terraform/agentcore-runtime-basic/variables.tf \
-  packages/aws/terraform/agentcore-runtime-basic/.terraform.lock.hcl
+git add terraform/aws/agentcore-runtime-basic/terraform.tf \
+  terraform/aws/agentcore-runtime-basic/providers.tf \
+  terraform/aws/agentcore-runtime-basic/variables.tf \
+  terraform/aws/agentcore-runtime-basic/.terraform.lock.hcl
 git commit -m "feat(aws): AgentCore Terraform 入力を追加"
 ```
 
@@ -567,8 +567,8 @@ git commit -m "feat(aws): AgentCore Terraform 入力を追加"
 
 **Files:**
 
-- Create: `packages/aws/terraform/agentcore-runtime-basic/main.tf`
-- Create: `packages/aws/terraform/agentcore-runtime-basic/outputs.tf`
+- Create: `terraform/aws/agentcore-runtime-basic/main.tf`
+- Create: `terraform/aws/agentcore-runtime-basic/outputs.tf`
 
 **Step 1: Write the failing check**
 
@@ -581,14 +581,14 @@ mise run tf agentcore-runtime-basic validate
 Expected: PASS, but there are no resources. Confirm with:
 
 ```bash
-rg "aws_s3_bucket|aws_s3_object" packages/aws/terraform/agentcore-runtime-basic
+rg "aws_s3_bucket|aws_s3_object" terraform/aws/agentcore-runtime-basic
 ```
 
 Expected: FAIL because no artifact resources exist yet.
 
 **Step 2: Write minimal implementation**
 
-Create `packages/aws/terraform/agentcore-runtime-basic/main.tf`:
+Create `terraform/aws/agentcore-runtime-basic/main.tf`:
 
 ```hcl
 data "aws_caller_identity" "current" {}
@@ -629,7 +629,7 @@ resource "aws_s3_object" "artifact" {
 }
 ```
 
-Create `packages/aws/terraform/agentcore-runtime-basic/outputs.tf`:
+Create `terraform/aws/agentcore-runtime-basic/outputs.tf`:
 
 ```hcl
 output "artifact_bucket_name" {
@@ -662,8 +662,8 @@ Expected: PASS.
 **Step 4: Commit**
 
 ```bash
-git add packages/aws/terraform/agentcore-runtime-basic/main.tf \
-  packages/aws/terraform/agentcore-runtime-basic/outputs.tf
+git add terraform/aws/agentcore-runtime-basic/main.tf \
+  terraform/aws/agentcore-runtime-basic/outputs.tf
 git commit -m "feat(aws): AgentCore artifact bucket を追加"
 ```
 
@@ -673,22 +673,22 @@ git commit -m "feat(aws): AgentCore artifact bucket を追加"
 
 **Files:**
 
-- Create: `packages/aws/terraform/agentcore-runtime-basic/iam.tf`
-- Modify: `packages/aws/terraform/agentcore-runtime-basic/main.tf`
+- Create: `terraform/aws/agentcore-runtime-basic/iam.tf`
+- Modify: `terraform/aws/agentcore-runtime-basic/main.tf`
 
 **Step 1: Write the failing check**
 
 Run:
 
 ```bash
-rg "bedrock-agentcore.amazonaws.com|bedrock:InvokeModel" packages/aws/terraform/agentcore-runtime-basic
+rg "bedrock-agentcore.amazonaws.com|bedrock:InvokeModel" terraform/aws/agentcore-runtime-basic
 ```
 
 Expected: FAIL because the execution role does not exist.
 
 **Step 2: Write minimal implementation**
 
-Create `packages/aws/terraform/agentcore-runtime-basic/iam.tf`:
+Create `terraform/aws/agentcore-runtime-basic/iam.tf`:
 
 ```hcl
 data "aws_iam_policy_document" "agentcore_assume_role" {
@@ -776,8 +776,8 @@ Expected: PASS.
 **Step 4: Commit**
 
 ```bash
-git add packages/aws/terraform/agentcore-runtime-basic/iam.tf \
-  packages/aws/terraform/agentcore-runtime-basic/main.tf
+git add terraform/aws/agentcore-runtime-basic/iam.tf \
+  terraform/aws/agentcore-runtime-basic/main.tf
 git commit -m "feat(aws): AgentCore Runtime IAM を追加"
 ```
 
@@ -787,22 +787,22 @@ git commit -m "feat(aws): AgentCore Runtime IAM を追加"
 
 **Files:**
 
-- Modify: `packages/aws/terraform/agentcore-runtime-basic/main.tf`
-- Modify: `packages/aws/terraform/agentcore-runtime-basic/outputs.tf`
+- Modify: `terraform/aws/agentcore-runtime-basic/main.tf`
+- Modify: `terraform/aws/agentcore-runtime-basic/outputs.tf`
 
 **Step 1: Write the failing check**
 
 Run:
 
 ```bash
-rg "aws_bedrockagentcore_agent_runtime|invoke-agent-runtime" packages/aws/terraform/agentcore-runtime-basic
+rg "aws_bedrockagentcore_agent_runtime|invoke-agent-runtime" terraform/aws/agentcore-runtime-basic
 ```
 
 Expected: FAIL because the Runtime and endpoint are not defined yet.
 
 **Step 2: Write minimal implementation**
 
-Append to `packages/aws/terraform/agentcore-runtime-basic/main.tf`:
+Append to `terraform/aws/agentcore-runtime-basic/main.tf`:
 
 ```hcl
 resource "aws_bedrockagentcore_agent_runtime" "this" {
@@ -844,7 +844,7 @@ resource "aws_bedrockagentcore_agent_runtime_endpoint" "default" {
 }
 ```
 
-Append to `packages/aws/terraform/agentcore-runtime-basic/outputs.tf`:
+Append to `terraform/aws/agentcore-runtime-basic/outputs.tf`:
 
 ```hcl
 output "agent_runtime_arn" {
@@ -891,8 +891,8 @@ Expected: PASS. If the provider rejects `name = "DEFAULT"` or `environment_varia
 **Step 4: Commit**
 
 ```bash
-git add packages/aws/terraform/agentcore-runtime-basic/main.tf \
-  packages/aws/terraform/agentcore-runtime-basic/outputs.tf
+git add terraform/aws/agentcore-runtime-basic/main.tf \
+  terraform/aws/agentcore-runtime-basic/outputs.tf
 git commit -m "feat(aws): AgentCore Runtime と endpoint を追加"
 ```
 
@@ -902,25 +902,25 @@ git commit -m "feat(aws): AgentCore Runtime と endpoint を追加"
 
 **Files:**
 
-- Create: `packages/aws/terraform/agentcore-runtime-basic/README.md`
-- Create: `packages/aws/terraform/agentcore-runtime-basic/cleanup.md`
-- Create: `packages/aws/terraform/agentcore-runtime-basic/terraform.tfvars.template`
+- Create: `terraform/aws/agentcore-runtime-basic/README.md`
+- Create: `terraform/aws/agentcore-runtime-basic/cleanup.md`
+- Create: `terraform/aws/agentcore-runtime-basic/terraform.tfvars.template`
 
 **Step 1: Write the failing check**
 
 Run:
 
 ```bash
-test -f packages/aws/terraform/agentcore-runtime-basic/README.md
-test -f packages/aws/terraform/agentcore-runtime-basic/cleanup.md
-test -f packages/aws/terraform/agentcore-runtime-basic/terraform.tfvars.template
+test -f terraform/aws/agentcore-runtime-basic/README.md
+test -f terraform/aws/agentcore-runtime-basic/cleanup.md
+test -f terraform/aws/agentcore-runtime-basic/terraform.tfvars.template
 ```
 
 Expected: FAIL because the docs and template do not exist.
 
 **Step 2: Write minimal implementation**
 
-Create `packages/aws/terraform/agentcore-runtime-basic/terraform.tfvars.template`:
+Create `terraform/aws/agentcore-runtime-basic/terraform.tfvars.template`:
 
 ```hcl
 # Copy this file to terraform.tfvars and set local values:
@@ -959,7 +959,7 @@ app in `../../apps/agentcore-strands-basic/` with direct code deployment.
 - The app ZIP has been generated:
 
 ```bash
-packages/aws/apps/agentcore-strands-basic/scripts/package.sh
+terraform/aws/apps/agentcore-strands-basic/scripts/package.sh
 ```
 
 ## Variables
@@ -967,8 +967,8 @@ packages/aws/apps/agentcore-strands-basic/scripts/package.sh
 Copy the template and set local values:
 
 ```bash
-cp packages/aws/terraform/agentcore-runtime-basic/terraform.tfvars.template \
-   packages/aws/terraform/agentcore-runtime-basic/terraform.tfvars
+cp terraform/aws/agentcore-runtime-basic/terraform.tfvars.template \
+   terraform/aws/agentcore-runtime-basic/terraform.tfvars
 ```
 
 `terraform.tfvars` is ignored by git.
@@ -1023,9 +1023,9 @@ Run:
 
 ```bash
 rg "AKIA|AWS_SECRET|AWS_PROFILE=|123456789012|nck-sakurai" \
-  packages/aws/terraform/agentcore-runtime-basic/README.md \
-  packages/aws/terraform/agentcore-runtime-basic/cleanup.md \
-  packages/aws/terraform/agentcore-runtime-basic/terraform.tfvars.template
+  terraform/aws/agentcore-runtime-basic/README.md \
+  terraform/aws/agentcore-runtime-basic/cleanup.md \
+  terraform/aws/agentcore-runtime-basic/terraform.tfvars.template
 mise run tf agentcore-runtime-basic fmt -check
 mise run tf agentcore-runtime-basic validate
 ```
@@ -1035,9 +1035,9 @@ Expected: `rg` finds no secrets or account-specific values. Terraform checks pas
 **Step 4: Commit**
 
 ```bash
-git add packages/aws/terraform/agentcore-runtime-basic/README.md \
-  packages/aws/terraform/agentcore-runtime-basic/cleanup.md \
-  packages/aws/terraform/agentcore-runtime-basic/terraform.tfvars.template
+git add terraform/aws/agentcore-runtime-basic/README.md \
+  terraform/aws/agentcore-runtime-basic/cleanup.md \
+  terraform/aws/agentcore-runtime-basic/terraform.tfvars.template
 git commit -m "docs(aws): AgentCore Terraform sample の手順を追加"
 ```
 
@@ -1049,14 +1049,14 @@ git commit -m "docs(aws): AgentCore Terraform sample の手順を追加"
 
 - Modify: `README.md`
 - Modify: `AGENTS.md`
-- Modify: `packages/aws/terraform/README.md`
+- Modify: `terraform/aws/README.md`
 
 **Step 1: Write the failing check**
 
 Run:
 
 ```bash
-rg "agentcore-runtime-basic|agentcore-strands-basic|AgentCore" README.md AGENTS.md packages/aws/terraform/README.md
+rg "agentcore-runtime-basic|agentcore-strands-basic|AgentCore" README.md AGENTS.md terraform/aws/README.md
 ```
 
 Expected: FAIL or incomplete mentions.
@@ -1065,7 +1065,7 @@ Expected: FAIL or incomplete mentions.
 
 Update `README.md`:
 
-- Add `packages/aws/apps/agentcore-strands-basic/` under `packages/aws/`.
+- Add `terraform/aws/apps/agentcore-strands-basic/` under `terraform/aws/`.
 - Add `agentcore-runtime-basic` under AWS Terraform samples.
 - Note that the nested Python app is not included in `dev:all`.
 
@@ -1075,7 +1075,7 @@ Update `AGENTS.md`:
 - Mention that the sample uses Python / uv direct code deployment and local ZIP artifacts that must not be committed.
 - Mention package-local verification commands.
 
-Update `packages/aws/terraform/README.md`:
+Update `terraform/aws/README.md`:
 
 - Add a table row:
 
@@ -1091,9 +1091,9 @@ Update `packages/aws/terraform/README.md`:
 Run:
 
 ```bash
-rg "agentcore-runtime-basic|agentcore-strands-basic|AgentCore" README.md AGENTS.md packages/aws/terraform/README.md
+rg "agentcore-runtime-basic|agentcore-strands-basic|AgentCore" README.md AGENTS.md terraform/aws/README.md
 mise run dev aws
-git status --porcelain | rg -v 'docs/plans/2026-06-10-aws-agentcore-runtime-(design|plan)\\.md|packages/aws/apps/agentcore-strands-basic|packages/aws/terraform/agentcore-runtime-basic|mise.toml|README.md|AGENTS.md|packages/aws/terraform/README.md|\\.gitignore'
+git status --porcelain | rg -v 'docs/plans/2026-06-10-aws-agentcore-runtime-(design|plan)\\.md|terraform/aws/apps/agentcore-strands-basic|terraform/aws/agentcore-runtime-basic|mise.toml|README.md|AGENTS.md|terraform/aws/README.md|\\.gitignore'
 ```
 
 Expected: docs mention the new sample, `mise run dev aws` prints `Hello from aws`, and no generated ZIP, build directory, local state, `.tfvars`, credential, or virtualenv file is tracked.
@@ -1101,7 +1101,7 @@ Expected: docs mention the new sample, `mise run dev aws` prints `Hello from aws
 **Step 4: Commit**
 
 ```bash
-git add README.md AGENTS.md packages/aws/terraform/README.md
+git add README.md AGENTS.md terraform/aws/README.md
 git commit -m "docs(aws): AgentCore sample を一覧に追加"
 ```
 
@@ -1113,11 +1113,11 @@ Run after all tasks:
 
 ```bash
 mise current
-mise exec -- uv lock --directory packages/aws/apps/agentcore-strands-basic --check
-mise exec -- uv run --directory packages/aws/apps/agentcore-strands-basic --locked \
+mise exec -- uv lock --directory terraform/aws/apps/agentcore-strands-basic --check
+mise exec -- uv run --directory terraform/aws/apps/agentcore-strands-basic --locked \
   python -m unittest discover -s tests
-bash -n packages/aws/apps/agentcore-strands-basic/scripts/package.sh
-packages/aws/apps/agentcore-strands-basic/scripts/package.sh
+bash -n terraform/aws/apps/agentcore-strands-basic/scripts/package.sh
+terraform/aws/apps/agentcore-strands-basic/scripts/package.sh
 mise run tf agentcore-runtime-basic init
 mise run tf agentcore-runtime-basic fmt -check
 mise run tf agentcore-runtime-basic validate

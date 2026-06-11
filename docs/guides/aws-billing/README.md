@@ -30,7 +30,7 @@ curl → 127.0.0.1:8080/invocations（自分の PC 上・無料）
   ```
 
 - **`jp.anthropic.claude-sonnet-4-6`**（cross-region inference profile）は **on-demand のトークン従量課金**です。ルーティング自体に追加料金はなく、リクエスト元リージョンの on-demand 価格で課金されます。
-- AgentCore Runtime の利用料は、Terraform で実際に [`agentcore-runtime-basic`](../../../packages/aws/terraform/agentcore-runtime-basic/README.md) を apply し、managed runtime 経由で呼んだときに初めて加わります。
+- AgentCore Runtime の利用料は、Terraform で実際に [`agentcore-runtime-basic`](../../../terraform/aws/agentcore-runtime-basic/README.md) を apply し、managed runtime 経由で呼んだときに初めて加わります。
 
 ## ① 実費・使用量を確認する（かかった額）
 
@@ -105,8 +105,8 @@ JSON が大きいので `| jq` で `model` / `pricePerUnit` を抽出すると�
 
 ## 関連
 
-- 見積もり専用ツール: [`packages/aws/cost-estimator/`](../../../packages/aws/cost-estimator/README.md) — `bcm-pricing-calculator` API で②の事前見積もりを出す自作モジュール（実費①ではなく見積もり用途）。
-- モデル ID の調べ方 / inference profile 形式: [AgentCore Terraform サンプル](../../../packages/aws/terraform/agentcore-runtime-basic/README.md)。
+- 見積もり専用ツール: [`apps/cost-estimator/`](../../../apps/cost-estimator/README.md) — `bcm-pricing-calculator` API で②の事前見積もりを出す自作モジュール（実費①ではなく見積もり用途）。
+- モデル ID の調べ方 / inference profile 形式: [AgentCore Terraform サンプル](../../../terraform/aws/agentcore-runtime-basic/README.md)。
 
 ## 参考
 
