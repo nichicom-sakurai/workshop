@@ -7,7 +7,7 @@ Google Cloud プロジェクト内の Cloud Storage bucket 一覧を読み取る
 
 > 前提（認証情報の設定）と共通コマンド（`init` / `fmt` / `validate` / `plan` / `apply`）は
 > [親 README](../README.md) を参照してください。`<example>` を `storage-buckets-list` に読み替えます。
-> 例: `mise exec -- terraform -chdir=packages/gc/terraform/storage-buckets-list plan`
+> 例: `mise exec -- terraform -chdir=terraform/gc/storage-buckets-list plan`
 
 ## 出力 (outputs)
 

@@ -1,6 +1,6 @@
 # workshop
 
-クラウド / IaC 学習用のモノレポです。`packages/`（provider ごとの Terraform サンプル）と `apps/`（runnable / deploy 対象のアプリ）に独立した単位を並べ、ツールのバージョンを [mise](https://mise.jdx.dev/) で一元管理します。
+クラウド / IaC 学習用のモノレポです。`terraform/`（provider ごとの Terraform サンプル）と `apps/`（runnable / deploy 対象のアプリ）に独立した単位を並べ、ツールのバージョンを [mise](https://mise.jdx.dev/) で一元管理します。
 
 ## 必要なツール
 
@@ -29,23 +29,21 @@ workshop/
 │   ├── cloud-run-rest/            # Cloud Run に deploy する最小の Bun REST service (Dockerfile 付き)
 │   ├── cost-estimator/            # AWS 構成の月額概算ツール (見積もり専用 catalog + bcm-pricing-calculator API adapter、deploy なし)
 │   └── openai/                    # OpenAI Agents SDK (TypeScript) の最小 HelloWorld サンプル (deploy なし。dev/chat/web で実行)
-└── packages/            # provider ごとの Terraform サンプル置き場 (各 provider 配下に terraform/)
+└── terraform/           # provider ごとの Terraform サンプル置き場 (provider 配下に operation を直置き)
     ├── aws/
-    │   └── terraform/
-    │       ├── README.md             # サンプル一覧と共通手順
-    │       ├── agentcore-runtime-basic/  # AgentCore Runtime + Strands Agents app を deploy する mutating サンプル
-    │       ├── caller-identity/      # AWS 操作ごとの独立した read-only サンプル (caller identity を読む)
-    │       ├── s3-private-bucket/    # private S3 bucket を作成し destroy まで学ぶ mutating サンプル
-    │       └── s3-object-upload/     # 既存 S3 bucket に object を upload する mutating サンプル
+    │   ├── README.md             # サンプル一覧と共通手順
+    │   ├── agentcore-runtime-basic/  # AgentCore Runtime + Strands Agents app を deploy する mutating サンプル
+    │   ├── caller-identity/      # AWS 操作ごとの独立した read-only サンプル (caller identity を読む)
+    │   ├── s3-private-bucket/    # private S3 bucket を作成し destroy まで学ぶ mutating サンプル
+    │   └── s3-object-upload/     # 既存 S3 bucket に object を upload する mutating サンプル
     └── gc/
-        └── terraform/
-            ├── README.md             # サンプル一覧と共通手順
-            ├── project-info/         # Google Cloud 操作ごとの独立した read-only サンプル (project nck-sakurai を読む)
-            ├── cloud-run-service-basic/  # Artifact Registry + private Cloud Run service を作る mutating サンプル
-            └── adk-agent-engine-basic/   # ADK agent を Vertex AI Agent Engine へ deploy する mutating サンプル
+        ├── README.md             # サンプル一覧と共通手順
+        ├── project-info/         # Google Cloud 操作ごとの独立した read-only サンプル (project nck-sakurai を読む)
+        ├── cloud-run-service-basic/  # Artifact Registry + private Cloud Run service を作る mutating サンプル
+        └── adk-agent-engine-basic/   # ADK agent を Vertex AI Agent Engine へ deploy する mutating サンプル
 ```
 
-`packages/<provider>/` 配下の Terraform サンプルと `apps/` 配下の各 app は、ツールのバージョンを root の `mise.toml` から継承します。特定ディレクトリだけ別ツール / バージョンが必要な場合は、そのフォルダに `mise.toml` を置くと差分だけ上書きできます。
+`terraform/<provider>/` 配下の Terraform サンプルと `apps/` 配下の各 app は、ツールのバージョンを root の `mise.toml` から継承します。特定ディレクトリだけ別ツール / バージョンが必要な場合は、そのフォルダに `mise.toml` を置くと差分だけ上書きできます。
 
 ## セットアップ
 
@@ -59,8 +57,8 @@ mise run bs
 `mise run bs`（= `bootstrap`）は次を実行します。
 
 1. root のツールを `mise install`
-2. `packages/*` と `apps/*` の各ディレクトリで `mise install`（固有 `mise.toml` がある場合のみ）
-3. `packages/*` と `apps/*` の各ディレクトリで `bun install`（`package.json` がある場合）
+2. `terraform/*` と `apps/*` の各ディレクトリで `mise install`（固有 `mise.toml` がある場合のみ）
+3. `terraform/*` と `apps/*` の各ディレクトリで `bun install`（`package.json` がある場合）
 4. git フックを有効化（`core.hooksPath` を `tools/git-hooks` に設定）
 
 ### shell への activate（推奨）
@@ -91,8 +89,8 @@ mise tasks            # 登録済みタスク一覧
 
 ### Terraform サンプル
 
-- AWS: [`packages/aws/terraform/README.md`](./packages/aws/terraform/README.md)
-- Google Cloud: [`packages/gc/terraform/README.md`](./packages/gc/terraform/README.md)
+- AWS: [`terraform/aws/README.md`](./terraform/aws/README.md)
+- Google Cloud: [`terraform/gc/README.md`](./terraform/gc/README.md)
 
 ### ガイド
 
@@ -108,6 +106,6 @@ mise tasks            # 登録済みタスク一覧
 ## アプリ / サンプルの追加
 
 - runnable app: `apps/<name>/` を作成し、`package.json`（`scripts.start` を定義）と `index.ts` を置く → `mise run bs` で依存をインストール → `mise run dev <name>` で実行
-- Terraform サンプル: `packages/<provider>/terraform/<operation>/` を作成（後述の [Terraform サンプル](#terraform-サンプル) 参照）
+- Terraform サンプル: `terraform/<provider>/<operation>/` を作成（後述の [Terraform サンプル](#terraform-サンプル) 参照）
 
-`bootstrap` は `packages/*` と `apps/*` を自動で走査するため、追加後にタスクや設定を書き換える必要はありません。
+`bootstrap` は `terraform/*` と `apps/*` を自動で走査するため、追加後にタスクや設定を書き換える必要はありません。

@@ -38,8 +38,8 @@ Terraform はこの ZIP を `artifact_zip_path`（この root module ディレ�
 template を copy して自分の値を設定してください（`terraform.tfvars` は gitignore 対象で commit されません）。
 
 ```bash
-cp packages/aws/terraform/agentcore-runtime-basic/terraform.tfvars.template \
-   packages/aws/terraform/agentcore-runtime-basic/terraform.tfvars
+cp terraform/aws/agentcore-runtime-basic/terraform.tfvars.template \
+   terraform/aws/agentcore-runtime-basic/terraform.tfvars
 # terraform.tfvars を編集し、model_id を設定
 ```
 
@@ -57,11 +57,11 @@ production では利用する model ARN へ絞ってください。
 ## 3. Terraform を実行
 
 ```bash
-mise exec -- terraform -chdir=packages/aws/terraform/agentcore-runtime-basic init
-mise exec -- terraform -chdir=packages/aws/terraform/agentcore-runtime-basic fmt -check
-mise exec -- terraform -chdir=packages/aws/terraform/agentcore-runtime-basic validate
-mise exec -- terraform -chdir=packages/aws/terraform/agentcore-runtime-basic plan
-mise exec -- terraform -chdir=packages/aws/terraform/agentcore-runtime-basic apply
+mise exec -- terraform -chdir=terraform/aws/agentcore-runtime-basic init
+mise exec -- terraform -chdir=terraform/aws/agentcore-runtime-basic fmt -check
+mise exec -- terraform -chdir=terraform/aws/agentcore-runtime-basic validate
+mise exec -- terraform -chdir=terraform/aws/agentcore-runtime-basic plan
+mise exec -- terraform -chdir=terraform/aws/agentcore-runtime-basic apply
 ```
 
 ## 4. Invoke
@@ -69,15 +69,15 @@ mise exec -- terraform -chdir=packages/aws/terraform/agentcore-runtime-basic app
 `apply` 後に `invoke_command` output を確認できます。
 
 ```bash
-mise exec -- terraform -chdir=packages/aws/terraform/agentcore-runtime-basic output -raw invoke_command
+mise exec -- terraform -chdir=terraform/aws/agentcore-runtime-basic output -raw invoke_command
 ```
 
 手動で実行する場合:
 
 ```bash
 aws bedrock-agentcore invoke-agent-runtime \
-  --agent-runtime-arn "$(mise exec -- terraform -chdir=packages/aws/terraform/agentcore-runtime-basic output -raw agent_runtime_arn)" \
-  --qualifier "$(mise exec -- terraform -chdir=packages/aws/terraform/agentcore-runtime-basic output -raw agent_runtime_endpoint_name)" \
+  --agent-runtime-arn "$(mise exec -- terraform -chdir=terraform/aws/agentcore-runtime-basic output -raw agent_runtime_arn)" \
+  --qualifier "$(mise exec -- terraform -chdir=terraform/aws/agentcore-runtime-basic output -raw agent_runtime_endpoint_name)" \
   --content-type application/json \
   --accept application/json \
   --cli-binary-format raw-in-base64-out \

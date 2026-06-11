@@ -63,12 +63,12 @@ export AWS_REGION=ap-northeast-1
 terraform を直接呼び出します（`-chdir` で対象サンプルを指定）。
 
 ```bash
-mise exec -- terraform -chdir=packages/aws/terraform/<example> init        # provider plugin を取得し作業ディレクトリを初期化 (最初に一度)
-mise exec -- terraform -chdir=packages/aws/terraform/<example> fmt -check  # .tf の整形ズレを検出 (書き換えず差分の有無のみ確認)
-mise exec -- terraform -chdir=packages/aws/terraform/<example> validate    # 構文・設定の整合性を静的チェック
-mise exec -- terraform -chdir=packages/aws/terraform/<example> plan        # 実行計画を表示
-mise exec -- terraform -chdir=packages/aws/terraform/<example> apply       # 計画を適用し output を表示
-mise exec -- terraform -chdir=packages/aws/terraform/<example> destroy     # mutating サンプルで作成したリソースを削除
+mise exec -- terraform -chdir=terraform/aws/<example> init        # provider plugin を取得し作業ディレクトリを初期化 (最初に一度)
+mise exec -- terraform -chdir=terraform/aws/<example> fmt -check  # .tf の整形ズレを検出 (書き換えず差分の有無のみ確認)
+mise exec -- terraform -chdir=terraform/aws/<example> validate    # 構文・設定の整合性を静的チェック
+mise exec -- terraform -chdir=terraform/aws/<example> plan        # 実行計画を表示
+mise exec -- terraform -chdir=terraform/aws/<example> apply       # 計画を適用し output を表示
+mise exec -- terraform -chdir=terraform/aws/<example> destroy     # mutating サンプルで作成したリソースを削除
 ```
 
 短縮形として `mise run tf <example> <command>`（例: `mise run tf caller-identity plan`）も同義で使えます。

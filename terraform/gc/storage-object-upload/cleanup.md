@@ -5,14 +5,14 @@ bucket 自体はこの sample の管理対象ではないため削除しませ�
 
 ## 前提
 
-- `packages/gc/terraform/storage-object-upload/terraform.tfvars` に、作成時と同じ `bucket_name` / `object_name` が残っていること
+- `terraform/gc/storage-object-upload/terraform.tfvars` に、作成時と同じ `bucket_name` / `object_name` が残っていること
 - `terraform init` が済んでいること
 - bucket はまだ削除されていないこと
 
 ## 削除対象を確認する
 
 ```bash
-D=packages/gc/terraform/storage-object-upload
+D=terraform/gc/storage-object-upload
 mise exec -- terraform -chdir="${D}" state list
 ```
 
@@ -21,7 +21,7 @@ mise exec -- terraform -chdir="${D}" state list
 ## 削除計画を確認する
 
 ```bash
-D=packages/gc/terraform/storage-object-upload
+D=terraform/gc/storage-object-upload
 mise exec -- terraform -chdir="${D}" plan -destroy
 ```
 
@@ -30,7 +30,7 @@ mise exec -- terraform -chdir="${D}" plan -destroy
 ## object を削除する
 
 ```bash
-D=packages/gc/terraform/storage-object-upload
+D=terraform/gc/storage-object-upload
 mise exec -- terraform -chdir="${D}" destroy
 ```
 
@@ -42,7 +42,7 @@ Terraform が確認プロンプトを出すため、plan の内容に問題が�
 state に管理対象が残っていないことを確認します。
 
 ```bash
-D=packages/gc/terraform/storage-object-upload
+D=terraform/gc/storage-object-upload
 mise exec -- terraform -chdir="${D}" state list
 ```
 

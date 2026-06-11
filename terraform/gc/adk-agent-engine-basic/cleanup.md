@@ -17,7 +17,7 @@
 まず state 上の管理対象を確認します。
 
 ```bash
-D=packages/gc/terraform/adk-agent-engine-basic
+D=terraform/gc/adk-agent-engine-basic
 mise exec -- terraform -chdir="${D}" state list
 ```
 
@@ -28,7 +28,7 @@ mise exec -- terraform -chdir="${D}" state list
 実際に削除する前に、destroy plan を確認します。
 
 ```bash
-D=packages/gc/terraform/adk-agent-engine-basic
+D=terraform/gc/adk-agent-engine-basic
 mise exec -- terraform -chdir="${D}" plan -destroy
 ```
 
@@ -40,7 +40,7 @@ mise exec -- terraform -chdir="${D}" plan -destroy
 （呼び出しテストで session を作った場合は下記「session が残って destroy が失敗する場合」を先に参照）。
 
 ```bash
-D=packages/gc/terraform/adk-agent-engine-basic
+D=terraform/gc/adk-agent-engine-basic
 mise exec -- terraform -chdir="${D}" destroy
 ```
 
@@ -65,7 +65,7 @@ Please delete the child resources before deleting the ReasoningEngine, or set fo
 apply / destroy の両方で自動読み込みされ（かつ gitignore 対象）るので、そこに1行足すのが簡単です。
 
 ```bash
-D=packages/gc/terraform/adk-agent-engine-basic
+D=terraform/gc/adk-agent-engine-basic
 echo 'deletion_policy = "FORCE"' >> "${D}/terraform.tfvars"
 mise exec -- terraform -chdir="${D}" apply    # deletion_policy を FORCE に更新（state に反映）
 mise exec -- terraform -chdir="${D}" destroy  # session ごと Agent Engine を削除
@@ -94,7 +94,7 @@ rm -rf apps/adk-helloworld/.build
 state に管理対象が残っていないことを確認します。
 
 ```bash
-D=packages/gc/terraform/adk-agent-engine-basic
+D=terraform/gc/adk-agent-engine-basic
 mise exec -- terraform -chdir="${D}" state list
 ```
 

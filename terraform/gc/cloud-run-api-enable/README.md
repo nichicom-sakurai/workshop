@@ -8,7 +8,7 @@
 
 > 前提（認証情報の設定）と共通コマンド（`init` / `fmt` / `validate` / `plan` / `apply`）は
 > [親 README](../README.md) を参照してください。`<example>` を `cloud-run-api-enable` に読み替えます。
-> 例: `mise exec -- terraform -chdir=packages/gc/terraform/cloud-run-api-enable apply`
+> 例: `mise exec -- terraform -chdir=terraform/gc/cloud-run-api-enable apply`
 
 ## このサンプルが行うこと
 
@@ -38,7 +38,7 @@
 ## cleanup
 
 ```bash
-mise exec -- terraform -chdir=packages/gc/terraform/cloud-run-api-enable destroy
+mise exec -- terraform -chdir=terraform/gc/cloud-run-api-enable destroy
 ```
 
 `disable_on_destroy = false` のため、`destroy` 後も3つの API は有効なままです。

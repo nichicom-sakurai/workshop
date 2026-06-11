@@ -18,8 +18,8 @@ storage 系で API 有効化を [storage-api-enable](../storage-api-enable/) と
 [cloud-run-api-enable](../cloud-run-api-enable/) で Terraform 管理します。**このサンプルの前に** apply してください。
 
 ```bash
-mise exec -- terraform -chdir=packages/gc/terraform/cloud-run-api-enable init
-mise exec -- terraform -chdir=packages/gc/terraform/cloud-run-api-enable apply
+mise exec -- terraform -chdir=terraform/gc/cloud-run-api-enable init
+mise exec -- terraform -chdir=terraform/gc/cloud-run-api-enable apply
 ```
 
 ## 全体の流れ（2段階 apply）
@@ -46,8 +46,8 @@ image URI は build のたびに変わるため、固定値は埋め込まず変
 この場合は手順1の `echo`（ファイルを上書きします）を実行せず、`image` 行を手で設定します。
 
 ```bash
-cp packages/gc/terraform/cloud-run-service-basic/terraform.tfvars.template \
-   packages/gc/terraform/cloud-run-service-basic/terraform.tfvars
+cp terraform/gc/cloud-run-service-basic/terraform.tfvars.template \
+   terraform/gc/cloud-run-service-basic/terraform.tfvars
 # terraform.tfvars を編集し、image（と必要な override）を設定
 ```
 
@@ -75,7 +75,7 @@ cp packages/gc/terraform/cloud-run-service-basic/terraform.tfvars.template \
 ## 操作の流れ
 
 ```bash
-D=packages/gc/terraform/cloud-run-service-basic
+D=terraform/gc/cloud-run-service-basic
 
 # 1. tag を決めて image URI を terraform.tfvars に設定
 TAG="$(git rev-parse --short HEAD)"
@@ -104,7 +104,7 @@ service は private のため、認証なしのリクエストは 403 になり�
 ID token を付けると、`run.routes.invoke` 権限を持つユーザー（project Owner / Editor を含む）として 200 が返ります。
 
 ```bash
-D=packages/gc/terraform/cloud-run-service-basic
+D=terraform/gc/cloud-run-service-basic
 SERVICE_URI="$(mise exec -- terraform -chdir=$D output -raw service_uri)"
 
 # 認証なし → 403 Forbidden

@@ -10,7 +10,7 @@ storage 系・Cloud Run 系で API 有効化を専用サンプル（[storage-api
 
 > 前提（認証情報の設定）と共通コマンド（`init` / `fmt` / `validate` / `plan` / `apply`）は
 > [親 README](../README.md) を参照してください。`<example>` を `vertex-ai-api-enable` に読み替えます。
-> 例: `mise exec -- terraform -chdir=packages/gc/terraform/vertex-ai-api-enable apply`
+> 例: `mise exec -- terraform -chdir=terraform/gc/vertex-ai-api-enable apply`
 
 ## このサンプルが行うこと
 
@@ -40,7 +40,7 @@ storage 系・Cloud Run 系で API 有効化を専用サンプル（[storage-api
 ## cleanup
 
 ```bash
-mise exec -- terraform -chdir=packages/gc/terraform/vertex-ai-api-enable destroy
+mise exec -- terraform -chdir=terraform/gc/vertex-ai-api-enable destroy
 ```
 
 `disable_on_destroy = false` のため、`destroy` 後も `aiplatform.googleapis.com` は有効なままです。

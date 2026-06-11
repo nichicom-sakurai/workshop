@@ -16,8 +16,8 @@
 template を copy して自分の値を設定してください（`terraform.tfvars` は gitignore 対象でコミットされません）。
 
 ```bash
-cp packages/gc/terraform/storage-object-upload/terraform.tfvars.template \
-   packages/gc/terraform/storage-object-upload/terraform.tfvars
+cp terraform/gc/storage-object-upload/terraform.tfvars.template \
+   terraform/gc/storage-object-upload/terraform.tfvars
 # terraform.tfvars を編集し、storage-bucket-basic と同じ bucket_name を設定
 ```
 
@@ -39,7 +39,7 @@ bucket 自体はこのサンプルでは削除しません。bucket を削除す
 ## 操作の流れ
 
 ```bash
-D=packages/gc/terraform/storage-object-upload
+D=terraform/gc/storage-object-upload
 mise exec -- terraform -chdir=$D init
 mise exec -- terraform -chdir=$D plan      # upload する object を確認
 mise exec -- terraform -chdir=$D apply     # object を1つ作成
@@ -63,8 +63,8 @@ mise exec -- terraform -chdir=$D state list # state 上の object を確認
 bucket を削除する前に、この sample の object を削除します。
 
 ```bash
-mise exec -- terraform -chdir=packages/gc/terraform/storage-object-upload plan -destroy
-mise exec -- terraform -chdir=packages/gc/terraform/storage-object-upload destroy
+mise exec -- terraform -chdir=terraform/gc/storage-object-upload plan -destroy
+mise exec -- terraform -chdir=terraform/gc/storage-object-upload destroy
 ```
 
 その後、bucket が空になった状態で [storage-bucket-basic の cleanup](../storage-bucket-basic/cleanup.md) を実行します。

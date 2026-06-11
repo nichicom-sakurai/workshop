@@ -7,7 +7,7 @@ Google Cloud プロジェクト内の service account 一覧を読み取る read
 
 > 前提（認証情報の設定）と共通コマンド（`init` / `fmt` / `validate` / `plan` / `apply`）は
 > [親 README](../README.md) を参照してください。`<example>` を `service-accounts-list` に読み替えます。
-> 例: `mise exec -- terraform -chdir=packages/gc/terraform/service-accounts-list plan`
+> 例: `mise exec -- terraform -chdir=terraform/gc/service-accounts-list plan`
 
 ## 出力 (outputs)
 

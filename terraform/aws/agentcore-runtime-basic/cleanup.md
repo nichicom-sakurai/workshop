@@ -6,14 +6,14 @@ S3 artifact bucket / object を作成します。学習後は `destroy` して�
 ## 削除前に確認
 
 ```bash
-mise exec -- terraform -chdir=packages/aws/terraform/agentcore-runtime-basic state list
-mise exec -- terraform -chdir=packages/aws/terraform/agentcore-runtime-basic plan -destroy
+mise exec -- terraform -chdir=terraform/aws/agentcore-runtime-basic state list
+mise exec -- terraform -chdir=terraform/aws/agentcore-runtime-basic plan -destroy
 ```
 
 ## 削除
 
 ```bash
-mise exec -- terraform -chdir=packages/aws/terraform/agentcore-runtime-basic destroy
+mise exec -- terraform -chdir=terraform/aws/agentcore-runtime-basic destroy
 ```
 
 ## destroy が失敗した場合

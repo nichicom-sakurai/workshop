@@ -14,8 +14,8 @@
 template を copy して自分の値を設定してください（`terraform.tfvars` は gitignore 対象で commit されません）。
 
 ```bash
-cp packages/aws/terraform/s3-object-upload/terraform.tfvars.template \
-   packages/aws/terraform/s3-object-upload/terraform.tfvars
+cp terraform/aws/s3-object-upload/terraform.tfvars.template \
+   terraform/aws/s3-object-upload/terraform.tfvars
 # terraform.tfvars を編集し、s3-private-bucket と同じ bucket_name を設定
 ```
 
@@ -38,12 +38,12 @@ bucket 自体はこのサンプルでは削除しません。bucket を削除す
 ## 操作の流れ
 
 ```bash
-mise exec -- terraform -chdir=packages/aws/terraform/s3-object-upload init
-mise exec -- terraform -chdir=packages/aws/terraform/s3-object-upload fmt -check
-mise exec -- terraform -chdir=packages/aws/terraform/s3-object-upload validate
-mise exec -- terraform -chdir=packages/aws/terraform/s3-object-upload plan      # upload する object を確認
-mise exec -- terraform -chdir=packages/aws/terraform/s3-object-upload apply     # object を1つ作成
-mise exec -- terraform -chdir=packages/aws/terraform/s3-object-upload state list # state 上の object を確認
+mise exec -- terraform -chdir=terraform/aws/s3-object-upload init
+mise exec -- terraform -chdir=terraform/aws/s3-object-upload fmt -check
+mise exec -- terraform -chdir=terraform/aws/s3-object-upload validate
+mise exec -- terraform -chdir=terraform/aws/s3-object-upload plan      # upload する object を確認
+mise exec -- terraform -chdir=terraform/aws/s3-object-upload apply     # object を1つ作成
+mise exec -- terraform -chdir=terraform/aws/s3-object-upload state list # state 上の object を確認
 ```
 
 学習後は [`cleanup.md`](./cleanup.md) の手順で object を削除します。
@@ -63,8 +63,8 @@ mise exec -- terraform -chdir=packages/aws/terraform/s3-object-upload state list
 bucket を削除する前に、この sample の object を削除します。
 
 ```bash
-mise exec -- terraform -chdir=packages/aws/terraform/s3-object-upload plan -destroy
-mise exec -- terraform -chdir=packages/aws/terraform/s3-object-upload destroy
+mise exec -- terraform -chdir=terraform/aws/s3-object-upload plan -destroy
+mise exec -- terraform -chdir=terraform/aws/s3-object-upload destroy
 ```
 
 その後、bucket が空になった状態で [s3-private-bucket の cleanup](../s3-private-bucket/) を実行します。

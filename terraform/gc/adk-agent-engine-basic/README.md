@@ -30,8 +30,8 @@ storage 系・Cloud Run 系と同じく、このサンプルの root module は 
 管理します。**このサンプルの前に** apply してください。
 
 ```bash
-mise exec -- terraform -chdir=packages/gc/terraform/vertex-ai-api-enable init
-mise exec -- terraform -chdir=packages/gc/terraform/vertex-ai-api-enable apply
+mise exec -- terraform -chdir=terraform/gc/vertex-ai-api-enable init
+mise exec -- terraform -chdir=terraform/gc/vertex-ai-api-enable apply
 ```
 
 ## 全体の流れ（archive 生成 → apply）
@@ -72,7 +72,7 @@ copy して編集します（`terraform.tfvars` は gitignore 対象）。
 ## 操作の流れ
 
 ```bash
-D=packages/gc/terraform/adk-agent-engine-basic
+D=terraform/gc/adk-agent-engine-basic
 
 # 0. 前提 API（vertex-ai-api-enable を先に apply 済みにしておく）
 
@@ -97,7 +97,7 @@ mise exec -- terraform -chdir=$D apply
 作成後、Agent Engine は Cloud Console または出力されたリソース名で確認できます。
 
 ```bash
-D=packages/gc/terraform/adk-agent-engine-basic
+D=terraform/gc/adk-agent-engine-basic
 mise exec -- terraform -chdir=$D output -raw reasoning_engine_name
 ```
 

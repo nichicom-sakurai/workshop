@@ -7,7 +7,7 @@
 
 > 前提（認証情報の設定）と共通コマンド（`init` / `fmt` / `validate` / `plan` / `apply`）は
 > [親 README](../README.md) を参照してください。`<example>` を `storage-service-account` に読み替えます。
-> 例: `mise exec -- terraform -chdir=packages/gc/terraform/storage-service-account plan`
+> 例: `mise exec -- terraform -chdir=terraform/gc/storage-service-account plan`
 
 ## 出力 (outputs)
 

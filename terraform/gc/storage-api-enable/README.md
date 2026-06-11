@@ -8,7 +8,7 @@ Cloud Storage API (`storage.googleapis.com`) を有効化する **mutating** サ
 
 > 前提（認証情報の設定）と共通コマンド（`init` / `fmt` / `validate` / `plan` / `apply`）は
 > [親 README](../README.md) を参照してください。`<example>` を `storage-api-enable` に読み替えます。
-> 例: `mise exec -- terraform -chdir=packages/gc/terraform/storage-api-enable apply`
+> 例: `mise exec -- terraform -chdir=terraform/gc/storage-api-enable apply`
 
 ## このサンプルが行うこと
 
@@ -31,7 +31,7 @@ Cloud Storage API (`storage.googleapis.com`) を有効化する **mutating** サ
 ## cleanup
 
 ```bash
-mise exec -- terraform -chdir=packages/gc/terraform/storage-api-enable destroy
+mise exec -- terraform -chdir=terraform/gc/storage-api-enable destroy
 ```
 
 `disable_on_destroy = false` のため、`destroy` 後も `storage.googleapis.com` は有効なままです。

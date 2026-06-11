@@ -70,11 +70,11 @@ gcloud auth application-default login
 `<example>` を実際のサンプル名（例: `project-info`）に置き換えて実行します。`tf` ラッパータスクは AWS サンプル専用のため、Google Cloud サンプルは `terraform` を直接呼びます。
 
 ```bash
-mise exec -- terraform -chdir=packages/gc/terraform/<example> init      # provider plugin を取得し作業ディレクトリを初期化 (最初に一度)
-mise exec -- terraform -chdir=packages/gc/terraform/<example> fmt -check # .tf の整形ズレを検出 (書き換えず差分の有無のみ確認)
-mise exec -- terraform -chdir=packages/gc/terraform/<example> validate   # 構文・設定の整合性を静的チェック
-mise exec -- terraform -chdir=packages/gc/terraform/<example> plan       # 実行計画を表示
-mise exec -- terraform -chdir=packages/gc/terraform/<example> apply      # 計画を適用し output を表示
+mise exec -- terraform -chdir=terraform/gc/<example> init      # provider plugin を取得し作業ディレクトリを初期化 (最初に一度)
+mise exec -- terraform -chdir=terraform/gc/<example> fmt -check # .tf の整形ズレを検出 (書き換えず差分の有無のみ確認)
+mise exec -- terraform -chdir=terraform/gc/<example> validate   # 構文・設定の整合性を静的チェック
+mise exec -- terraform -chdir=terraform/gc/<example> plan       # 実行計画を表示
+mise exec -- terraform -chdir=terraform/gc/<example> apply      # 計画を適用し output を表示
 ```
 
 ## 各サンプルが生成するファイル

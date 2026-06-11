@@ -15,8 +15,8 @@ bucket 名は**全 Google Cloud で一意**である必要があるため、固�
 template を copy して自分の値を設定してください（`terraform.tfvars` は gitignore 対象でコミットされません）。
 
 ```bash
-cp packages/gc/terraform/storage-bucket-basic/terraform.tfvars.template \
-   packages/gc/terraform/storage-bucket-basic/terraform.tfvars
+cp terraform/gc/storage-bucket-basic/terraform.tfvars.template \
+   terraform/gc/storage-bucket-basic/terraform.tfvars
 # terraform.tfvars を編集し、一意な bucket_name を設定
 ```
 
@@ -36,7 +36,7 @@ private-by-default の設定です。
 ## 操作の流れ
 
 ```bash
-D=packages/gc/terraform/storage-bucket-basic
+D=terraform/gc/storage-bucket-basic
 mise exec -- terraform -chdir=$D init
 mise exec -- terraform -chdir=$D plan      # 作成内容を確認
 mise exec -- terraform -chdir=$D apply     # bucket を1つ作成
@@ -63,13 +63,13 @@ mise exec -- terraform -chdir=$D destroy   # 学習後に削除
 削除前に destroy plan を確認します。
 
 ```bash
-mise exec -- terraform -chdir=packages/gc/terraform/storage-bucket-basic plan -destroy
+mise exec -- terraform -chdir=terraform/gc/storage-bucket-basic plan -destroy
 ```
 
 確認後、同じ root module / state で `destroy` します。
 
 ```bash
-mise exec -- terraform -chdir=packages/gc/terraform/storage-bucket-basic destroy
+mise exec -- terraform -chdir=terraform/gc/storage-bucket-basic destroy
 ```
 
 > オブジェクトをアップロードする発展サンプルは [storage-object-upload](../storage-object-upload/) で扱います。

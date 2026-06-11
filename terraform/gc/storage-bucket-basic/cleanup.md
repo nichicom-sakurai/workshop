@@ -7,7 +7,7 @@ Terraform は、作成時と同じ root module / state を使って削除しま�
 
 ## 前提
 
-- `packages/gc/terraform/storage-bucket-basic/terraform.tfvars` に、作成時と同じ `bucket_name` が残っていること
+- `terraform/gc/storage-bucket-basic/terraform.tfvars` に、作成時と同じ `bucket_name` が残っていること
 - `terraform init` が済んでいること
 - bucket に object を追加していないこと
 
@@ -19,7 +19,7 @@ Terraform は、作成時と同じ root module / state を使って削除しま�
 まず state 上の管理対象を確認します。
 
 ```bash
-D=packages/gc/terraform/storage-bucket-basic
+D=terraform/gc/storage-bucket-basic
 mise exec -- terraform -chdir="${D}" state list
 ```
 
@@ -30,7 +30,7 @@ mise exec -- terraform -chdir="${D}" state list
 実際に削除する前に、destroy plan を確認します。
 
 ```bash
-D=packages/gc/terraform/storage-bucket-basic
+D=terraform/gc/storage-bucket-basic
 mise exec -- terraform -chdir="${D}" plan -destroy
 ```
 
@@ -41,7 +41,7 @@ mise exec -- terraform -chdir="${D}" plan -destroy
 確認後、`destroy` を実行します。
 
 ```bash
-D=packages/gc/terraform/storage-bucket-basic
+D=terraform/gc/storage-bucket-basic
 mise exec -- terraform -chdir="${D}" destroy
 ```
 
@@ -53,7 +53,7 @@ Terraform が確認プロンプトを出すため、plan の内容に問題が�
 state に管理対象が残っていないことを確認します。
 
 ```bash
-D=packages/gc/terraform/storage-bucket-basic
+D=terraform/gc/storage-bucket-basic
 mise exec -- terraform -chdir="${D}" state list
 ```
 
