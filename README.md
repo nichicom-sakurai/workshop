@@ -34,14 +34,15 @@ workshop/
     │       ├── caller-identity/      # AWS 操作ごとの独立した read-only サンプル (caller identity を読む)
     │       ├── s3-private-bucket/    # private S3 bucket を作成し destroy まで学ぶ mutating サンプル
     │       └── s3-object-upload/     # 既存 S3 bucket に object を upload する mutating サンプル
-    └── gc/
-        ├── apps/
-        │   ├── adk-helloworld/       # Google ADK の最小 HelloWorld agent (Gemini API key 方式でローカル実行する Python app)
-        │   └── cloud-run-rest/       # Cloud Run に deploy する最小の Bun REST service (Dockerfile 付き)
-        └── terraform/
-            ├── README.md             # サンプル一覧と共通手順
-            ├── project-info/         # Google Cloud 操作ごとの独立した read-only サンプル (project nck-sakurai を読む)
-            └── cloud-run-service-basic/  # Artifact Registry + private Cloud Run service を作る mutating サンプル
+    ├── gc/
+    │   ├── apps/
+    │   │   ├── adk-helloworld/       # Google ADK の最小 HelloWorld agent (Gemini API key 方式でローカル実行する Python app)
+    │   │   └── cloud-run-rest/       # Cloud Run に deploy する最小の Bun REST service (Dockerfile 付き)
+    │   └── terraform/
+    │       ├── README.md             # サンプル一覧と共通手順
+    │       ├── project-info/         # Google Cloud 操作ごとの独立した read-only サンプル (project nck-sakurai を読む)
+    │       └── cloud-run-service-basic/  # Artifact Registry + private Cloud Run service を作る mutating サンプル
+    └── openai/              # OpenAI Agents SDK (TypeScript) の最小 HelloWorld サンプル (Agent + run、key 未設定時は案内して exit 0)
 ```
 
 `packages/` 配下の各プロジェクトは `bun` のバージョンを root の `mise.toml` から継承します。特定プロジェクトだけ別ツール / バージョンが必要な場合は、そのフォルダに `mise.toml` を置くと差分だけ上書きできます。
@@ -81,7 +82,7 @@ eval "$(mise activate zsh)"
 | `install-hooks` | git commit-msg フックを有効化 | `mise run install-hooks` |
 
 ```bash
-mise run dev aws      # aws / gc を個別実行
+mise run dev aws      # aws / gc / openai を個別実行
 mise run dev:all      # まとめて実行
 mise tasks            # 登録済みタスク一覧
 ```
