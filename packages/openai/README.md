@@ -37,6 +37,20 @@ model は明示せず SDK 既定を使います。`OPENAI_DEFAULT_MODEL` を設�
 export OPENAI_DEFAULT_MODEL=gpt-5
 ```
 
+## 対話チャット (マルチターン)
+
+単発実行 (`index.ts`) のほかに、ターミナルで継続的にやり取りできるチャット (`chat.ts`) を同梱しています。
+
+```bash
+mise run chat openai
+```
+
+- `You:` に入力すると agent が応答します。会話履歴を保持するため、直前までのやり取りを踏まえた返答になります。
+- 空行 / `Ctrl+D` / `/exit` で終了します。
+- `OPENAI_API_KEY` 未設定時は案内を表示して終了します（単発実行と同じ）。
+
+会話の継続は、SDK の `run()` が返す `result.history` を次ターンの入力に渡すことで実現しています。
+
 ## 想定出力
 
 - **API key 未設定時**: `[INFO] OPENAI_API_KEY が未設定のため...` の案内を表示して exit 0 で終了します。

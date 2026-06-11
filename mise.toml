@@ -25,6 +25,10 @@ for d in packages/*/; do
 done
 """
 
+[tasks.chat]
+description = "指定プロジェクトのチャットを起動 (例: mise run chat openai)"
+run = "mise exec -- bun run --cwd=packages/{{arg(name='project')}} chat"
+
 # --- terraform サンプルの実行タスク ---
 
 [tasks.tf]
