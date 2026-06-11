@@ -1,17 +1,17 @@
-# packages/gc Terraform learning design
+# terraform/gc Terraform learning design
 
 Date: 2026-06-09
 Issue URL: https://github.com/nichicom-sakurai/workshop/issues/6
 
 ## Context
 
-`workshop` is a cloud / IaC learning monorepo. `packages/gc` currently has a
+`workshop` is a cloud / IaC learning monorepo. `terraform/gc` currently has a
 minimal Bun package and one Google Cloud Terraform sample:
-`packages/gc/terraform/project-info/`.
+`terraform/gc/project-info/`.
 
 The existing Terraform convention is:
 
-- Put each sample directly under `packages/gc/terraform/<operation>/`.
+- Put each sample directly under `terraform/gc/<operation>/`.
 - Treat each sample as an independent root module with its own local state.
 - Keep the current samples read-only unless a mutating sample is explicitly
   chosen.
@@ -59,13 +59,13 @@ Never:
 Always:
 
 - Keep each sample self-contained under
-  `packages/gc/terraform/<operation>/`.
+  `terraform/gc/<operation>/`.
 - Keep sample names kebab-case and named by target + operation.
 - Mark each sample as `read-only` or `mutating` in
-  `packages/gc/terraform/README.md`.
+  `terraform/gc/README.md`.
 - Use `provider "google" { project = "nck-sakurai" }` consistently unless the
   repository later adopts a variable-driven project convention.
-- Use `mise exec -- terraform -chdir=packages/gc/terraform/<operation> ...` in
+- Use `mise exec -- terraform -chdir=terraform/gc/<operation> ...` in
   docs and verification.
 - Commit `.terraform.lock.hcl` after `terraform init`.
 - Keep local state and local variables ignored.
@@ -132,7 +132,7 @@ Confidence: 86%.
 ### Proposed folder structure
 
 ```text
-packages/gc/
+terraform/gc/
 ├── index.ts
 ├── package.json
 └── terraform/
@@ -194,27 +194,27 @@ That lock file should be committed for every initialized sample.
 
 ### Concrete file-change list
 
-- `packages/gc/terraform/README.md`
+- `terraform/gc/README.md`
   - Add the new samples to the table.
   - Add a learning order section.
   - Clarify which samples mutate the project and which are read-only.
   - Add cleanup expectations for mutating samples.
-- `packages/gc/terraform/service-accounts-list/*`
+- `terraform/gc/service-accounts-list/*`
   - Add the read-only service account list sample.
-- `packages/gc/terraform/storage-api-enable/*`
+- `terraform/gc/storage-api-enable/*`
   - Add the API enablement sample with `disable_on_destroy = false`.
-- `packages/gc/terraform/storage-buckets-list/*`
+- `terraform/gc/storage-buckets-list/*`
   - Add the read-only bucket inventory sample.
-- `packages/gc/terraform/storage-service-account/*`
+- `terraform/gc/storage-service-account/*`
   - Add the read-only Cloud Storage service account sample.
-- `packages/gc/terraform/storage-bucket-basic/*`
+- `terraform/gc/storage-bucket-basic/*`
   - Add the private bucket lifecycle sample.
   - Include `terraform.tfvars.template`, not real local values.
   - Include `cleanup.md` with the `terraform plan -destroy` and
     `terraform destroy` flow for deleting the bucket created by this sample.
   - Document that no separate `delete.tf` is added because Terraform deletion
     should use the same root module and state that created the bucket.
-- `packages/gc/terraform/storage-object-upload/*`
+- `terraform/gc/storage-object-upload/*`
   - Add the object upload follow-up sample.
   - Include `objects/hello.txt` as the committed local source file.
   - Include `terraform.tfvars.template`, not real local values.
@@ -231,7 +231,7 @@ commands.
 
 ## Acceptance Criteria
 
-Given a learner reads `packages/gc/terraform/README.md`, when they inspect the
+Given a learner reads `terraform/gc/README.md`, when they inspect the
 sample table, then each sample is clearly marked as `read-only` or `mutating`.
 
 Given a learner follows the samples in order, when they run `init`, `fmt
@@ -354,18 +354,18 @@ ignored.
 For each sample:
 
 ```bash
-mise exec -- terraform -chdir=packages/gc/terraform/<operation> init
-mise exec -- terraform -chdir=packages/gc/terraform/<operation> fmt -check
-mise exec -- terraform -chdir=packages/gc/terraform/<operation> validate
-mise exec -- terraform -chdir=packages/gc/terraform/<operation> plan
+mise exec -- terraform -chdir=terraform/gc/<operation> init
+mise exec -- terraform -chdir=terraform/gc/<operation> fmt -check
+mise exec -- terraform -chdir=terraform/gc/<operation> validate
+mise exec -- terraform -chdir=terraform/gc/<operation> plan
 ```
 
 For mutating samples only:
 
 ```bash
-mise exec -- terraform -chdir=packages/gc/terraform/<operation> apply
-mise exec -- terraform -chdir=packages/gc/terraform/<operation> plan -destroy
-mise exec -- terraform -chdir=packages/gc/terraform/<operation> destroy
+mise exec -- terraform -chdir=terraform/gc/<operation> apply
+mise exec -- terraform -chdir=terraform/gc/<operation> plan -destroy
+mise exec -- terraform -chdir=terraform/gc/<operation> destroy
 ```
 
 After verification:

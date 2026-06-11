@@ -45,4 +45,4 @@ printf '[OK] Created %s\n' "${ARTIFACT_PATH}"
 printf '[INFO] Archive contents:\n'
 tar -tzf "${ARTIFACT_PATH}" | sed 's/^/  /'
 printf '[INFO] Next: plan/apply the Terraform sample that reads this archive\n'
-printf '       mise exec -- terraform -chdir=packages/gc/terraform/adk-agent-engine-basic plan\n'
+printf '       mise exec -- terraform -chdir=terraform/gc/adk-agent-engine-basic plan\n'

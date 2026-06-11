@@ -5,7 +5,7 @@ Cloud Run の [container contract](https://docs.cloud.google.com/run/docs/contai
 型定義のみ dev 依存として `@types/bun` を持ち、エディタと `bunx tsc --noEmit` で型チェックできます。
 
 このアプリを private Cloud Run service として deploy する Terraform サンプルは
-[`packages/gc/terraform/cloud-run-service-basic/`](../../packages/gc/terraform/cloud-run-service-basic/) にあります。
+[`terraform/gc/cloud-run-service-basic/`](../../terraform/gc/cloud-run-service-basic/) にあります。
 
 ## ファイル構成
 
@@ -69,7 +69,7 @@ curl -s localhost:8080/
 ## container image の build / push（Cloud Build）
 
 infrastructure（Artifact Registry / Cloud Run）は Terraform、image の build / push は `gcloud builds submit` と役割を分けています。
-Artifact Registry repository の作成を含む全体の流れは [Terraform サンプルの README](../../packages/gc/terraform/cloud-run-service-basic/README.md) を参照してください。
+Artifact Registry repository の作成を含む全体の流れは [Terraform サンプルの README](../../terraform/gc/cloud-run-service-basic/README.md) を参照してください。
 
 このディレクトリから実行する build / push コマンドは次の形です。
 

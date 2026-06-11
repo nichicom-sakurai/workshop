@@ -12,7 +12,7 @@ OpenAI Agents SDK ([@openai/agents](https://openai.github.io/openai-agents-js/))
 mise run dev openai
 ```
 
-`OPENAI_API_KEY` が未設定の場合は設定方法の案内を表示して正常終了 (exit 0) します。`dev`/`chat`/`web` タスクは project 名を `packages/` → `apps/` の順に解決するため、`apps/openai` でもそのまま動きます。
+`OPENAI_API_KEY` が未設定の場合は設定方法の案内を表示して正常終了 (exit 0) します。`dev`/`chat`/`web` タスクは project 名を `apps/` から解決するため、`apps/openai` でもそのまま動きます。
 
 ## API key の設定
 

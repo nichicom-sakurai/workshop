@@ -86,7 +86,7 @@ GOOGLE_CLOUD_LOCATION=us-central1
 ```
 
 - API key は不要で、認証は Application Default Credentials (ADC) を使います。事前に `gcloud auth application-default login` を実行しておきます。
-- 対象プロジェクトで Vertex AI API を有効化しておきます（`gcloud services enable aiplatform.googleapis.com --project=your-gcp-project-id`）。Terraform で API 有効化を学ぶ場合は、この repo の `packages/gc/terraform/<op>-api-enable/`（`google_project_service`）パターンが参考になります。
+- 対象プロジェクトで Vertex AI API を有効化しておきます（`gcloud services enable aiplatform.googleapis.com --project=your-gcp-project-id`）。Terraform で API 有効化を学ぶ場合は、この repo の `terraform/gc/<op>-api-enable/`（`google_project_service`）パターンが参考になります。
 - 以降の `adk run` / `adk web` のコマンドは Gemini API key 方式と同じです。
 
 ## Cloud Run へ deploy（`adk deploy cloud_run`）
@@ -121,7 +121,7 @@ mise exec -- uv run --directory apps/adk-helloworld --locked \
 
 Cloud Run だけでなく、**Vertex AI Agent Engine（API 名: Reasoning Engine）**へ Terraform で deploy する
 学習サンプルも用意しています。deploy 本体（`google_vertex_ai_reasoning_engine` の作成）は
-[packages/gc/terraform/adk-agent-engine-basic](../../packages/gc/terraform/adk-agent-engine-basic/) 側にあり、
+[terraform/gc/adk-agent-engine-basic](../../terraform/gc/adk-agent-engine-basic/) 側にあり、
 このアプリ側は **deploy に渡す source archive の生成**を担当します
 （**infrastructure は Terraform、artifact 生成は script** という責務分離）。
 
@@ -151,7 +151,7 @@ script は `.env*` / `.adk/` / `__pycache__` などローカル runtime/secret �
 
 生成した archive を読んで Agent Engine を作成する Terraform の手順（前提 API の有効化、`init` / `fmt` /
 `validate` / `plan` / `apply`、cleanup）は
-[adk-agent-engine-basic の README](../../packages/gc/terraform/adk-agent-engine-basic/README.md) を参照してください。
+[adk-agent-engine-basic の README](../../terraform/gc/adk-agent-engine-basic/README.md) を参照してください。
 
 > Agent Engine 用 `requirements.txt` の `google-adk` は `pyproject.toml` の pin と一致させます。
 > ズレは `tests/test_agent_engine_packaging.py` が検出します。

@@ -1,4 +1,4 @@
-# packages/aws AgentCore Runtime Terraform design
+# terraform/aws AgentCore Runtime Terraform design
 
 Date: 2026-06-10
 Issue URL: https://github.com/nichicom-sakurai/workshop/issues/14
@@ -6,7 +6,7 @@ Issue URL: https://github.com/nichicom-sakurai/workshop/issues/14
 ## Context
 
 `workshop` is a cloud / IaC learning monorepo. AWS Terraform samples currently
-live directly under `packages/aws/terraform/<operation>/` as independent root
+live directly under `terraform/aws/<operation>/` as independent root
 modules with separate local state.
 
 The selected direction is to add a Terraform-first Amazon Bedrock AgentCore
@@ -68,9 +68,9 @@ Never:
 Always:
 
 - Keep the Terraform sample self-contained under
-  `packages/aws/terraform/agentcore-runtime-basic/`.
+  `terraform/aws/agentcore-runtime-basic/`.
 - Keep the agent code self-contained under
-  `packages/aws/apps/agentcore-strands-basic/`.
+  `terraform/aws/apps/agentcore-strands-basic/`.
 - Keep `model_id` required and local-only via `terraform.tfvars`.
 - Provide a committed `terraform.tfvars.template` with placeholders only.
 - Keep package creation as an explicit pre-apply command documented in the
@@ -78,7 +78,7 @@ Always:
 - Use root `mise.toml` for any new repeatable tooling needed by the sample, with
   exact versions.
 - Commit Python dependency lock files if a Python project manager creates them.
-- Add the sample to `packages/aws/terraform/README.md`, root `README.md`, and
+- Add the sample to `terraform/aws/README.md`, root `README.md`, and
   `AGENTS.md`.
 - Document setup, package, `init`, `fmt`, `validate`, `plan`, `apply`,
   `invoke-agent-runtime`, and `destroy`.
@@ -104,9 +104,9 @@ Confidence: 84%.
 The sample has two cooperating but separate parts:
 
 1. App package:
-   `packages/aws/apps/agentcore-strands-basic/`
+   `terraform/aws/apps/agentcore-strands-basic/`
 2. Terraform root module:
-   `packages/aws/terraform/agentcore-runtime-basic/`
+   `terraform/aws/agentcore-runtime-basic/`
 
 The learner first builds a ZIP artifact from the app directory. Terraform then
 uploads that artifact to a private S3 bucket, creates an AgentCore Runtime
@@ -118,7 +118,7 @@ an endpoint for invocation.
 Proposed files:
 
 ```text
-packages/aws/apps/agentcore-strands-basic/
+terraform/aws/apps/agentcore-strands-basic/
 ├── README.md
 ├── main.py
 ├── pyproject.toml
@@ -159,7 +159,7 @@ consume an artifact path; it should not perform dependency resolution during
 Proposed files:
 
 ```text
-packages/aws/terraform/agentcore-runtime-basic/
+terraform/aws/agentcore-runtime-basic/
 ├── README.md
 ├── cleanup.md
 ├── iam.tf
@@ -227,18 +227,18 @@ Concrete file-change list:
   - Ignore app-local build output, ZIP artifacts, `.venv/`, and local Python
     caches if existing ignore rules do not already cover them.
 - `README.md`
-  - Add `packages/aws/apps/agentcore-strands-basic/` to the layout.
+  - Add `terraform/aws/apps/agentcore-strands-basic/` to the layout.
   - Mention the new AgentCore Terraform sample in the AWS sample section.
 - `AGENTS.md`
   - Update the AWS package summary and gotchas so agents know the sample has
     Python packaging and direct code deployment.
-- `packages/aws/terraform/README.md`
+- `terraform/aws/README.md`
   - Add `agentcore-runtime-basic` as a mutating sample.
   - Add it to the learning sequence after lower-risk S3/IAM basics or clearly
     mark it as an advanced AWS sample.
-- `packages/aws/apps/agentcore-strands-basic/*`
+- `terraform/aws/apps/agentcore-strands-basic/*`
   - Add the Strands + Bedrock agent and packaging docs.
-- `packages/aws/terraform/agentcore-runtime-basic/*`
+- `terraform/aws/agentcore-runtime-basic/*`
   - Add the Terraform root module and docs.
 
 ## Acceptance Criteria
