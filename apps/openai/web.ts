@@ -1,4 +1,4 @@
-// packages/openai: OpenAI Agents SDK の最小 Web チャット UI (Bun.serve、依存ゼロ)。
+// apps/openai: OpenAI Agents SDK の最小 Web チャット UI (Bun.serve、依存ゼロ)。
 //
 // `mise run web openai` で起動し、ブラウザで http://localhost:3000 を開く。
 // サーバ側で会話履歴を 1 本だけ保持し (ローカル単一ユーザ前提の割り切り)、
@@ -16,7 +16,7 @@ if (!apiKey) {
       "",
       "実行するには OpenAI API key を設定してください:",
       "  export OPENAI_API_KEY=sk-...",
-      "  # または packages/openai/.env を作成 (.env.template を参照)",
+      "  # または apps/openai/.env を作成 (.env.template を参照)",
     ].join("\n"),
   );
   process.exit(0);

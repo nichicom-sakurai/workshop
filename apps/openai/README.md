@@ -1,4 +1,4 @@
-# packages/openai
+# apps/openai
 
 OpenAI Agents SDK ([@openai/agents](https://openai.github.io/openai-agents-js/)) の TypeScript 最小 HelloWorld サンプルです。`Agent` と `run` で 1 回だけ agent を実行する導線を提供します。
 
@@ -12,7 +12,7 @@ OpenAI Agents SDK ([@openai/agents](https://openai.github.io/openai-agents-js/))
 mise run dev openai
 ```
 
-`OPENAI_API_KEY` が未設定の場合は設定方法の案内を表示して正常終了 (exit 0) します。`mise run dev:all` でまとめて実行しても、API key 無しで途中失敗しません。
+`OPENAI_API_KEY` が未設定の場合は設定方法の案内を表示して正常終了 (exit 0) します。`dev`/`chat`/`web` タスクは project 名を `packages/` → `apps/` の順に解決するため、`apps/openai` でもそのまま動きます。
 
 ## API key の設定
 
@@ -23,7 +23,7 @@ mise run dev openai
 export OPENAI_API_KEY=sk-...
 
 # 方法 2: .env ファイル (Bun が同ディレクトリの .env を自動読み込み)
-cp packages/openai/.env.template packages/openai/.env
+cp apps/openai/.env.template apps/openai/.env
 # 続けて .env を編集し OPENAI_API_KEY を設定する
 ```
 

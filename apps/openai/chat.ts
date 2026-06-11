@@ -1,4 +1,4 @@
-// packages/openai: OpenAI Agents SDK のターミナル対話チャット (マルチターン)。
+// apps/openai: OpenAI Agents SDK のターミナル対話チャット (マルチターン)。
 //
 // `mise run chat openai` で起動。OPENAI_API_KEY が未設定なら案内して正常終了する。
 // 各ターンで run() に直前までの会話履歴 (result.history) を渡し、文脈を維持する。
@@ -15,7 +15,7 @@ if (!apiKey) {
       "",
       "実行するには OpenAI API key を設定してください:",
       "  export OPENAI_API_KEY=sk-...",
-      "  # または packages/openai/.env を作成 (.env.template を参照)",
+      "  # または apps/openai/.env を作成 (.env.template を参照)",
     ].join("\n"),
   );
   process.exit(0);

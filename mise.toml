@@ -10,14 +10,18 @@ alias = "bs"
 description = "Bootstrap project dependencies and setup"
 run = "./tools/bootstrap.sh"
 
-# --- packages/* の実行タスク ---
+# --- 実行タスク (project 名を packages/ → apps/ の順に解決) ---
 
 [tasks.dev]
-description = "指定プロジェクトを実行 (例: mise run dev aws)"
-run = "mise exec -- bun run --cwd=packages/{{arg(name='project')}} start"
+description = "指定プロジェクトを実行 (例: mise run dev aws / mise run dev openai)"
+run = """
+project="{{arg(name='project')}}"; dir="packages/${project}"; [ -d "${dir}" ] || dir="apps/${project}"
+[ -d "${dir}" ] || { echo "[NG] project が見つかりません: ${project} (packages/ と apps/ を確認)" >&2; exit 1; }
+mise exec -- bun run --cwd="${dir}" start
+"""
 
 [tasks."dev:all"]
-description = "packages 配下の全プロジェクトを実行"
+description = "packages 配下の全プロジェクトを実行 (apps は対象外)"
 run = """
 for d in packages/*/; do
   echo "[${d}]"
@@ -27,11 +31,19 @@ done
 
 [tasks.chat]
 description = "指定プロジェクトのチャットを起動 (例: mise run chat openai)"
-run = "mise exec -- bun run --cwd=packages/{{arg(name='project')}} chat"
+run = """
+project="{{arg(name='project')}}"; dir="packages/${project}"; [ -d "${dir}" ] || dir="apps/${project}"
+[ -d "${dir}" ] || { echo "[NG] project が見つかりません: ${project} (packages/ と apps/ を確認)" >&2; exit 1; }
+mise exec -- bun run --cwd="${dir}" chat
+"""
 
 [tasks.web]
 description = "指定プロジェクトの Web チャット UI を起動 (例: mise run web openai)"
-run = "mise exec -- bun run --cwd=packages/{{arg(name='project')}} web"
+run = """
+project="{{arg(name='project')}}"; dir="packages/${project}"; [ -d "${dir}" ] || dir="apps/${project}"
+[ -d "${dir}" ] || { echo "[NG] project が見つかりません: ${project} (packages/ と apps/ を確認)" >&2; exit 1; }
+mise exec -- bun run --cwd="${dir}" web
+"""
 
 # --- terraform サンプルの実行タスク ---
 
