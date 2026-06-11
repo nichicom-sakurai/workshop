@@ -7,6 +7,10 @@
     {
       "path": "apps/adk-helloworld",
       "envManager": "ms-python.python:venv"
+    },
+    {
+      "path": "apps/agentcore-rag-chat",
+      "envManager": "ms-python.python:venv"
     }
   ],
   "cSpell.customDictionaries": {
