@@ -1,6 +1,6 @@
 # adk-agent-engine-basic (mutating)
 
-[apps/adk-helloworld](../../apps/adk-helloworld/) の ADK agent を **Vertex AI Agent Engine**
+[apps/adk-helloworld](../../../../apps/adk-helloworld/) の ADK agent を **Vertex AI Agent Engine**
 （API 名: Reasoning Engine）へ deploy する **mutating** サンプルです。
 **infrastructure は Terraform、source archive の生成は `package-agent-engine.sh`** という責務分離を学びます
 （cloud-run-service-basic の「image の build/push は `gcloud`」と同じ流儀）。
@@ -42,7 +42,7 @@ clone 直後やクリーン後は **必ず先に生成**してから plan/apply 
 
 ```bash
 # 1. source archive を生成（.build/source.tar.gz。gitignore 対象）
-bash packages/gc/apps/adk-helloworld/scripts/package-agent-engine.sh
+bash apps/adk-helloworld/scripts/package-agent-engine.sh
 ```
 
 > `terraform validate` は archive が無くても通ります（`filebase64` は validate では評価されず、
@@ -56,7 +56,7 @@ copy して編集します（`terraform.tfvars` は gitignore 対象）。
 
 | 変数 | 必須 | default | 内容 |
 | --- | --- | --- | --- |
-| `source_archive_path` | | `../../apps/adk-helloworld/.build/source.tar.gz` | `filebase64` が読む archive のパス（この `.tf` の場所からの相対パス）。`package-agent-engine.sh` の出力先 |
+| `source_archive_path` | | `../../../../apps/adk-helloworld/.build/source.tar.gz` | `filebase64` が読む archive のパス（この `.tf` の場所からの相対パス）。`package-agent-engine.sh` の出力先 |
 | `display_name` | | `adk-helloworld` | 作成する Agent Engine の表示名 |
 | `description` | | （inline source の説明） | Agent Engine の説明 |
 | `region` | | `us-central1` | Agent Engine の region。全 region では使えないため公式サンプルと同じ `us-central1` を default に |
@@ -77,7 +77,7 @@ D=packages/gc/terraform/adk-agent-engine-basic
 # 0. 前提 API（vertex-ai-api-enable を先に apply 済みにしておく）
 
 # 1. source archive を生成
-bash packages/gc/apps/adk-helloworld/scripts/package-agent-engine.sh
+bash apps/adk-helloworld/scripts/package-agent-engine.sh
 
 # 2. 初期化・整形チェック・検証
 mise exec -- terraform -chdir=$D init

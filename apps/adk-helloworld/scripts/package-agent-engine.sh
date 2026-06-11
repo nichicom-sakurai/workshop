@@ -6,7 +6,7 @@
 # script はソース(hello_world/ + agent_engine_app.py)と requirements.txt を
 # tar.gz に固めるだけで、AgentCore の package.sh のような依存 vendoring はしない。
 #
-# 生成物 .build/source.tar.gz は gitignore 対象(packages/gc/apps/*/.build/)。
+# 生成物 .build/source.tar.gz は gitignore 対象(apps/*/.build/)。
 # Terraform は adk-agent-engine-basic の filebase64(var.source_archive_path) で読む。
 set -euo pipefail
 

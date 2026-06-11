@@ -15,9 +15,9 @@ Google Cloud provider の認証と Terraform の基本操作を学ぶための�
 | [storage-bucket-basic](./storage-bucket-basic/) | mutating | `google_storage_bucket` で private bucket を1つ作成し、[`cleanup.md`](./storage-bucket-basic/cleanup.md) の手順で `destroy` まで lifecycle を学ぶ |
 | [storage-object-upload](./storage-object-upload/) | mutating | `google_storage_bucket_object` で既存 bucket に local file を1つ upload し、object cleanup まで学ぶ |
 | [cloud-run-api-enable](./cloud-run-api-enable/) | mutating | `google_project_service` を `for_each` で回し、Cloud Run 一式の3 API（`run` / `artifactregistry` / `cloudbuild`）を有効化する（`disable_on_destroy = false`） |
-| [cloud-run-service-basic](./cloud-run-service-basic/) | mutating | Artifact Registry repository と private な Cloud Run service を作成し、[apps/cloud-run-rest](../apps/cloud-run-rest/) の image を deploy する（image の build / push は `gcloud builds submit`） |
+| [cloud-run-service-basic](./cloud-run-service-basic/) | mutating | Artifact Registry repository と private な Cloud Run service を作成し、[apps/cloud-run-rest](../../../apps/cloud-run-rest/) の image を deploy する（image の build / push は `gcloud builds submit`） |
 | [vertex-ai-api-enable](./vertex-ai-api-enable/) | mutating | `google_project_service` で `aiplatform.googleapis.com`（Vertex AI / Agent Engine の API）を有効化する（`disable_on_destroy = false`） |
-| [adk-agent-engine-basic](./adk-agent-engine-basic/) | mutating | `google_vertex_ai_reasoning_engine` で [apps/adk-helloworld](../apps/adk-helloworld/) を Vertex AI Agent Engine へ inline source 方式で deploy する（source archive の生成は `package-agent-engine.sh`） |
+| [adk-agent-engine-basic](./adk-agent-engine-basic/) | mutating | `google_vertex_ai_reasoning_engine` で [apps/adk-helloworld](../../../apps/adk-helloworld/) を Vertex AI Agent Engine へ inline source 方式で deploy する（source archive の生成は `package-agent-engine.sh`） |
 
 新しいサンプルは `terraform/` 直下にディレクトリを 1 つ足し、この表に 1 行追加します（`<operation>` は `storage-bucket-list` のような kebab-case の「対象 + 操作」）。read-only は名詞 / `*-list` / `*-read`、リソースを作成する mutating はリソース名中心で命名し、本表の「種別」列で区別します。
 
@@ -35,7 +35,7 @@ read-only の基礎から、低リスクな mutating（リソース作成）へ�
 8. [cloud-run-api-enable](./cloud-run-api-enable/) — `google_project_service` を `for_each` で複数 API に展開し、Cloud Run 一式の前提 API をまとめて有効化する。
 9. [cloud-run-service-basic](./cloud-run-service-basic/) — Artifact Registry + Cloud Run で「Terraform の外で image を push する」2段階 apply と、private service の認証付き動作確認を学ぶ。
 10. [vertex-ai-api-enable](./vertex-ai-api-enable/) — `google_project_service` で Vertex AI API を有効化する（Agent Engine の前提）。
-11. [adk-agent-engine-basic](./adk-agent-engine-basic/) — `google_vertex_ai_reasoning_engine` で [apps/adk-helloworld](../apps/adk-helloworld/) を Agent Engine へ deploy する。「Terraform の外で source archive を作る」依存と、AdkApp entrypoint・inline source 方式を学ぶ。
+11. [adk-agent-engine-basic](./adk-agent-engine-basic/) — `google_vertex_ai_reasoning_engine` で [apps/adk-helloworld](../../../apps/adk-helloworld/) を Agent Engine へ deploy する。「Terraform の外で source archive を作る」依存と、AdkApp entrypoint・inline source 方式を学ぶ。
 
 ## 種別ごとの扱い（read-only / mutating）
 

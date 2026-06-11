@@ -1,7 +1,7 @@
 # cloud-run-service-basic (mutating)
 
 Artifact Registry の Docker repository と、private な Cloud Run service を作成する **mutating** サンプルです。
-deploy するアプリ本体は [packages/gc/apps/cloud-run-rest/](../../apps/cloud-run-rest/) にあり、
+deploy するアプリ本体は [apps/cloud-run-rest/](../../../../apps/cloud-run-rest/) にあり、
 **infrastructure は Terraform、container image の build / push は `gcloud builds submit`** という責務分離を学びます。
 **実際に課金対象になり得るリソースを作成する**ため、学習後は [`cleanup.md`](./cleanup.md) の手順で `destroy` してください。
 
@@ -87,7 +87,7 @@ mise exec -- terraform -chdir=$D init
 mise exec -- terraform -chdir=$D apply -target=google_artifact_registry_repository.learning
 
 # 3. 同じ tag で image を build / push（アプリのディレクトリから実行）
-(cd packages/gc/apps/cloud-run-rest && \
+(cd apps/cloud-run-rest && \
   gcloud builds submit --project nck-sakurai --tag "${IMAGE}" .)
 
 # 4. 全体を plan / apply
@@ -96,7 +96,7 @@ mise exec -- terraform -chdir=$D apply
 ```
 
 手順3の build / push の詳細（アップロード範囲、tag の付け方、staging bucket）は
-[アプリ側 README](../../apps/cloud-run-rest/README.md) を参照してください。
+[アプリ側 README](../../../../apps/cloud-run-rest/README.md) を参照してください。
 
 ## 動作確認（認証付き）
 

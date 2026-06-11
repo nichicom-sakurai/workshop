@@ -20,7 +20,7 @@ Cloud Run の [container contract](https://docs.cloud.google.com/run/docs/contai
 | `.gcloudignore` | `gcloud builds submit` のアップロード対象から不要なファイルを除外 |
 
 > この repo のトップレベル package（`packages/<name>/`）は `index.ts` を直下に置く規約ですが、
-> このアプリは `packages/gc/apps/` 配下の nested app のため `src/index.ts` をエントリポイントにしています。
+> このアプリは root の `apps/` 配下のアプリのため `src/index.ts` をエントリポイントにしています。
 > `mise run dev:all` の走査対象（`packages/` 直下）には含まれないので、常駐 server がタスクをブロックしません。
 
 ## Cloud Run container contract の要点
@@ -35,7 +35,7 @@ Cloud Run が注入する `K_REVISION` / `K_SERVICE` をレスポンスに含め
 ## local 実行
 
 ```bash
-cd packages/gc/apps/cloud-run-rest
+cd apps/cloud-run-rest
 mise exec -- bun run start
 ```
 
@@ -61,7 +61,7 @@ curl -s localhost:9090/   # 別ターミナルで実行
 Docker が使える環境なら、Cloud Run と同じコンテナ起動を local で再現できます。
 
 ```bash
-cd packages/gc/apps/cloud-run-rest
+cd apps/cloud-run-rest
 docker build -t cloud-run-rest:local .
 docker run --rm -e PORT=8080 -p 8080:8080 cloud-run-rest:local
 curl -s localhost:8080/
@@ -75,7 +75,7 @@ Artifact Registry repository の作成を含む全体の流れは [Terraform サ
 このディレクトリから実行する build / push コマンドは次の形です。
 
 ```bash
-cd packages/gc/apps/cloud-run-rest
+cd apps/cloud-run-rest
 TAG="$(git rev-parse --short HEAD)"
 gcloud builds submit --project nck-sakurai \
   --tag "asia-northeast1-docker.pkg.dev/nck-sakurai/cloud-run-rest/cloud-run-rest:${TAG}" .

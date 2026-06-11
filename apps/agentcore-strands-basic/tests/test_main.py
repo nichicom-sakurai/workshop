@@ -1,6 +1,6 @@
 """main.py の unittest テスト。
 
-実行 (README の方法): mise exec -- uv run --directory packages/aws/apps/agentcore-strands-basic --locked python -m unittest discover -s tests
+実行 (README の方法): mise exec -- uv run --directory apps/agentcore-strands-basic --locked python -m unittest discover -s tests
 
 unittest の仕組み（要点・忘れないように）:
   - 収集条件: ファイル名 test*.py / クラスは unittest.TestCase を継承 / メソッドは test で始まる

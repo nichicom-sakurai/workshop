@@ -1,6 +1,6 @@
 # AWS 課金・コストの確認
 
-このリポジトリの学習サンプル、特に Bedrock / AgentCore を使う [`packages/aws/apps/agentcore-strands-basic/`](../../../packages/aws/apps/agentcore-strands-basic/README.md) を動かすと、AWS の**従量課金**が発生します。本ドキュメントは「**どこに課金されるのか**」と「**実費・単価をどう確認するか**(サイト / CLI)」をまとめた調査メモです。
+このリポジトリの学習サンプル、特に Bedrock / AgentCore を使う [`apps/agentcore-strands-basic/`](../../../apps/agentcore-strands-basic/README.md) を動かすと、AWS の**従量課金**が発生します。本ドキュメントは「**どこに課金されるのか**」と「**実費・単価をどう確認するか**(サイト / CLI)」をまとめた調査メモです。
 
 > [INFO] CLI 例は `mise exec -- aws ...` 形式です（AWS CLI は mise 管理。認証は [AWS CLI 基本コマンド](../aws-cli/README.md) / [認証情報の設定](../aws-cli-credentials/README.md) を参照）。
 

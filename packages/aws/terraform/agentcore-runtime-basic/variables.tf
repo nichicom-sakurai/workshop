@@ -1,5 +1,5 @@
 variable "artifact_zip_path" {
-  description = "AgentCore Runtime の direct code deployment ZIP artifact への、この root module ディレクトリからの相対 path (main.tf で path.module 起点に解決します)。plan / apply の前に packages/aws/apps/agentcore-strands-basic/scripts/package.sh で作成してください。"
+  description = "AgentCore Runtime の direct code deployment ZIP artifact への、この root module ディレクトリからの相対 path (main.tf で path.module 起点に解決します)。plan / apply の前に apps/agentcore-strands-basic/scripts/package.sh で作成してください。"
   type        = string
 
   validation {

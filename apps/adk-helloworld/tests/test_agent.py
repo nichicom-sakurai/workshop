@@ -1,7 +1,7 @@
 """hello_world/agent.py の unittest テスト。
 
 実行 (README の方法):
-  mise exec -- uv run --directory packages/gc/apps/adk-helloworld --locked \
+  mise exec -- uv run --directory apps/adk-helloworld --locked \
     python -m unittest discover -s tests
 
 このテストは root_agent の「静的な定義」だけを検証する（名前・model の宣言・指示文）。

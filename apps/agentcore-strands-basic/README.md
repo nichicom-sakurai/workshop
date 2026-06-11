@@ -11,13 +11,13 @@ package 化されます。`bedrock-agentcore` と `strands-agents` を使い、`
 ## 依存関係の検証
 
 ```bash
-mise exec -- uv lock --directory packages/aws/apps/agentcore-strands-basic --check
+mise exec -- uv lock --directory apps/agentcore-strands-basic --check
 ```
 
 ## テストの実行
 
 ```bash
-mise exec -- uv run --directory packages/aws/apps/agentcore-strands-basic --locked \
+mise exec -- uv run --directory apps/agentcore-strands-basic --locked \
   python -m unittest discover -s tests
 ```
 
@@ -26,7 +26,7 @@ mise exec -- uv run --directory packages/aws/apps/agentcore-strands-basic --lock
 `main.py` を直接実行すると AgentCore Runtime のローカルサーバー (uvicorn) が起動し、`127.0.0.1:8080` で `POST /invocations`（エントリポイント）と `GET /ping`（ヘルスチェック）を公開します。AgentCore へ deploy する前の動作確認に使います（停止は `Ctrl+C`）。
 
 ```bash
-mise exec -- uv run --directory packages/aws/apps/agentcore-strands-basic --locked python main.py
+mise exec -- uv run --directory apps/agentcore-strands-basic --locked python main.py
 ```
 
 別ターミナルから呼び出します。
@@ -41,7 +41,7 @@ curl -X POST http://127.0.0.1:8080/invocations \
 `BEDROCK_MODEL_ID` 未設定のときは `{"status": "error", "error": "BEDROCK_MODEL_ID is not set"}` が返ります（クラッシュしません）。実際に model を呼ぶには、ID と AWS 認証情報・region を渡して起動します。
 
 ```bash
-mise exec -- uv run --directory packages/aws/apps/agentcore-strands-basic --locked \
+mise exec -- uv run --directory apps/agentcore-strands-basic --locked \
   env BEDROCK_MODEL_ID="jp.anthropic.claude-sonnet-4-6" AWS_REGION=ap-northeast-1 AWS_PROFILE=default \
   python main.py
 ```
@@ -53,13 +53,13 @@ mise exec -- uv run --directory packages/aws/apps/agentcore-strands-basic --lock
 Terraform を実行する前に ZIP artifact を build します。
 
 ```bash
-packages/aws/apps/agentcore-strands-basic/scripts/package.sh
+apps/agentcore-strands-basic/scripts/package.sh
 ```
 
 このスクリプトは次を生成します。
 
 ```text
-packages/aws/apps/agentcore-strands-basic/dist/agentcore-strands-basic.zip
+apps/agentcore-strands-basic/dist/agentcore-strands-basic.zip
 ```
 
 この path を Terraform サンプルへ `artifact_zip_path` として渡します。
