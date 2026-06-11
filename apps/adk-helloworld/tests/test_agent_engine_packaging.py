@@ -1,7 +1,7 @@
 """Agent Engine packaging の静的な整合性テスト（stdlib のみ、新規依存なし）。
 
 実行（README の方法）:
-  mise exec -- uv run --directory packages/gc/apps/adk-helloworld --locked \
+  mise exec -- uv run --directory apps/adk-helloworld --locked \
     python -m unittest discover -s tests
 
 このテストは Agent Engine 用の committed ファイル（agent-engine/）を **import せず

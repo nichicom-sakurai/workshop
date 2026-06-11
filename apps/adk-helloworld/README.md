@@ -27,7 +27,7 @@
 ## 依存関係の検証
 
 ```bash
-mise exec -- uv lock --directory packages/gc/apps/adk-helloworld --check
+mise exec -- uv lock --directory apps/adk-helloworld --check
 ```
 
 ## テストの実行
@@ -35,7 +35,7 @@ mise exec -- uv lock --directory packages/gc/apps/adk-helloworld --check
 `root_agent` の構築（ネットワーク呼び出しなし）を検証するため、API key 無しで通ります。
 
 ```bash
-mise exec -- uv run --directory packages/gc/apps/adk-helloworld --locked \
+mise exec -- uv run --directory apps/adk-helloworld --locked \
   python -m unittest discover -s tests
 ```
 
@@ -46,9 +46,9 @@ mise exec -- uv run --directory packages/gc/apps/adk-helloworld --locked \
 [Google AI Studio](https://aistudio.google.com/apikey) で API key を取得し、テンプレートから `.env` を作って key を書き込みます。`.env` は agent パッケージ（`hello_world/`）の中に置きます。
 
 ```bash
-cp packages/gc/apps/adk-helloworld/hello_world/.env.template \
-  packages/gc/apps/adk-helloworld/hello_world/.env
-# packages/gc/apps/adk-helloworld/hello_world/.env を編集し、
+cp apps/adk-helloworld/hello_world/.env.template \
+  apps/adk-helloworld/hello_world/.env
+# apps/adk-helloworld/hello_world/.env を編集し、
 # GOOGLE_API_KEY=YOUR_API_KEY_HERE を実 key に置き換える
 ```
 
@@ -59,7 +59,7 @@ cp packages/gc/apps/adk-helloworld/hello_world/.env.template \
 `hello_world/` の 1 つ上（このディレクトリ）から実行します。`uv run --directory` で cwd をこのディレクトリに合わせています。
 
 ```bash
-mise exec -- uv run --directory packages/gc/apps/adk-helloworld --locked \
+mise exec -- uv run --directory apps/adk-helloworld --locked \
   adk run hello_world
 ```
 
@@ -68,7 +68,7 @@ mise exec -- uv run --directory packages/gc/apps/adk-helloworld --locked \
 ### 3. Web UI で対話する（`adk web`）
 
 ```bash
-mise exec -- uv run --directory packages/gc/apps/adk-helloworld --locked \
+mise exec -- uv run --directory apps/adk-helloworld --locked \
   adk web
 ```
 
@@ -98,7 +98,7 @@ export GOOGLE_CLOUD_PROJECT="your-gcp-project-id"
 export GOOGLE_CLOUD_LOCATION="us-central1"
 export GOOGLE_GENAI_USE_VERTEXAI=TRUE
 
-mise exec -- uv run --directory packages/gc/apps/adk-helloworld --locked \
+mise exec -- uv run --directory apps/adk-helloworld --locked \
   adk deploy cloud_run \
     --project="${GOOGLE_CLOUD_PROJECT}" \
     --region="${GOOGLE_CLOUD_LOCATION}" \
@@ -141,10 +141,10 @@ Cloud Run だけでなく、**Vertex AI Agent Engine（API 名: Reasoning Engine
 ### source archive を生成する
 
 ```bash
-bash packages/gc/apps/adk-helloworld/scripts/package-agent-engine.sh
+bash apps/adk-helloworld/scripts/package-agent-engine.sh
 ```
 
-`.build/source.tar.gz` が生成されます（`packages/gc/apps/*/.build/` は gitignore 対象でコミットされません）。
+`.build/source.tar.gz` が生成されます（`apps/*/.build/` は gitignore 対象でコミットされません）。
 script は `.env*` / `.adk/` / `__pycache__` などローカル runtime/secret 由来のものを archive から除外します。
 
 ### deploy する
