@@ -1,6 +1,6 @@
 # workshop
 
-クラウド / IaC 学習用のモノレポです。`packages/` 配下に独立したプロジェクトを並べ、ツールのバージョンを [mise](https://mise.jdx.dev/) で一元管理します。
+クラウド / IaC 学習用のモノレポです。`packages/`（プロジェクト群）と `apps/`（アプリ群）に独立した単位を並べ、ツールのバージョンを [mise](https://mise.jdx.dev/) で一元管理します。
 
 ## 必要なツール
 
@@ -23,11 +23,12 @@ workshop/
 ├── tools/
 │   ├── bootstrap.sh     # 全環境のセットアップスクリプト
 │   └── git-hooks/       # git フック (commit-msg: Conventional Commits 検証)
-├── apps/                # デプロイ対象アプリ群 (provider 非依存。bootstrap の対象。dev / dev:all の対象外)
+├── apps/                # アプリ群 (provider 非依存。bootstrap の対象。dev:all の対象外、dev/chat/web は project 名で実行)
 │   ├── agentcore-strands-basic/   # AgentCore Runtime に deploy する Python + Strands Agents app
 │   ├── adk-helloworld/            # Google ADK の最小 HelloWorld agent (ローカル実行 + Agent Engine deploy 用 source archive 生成)
-│   └── cloud-run-rest/            # Cloud Run に deploy する最小の Bun REST service (Dockerfile 付き)
-└── packages/            # プロジェクト群 (bootstrap の対象。dev / dev:all は直下のプロジェクトのみ)
+│   ├── cloud-run-rest/            # Cloud Run に deploy する最小の Bun REST service (Dockerfile 付き)
+│   └── openai/                    # OpenAI Agents SDK (TypeScript) の最小 HelloWorld サンプル (deploy なし。dev/chat/web で実行)
+└── packages/            # プロジェクト群 (bootstrap の対象。dev:all は直下のプロジェクトのみ)
     ├── aws/
     │   ├── cost-estimator/           # 見積もり専用 catalog + bcm-pricing-calculator API adapter
     │   └── terraform/
@@ -36,13 +37,12 @@ workshop/
     │       ├── caller-identity/      # AWS 操作ごとの独立した read-only サンプル (caller identity を読む)
     │       ├── s3-private-bucket/    # private S3 bucket を作成し destroy まで学ぶ mutating サンプル
     │       └── s3-object-upload/     # 既存 S3 bucket に object を upload する mutating サンプル
-    ├── gc/
-    │   └── terraform/
-    │       ├── README.md             # サンプル一覧と共通手順
-    │       ├── project-info/         # Google Cloud 操作ごとの独立した read-only サンプル (project nck-sakurai を読む)
-    │       ├── cloud-run-service-basic/  # Artifact Registry + private Cloud Run service を作る mutating サンプル
-    │       └── adk-agent-engine-basic/   # ADK agent を Vertex AI Agent Engine へ deploy する mutating サンプル
-    └── openai/              # OpenAI Agents SDK (TypeScript) の最小 HelloWorld サンプル (Agent + run、key 未設定時は案内して exit 0)
+    └── gc/
+        └── terraform/
+            ├── README.md             # サンプル一覧と共通手順
+            ├── project-info/         # Google Cloud 操作ごとの独立した read-only サンプル (project nck-sakurai を読む)
+            ├── cloud-run-service-basic/  # Artifact Registry + private Cloud Run service を作る mutating サンプル
+            └── adk-agent-engine-basic/   # ADK agent を Vertex AI Agent Engine へ deploy する mutating サンプル
 ```
 
 `packages/` 配下の各プロジェクトは `bun` のバージョンを root の `mise.toml` から継承します。特定プロジェクトだけ別ツール / バージョンが必要な場合は、そのフォルダに `mise.toml` を置くと差分だけ上書きできます。
