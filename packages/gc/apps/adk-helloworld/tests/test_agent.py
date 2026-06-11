@@ -29,7 +29,7 @@ class HelloWorldAgentTest(unittest.TestCase):
 
     def test_agent_uses_pinned_gemini_model(self):
         # model は具体 ID で pin する方針（gemini-flash-latest のような alias は使わない）。
-        self.assertEqual(root_agent.model, "gemini-2.5-flash")
+        self.assertEqual(root_agent.model, "gemini-2.5-flash-lite")
 
     def test_agent_has_non_empty_instruction(self):
         # instruction（system prompt 相当）が空でない文字列であることを確認する。

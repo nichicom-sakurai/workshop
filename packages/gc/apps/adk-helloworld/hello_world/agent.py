@@ -24,9 +24,10 @@ from google.adk import Agent
 root_agent = Agent(
     # name: エージェントの識別子。adk web の選択肢などに表示される。
     name="hello_world",
-    # model: 使用する Gemini model の ID。gemini-2.5-flash は軽量・高速な世代。
+    # model: 使用する Gemini model の ID。gemini-2.5-flash-lite は flash 系の中で
+    # 最も軽量・低レイテンシな世代で、混雑時の 503 を回避しやすい。
     # API key 方式（GOOGLE_API_KEY）でも Vertex AI 方式でも、同じ ID で呼べる。
-    model="gemini-2.5-flash",
+    model="gemini-2.5-flash-lite",
     # description: このエージェントが何をするかの短い説明。
     description="A minimal HelloWorld agent that greets the user.",
     # instruction: model への「振る舞いの指示」（system prompt 相当）。
