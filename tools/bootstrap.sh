@@ -6,7 +6,7 @@ FILE_PATH=$(dirname "$0")
 cd "$FILE_PATH/../" || exit 1
 
 # プロジェクト格納ディレクトリ (この配下を全て bootstrap する)
-PROJECTS_DIRS=("packages" "apps")
+PROJECTS_DIRS=("terraform" "apps")
 
 echo "[INFO] Bootstrap start"
 echo "[INFO] Working directory: $(pwd)"
@@ -29,12 +29,12 @@ fi
 
 ##############################################################################
 ##
-##  packages/* と apps/* (配下の全プロジェクトを bootstrap)
+##  terraform/* と apps/* (配下の全プロジェクトを bootstrap)
 ##  固有 mise.toml があれば mise install / package.json があれば bun install
 ##
 ##############################################################################
 echo ""
-echo "[INFO] packages/* and apps/* bootstrap: Start"
+echo "[INFO] terraform/* and apps/* bootstrap: Start"
 if ! type mise >/dev/null 2>&1; then
   echo "[WARNING] Skip bootstrap because mise could not be found."
 else
@@ -60,7 +60,7 @@ else
         (cd "$dir" && mise exec -- bun install)
       done
   done
-  echo "[OK] packages/* and apps/* bootstrap: Success"
+  echo "[OK] terraform/* and apps/* bootstrap: Success"
 fi
 
 ##############################################################################

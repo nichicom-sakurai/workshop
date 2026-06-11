@@ -10,31 +10,31 @@ alias = "bs"
 description = "Bootstrap project dependencies and setup"
 run = "./tools/bootstrap.sh"
 
-# --- 実行タスク (runnable プロジェクトを packages/ → apps/ の順に解決) ---
-# packages/<provider> は Terraform 置き場で package.json を持たないため解決対象外。
+# --- 実行タスク (runnable プロジェクトを apps/ から解決) ---
+# terraform/<provider> は Terraform 置き場で package.json を持たないため解決対象外。
 # runnable な app は apps/ 配下 (openai / cost-estimator など)。
 
 [tasks.dev]
 description = "指定プロジェクトを実行 (例: mise run dev openai / mise run dev cost-estimator)"
 run = """
-project="{{arg(name='project')}}"; dir="packages/${project}"; [ -f "${dir}/package.json" ] || dir="apps/${project}"
-[ -f "${dir}/package.json" ] || { echo "[NG] runnable project が見つかりません: ${project} (packages/ と apps/ を確認)" >&2; exit 1; }
+project="{{arg(name='project')}}"; dir="apps/${project}"
+[ -f "${dir}/package.json" ] || { echo "[NG] runnable project が見つかりません: ${project} (apps/ を確認)" >&2; exit 1; }
 mise exec -- bun run --cwd="${dir}" start
 """
 
 [tasks.chat]
 description = "指定プロジェクトのチャットを起動 (例: mise run chat openai)"
 run = """
-project="{{arg(name='project')}}"; dir="packages/${project}"; [ -f "${dir}/package.json" ] || dir="apps/${project}"
-[ -f "${dir}/package.json" ] || { echo "[NG] runnable project が見つかりません: ${project} (packages/ と apps/ を確認)" >&2; exit 1; }
+project="{{arg(name='project')}}"; dir="apps/${project}"
+[ -f "${dir}/package.json" ] || { echo "[NG] runnable project が見つかりません: ${project} (apps/ を確認)" >&2; exit 1; }
 mise exec -- bun run --cwd="${dir}" chat
 """
 
 [tasks.web]
 description = "指定プロジェクトの Web チャット UI を起動 (例: mise run web openai)"
 run = """
-project="{{arg(name='project')}}"; dir="packages/${project}"; [ -f "${dir}/package.json" ] || dir="apps/${project}"
-[ -f "${dir}/package.json" ] || { echo "[NG] runnable project が見つかりません: ${project} (packages/ と apps/ を確認)" >&2; exit 1; }
+project="{{arg(name='project')}}"; dir="apps/${project}"
+[ -f "${dir}/package.json" ] || { echo "[NG] runnable project が見つかりません: ${project} (apps/ を確認)" >&2; exit 1; }
 mise exec -- bun run --cwd="${dir}" web
 """
 
@@ -42,7 +42,7 @@ mise exec -- bun run --cwd="${dir}" web
 
 [tasks.tf]
 description = "terraform サンプルを実行 (例: mise run tf caller-identity plan)"
-run = "mise exec -- terraform -chdir=packages/aws/terraform/{{arg(name='example')}} {{arg(name='command', var=true)}}"
+run = "mise exec -- terraform -chdir=terraform/aws/{{arg(name='example')}} {{arg(name='command', var=true)}}"
 
 # --- git hooks ---
 
