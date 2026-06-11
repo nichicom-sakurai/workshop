@@ -105,7 +105,7 @@ JSON が大きいので `| jq` で `model` / `pricePerUnit` を抽出すると�
 
 ## 関連
 
-- 見積もり専用ツール: [`packages/aws/cost-estimator/`](../../../packages/aws/cost-estimator/README.md) — `bcm-pricing-calculator` API で②の事前見積もりを出す自作モジュール（実費①ではなく見積もり用途）。
+- 見積もり専用ツール: [`apps/cost-estimator/`](../../../apps/cost-estimator/README.md) — `bcm-pricing-calculator` API で②の事前見積もりを出す自作モジュール（実費①ではなく見積もり用途）。
 - モデル ID の調べ方 / inference profile 形式: [AgentCore Terraform サンプル](../../../packages/aws/terraform/agentcore-runtime-basic/README.md)。
 
 ## 参考

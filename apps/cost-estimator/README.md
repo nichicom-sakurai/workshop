@@ -34,7 +34,7 @@ cost-estimator/
 依存は dev 用の `@types/bun` のみ。YAML パース（`Bun.YAML`）・テスト（`bun:test`）・
 型チェック（`tsc`）はすべて Bun 同梱機能で行い、**ランタイム依存はゼロ**です。
 
-> このパッケージは `packages/aws/` 配下のネスト構成のため、`mise run dev:all`
+> このツールは root の `apps/` 配下にあるため、`mise run dev:all`
 > （`packages/*` 直下のみ対象）では起動しません。`mise run bs` の `bun install` は対象です。
 
 ## 使い方
@@ -43,20 +43,20 @@ bun は mise 管理のため、`mise exec -- ` を前置します（shell を ac
 
 ```bash
 # dry-run: payload + metadata + summary を JSON で出力（AWS 認証不要）
-mise exec -- bun run packages/aws/cost-estimator/index.ts
+mise exec -- bun run apps/cost-estimator/index.ts
 
 # needs_research を除外して出力
-mise exec -- bun run packages/aws/cost-estimator/index.ts --exclude-needs-research
+mise exec -- bun run apps/cost-estimator/index.ts --exclude-needs-research
 
 # account ID を指定（既定は AWS_ESTIMATE_ACCOUNT_ID env か placeholder）
-mise exec -- bun run packages/aws/cost-estimator/index.ts --account-id 123456789012
+mise exec -- bun run apps/cost-estimator/index.ts --account-id 123456789012
 
 # 実 API へ送信（AWS 認証が必要。workload estimate は事前に作成しておく）
-mise exec -- bun run packages/aws/cost-estimator/index.ts \
+mise exec -- bun run apps/cost-estimator/index.ts \
   --submit --workload-estimate-id <uuid>
 
 # ヘルプ
-mise exec -- bun run packages/aws/cost-estimator/index.ts --help
+mise exec -- bun run apps/cost-estimator/index.ts --help
 ```
 
 出力（dry-run）は次の形です。`batches` は API の `--usage` 上限（25 件/batch）で分割済みです。
@@ -110,7 +110,7 @@ mise exec -- bun run packages/aws/cost-estimator/index.ts --help
 ## 検証
 
 ```bash
-cd packages/aws/cost-estimator
+cd apps/cost-estimator
 mise exec -- bun test          # 全テスト
 mise exec -- bunx tsc --noEmit # 型チェック
 ```

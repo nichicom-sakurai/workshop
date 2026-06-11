@@ -27,10 +27,10 @@ workshop/
 │   ├── agentcore-strands-basic/   # AgentCore Runtime に deploy する Python + Strands Agents app
 │   ├── adk-helloworld/            # Google ADK の最小 HelloWorld agent (ローカル実行 + Agent Engine deploy 用 source archive 生成)
 │   ├── cloud-run-rest/            # Cloud Run に deploy する最小の Bun REST service (Dockerfile 付き)
+│   ├── cost-estimator/            # AWS 構成の月額概算ツール (見積もり専用 catalog + bcm-pricing-calculator API adapter、deploy なし)
 │   └── openai/                    # OpenAI Agents SDK (TypeScript) の最小 HelloWorld サンプル (deploy なし。dev/chat/web で実行)
 └── packages/            # プロジェクト群 (bootstrap の対象。dev:all は直下のプロジェクトのみ)
     ├── aws/
-    │   ├── cost-estimator/           # 見積もり専用 catalog + bcm-pricing-calculator API adapter
     │   └── terraform/
     │       ├── README.md             # サンプル一覧と共通手順
     │       ├── agentcore-runtime-basic/  # AgentCore Runtime + Strands Agents app を deploy する mutating サンプル
