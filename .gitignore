@@ -25,6 +25,9 @@ packages/aws/apps/*/.build/
 packages/aws/apps/*/dist/
 *.zip
 
+# Agent Engine source archive build artifacts (packages/gc/apps/*/scripts/package-agent-engine.sh)
+packages/gc/apps/*/.build/
+
 # Bun lockfiles: committed once a package gains a dependency (e.g. cloud-run-rest's
 # @types/bun) so installs are repeatable; skeleton packages have none, so none to commit.
 
