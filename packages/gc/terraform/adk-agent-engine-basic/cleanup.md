@@ -36,7 +36,8 @@ mise exec -- terraform -chdir="${D}" plan -destroy
 
 ## リソースを削除する
 
-確認後、`destroy` を実行します。`deletion_policy = "DELETE"` のため、Agent Engine リソースは削除されます。
+確認後、`destroy` を実行します。`deletion_policy`（default `DELETE`）のため Agent Engine リソースは削除されます
+（呼び出しテストで session を作った場合は下記「session が残って destroy が失敗する場合」を先に参照）。
 
 ```bash
 D=packages/gc/terraform/adk-agent-engine-basic
@@ -48,6 +49,36 @@ Terraform が確認プロンプトを出すため、plan の内容に問題が�
 
 > **destroy も時間がかかります。** Agent Engine の削除は managed runtime の解体を伴うため数分かかることが
 > あります（provider の delete timeout は default 60分）。
+
+## session が残って destroy が失敗する場合
+
+[README の「呼び出し方（SDK / REST）」](./README.md#呼び出し方sdk--rest)で agent を叩くと、`create_session`
+で session が作られます。session は Agent Engine の **child resource** で、`deletion_policy = "DELETE"` のままだと
+destroy が次のエラーで止まります。
+
+```
+Error 400: The ReasoningEngine "..." contains child resources: sessions.
+Please delete the child resources before deleting the ReasoningEngine, or set force to true ...
+```
+
+この場合は `deletion_policy = "FORCE"` にすると child（session）ごと削除できます。`terraform.tfvars` は
+apply / destroy の両方で自動読み込みされ（かつ gitignore 対象）るので、そこに1行足すのが簡単です。
+
+```bash
+D=packages/gc/terraform/adk-agent-engine-basic
+echo 'deletion_policy = "FORCE"' >> "${D}/terraform.tfvars"
+mise exec -- terraform -chdir="${D}" apply    # deletion_policy を FORCE に更新（state に反映）
+mise exec -- terraform -chdir="${D}" destroy  # session ごと Agent Engine を削除
+```
+
+> Terraform を経由せず一発で消したい場合は、REST で直接 force 削除もできます。その後は
+> `terraform state rm google_vertex_ai_reasoning_engine.adk_hello` で state を整えます
+> （`<RESOURCE_ID>` は `terraform output -raw reasoning_engine_name`）。
+>
+> ```bash
+> curl -s -X DELETE -H "Authorization: Bearer $(gcloud auth print-access-token)" \
+>   "https://us-central1-aiplatform.googleapis.com/v1/projects/nck-sakurai/locations/us-central1/reasoningEngines/<RESOURCE_ID>?force=true"
+> ```
 
 ## 生成 artifact の片付け（ローカル）
 

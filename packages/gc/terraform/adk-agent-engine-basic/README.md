@@ -61,6 +61,7 @@ copy して編集します（`terraform.tfvars` は gitignore 対象）。
 | `description` | | （inline source の説明） | Agent Engine の説明 |
 | `region` | | `us-central1` | Agent Engine の region。全 region では使えないため公式サンプルと同じ `us-central1` を default に |
 | `python_version` | | `3.13` | managed runtime の Python version（`python_spec.version`、3.9〜3.14） |
+| `deletion_policy` | | `DELETE` | 削除ポリシー（`DELETE` / `FORCE` / `PREVENT` / `ABANDON`）。呼び出しテストで session を作ると `DELETE` では destroy が失敗するため、その場合は `FORCE`（[cleanup.md](./cleanup.md) 参照） |
 
 ## このサンプルが作るリソース
 

@@ -39,8 +39,11 @@ resource "google_vertex_ai_reasoning_engine" "adk_hello" {
     }
   }
 
-  # deletion_policy = "DELETE"（default）を明示します。学習サンプルは destroy までを
-  # 学ぶため、`terraform destroy` でリソースを削除できる状態にします
-  # （PREVENT にすると destroy が止まります）。
-  deletion_policy = "DELETE"
+  # deletion_policy は var で切り替えます（default "DELETE"）。学習サンプルは destroy まで
+  # 学ぶため通常は DELETE。ただし「呼び出し方」の手順で agent を叩くと create_session で
+  # session（child resource）が作られ、DELETE では destroy が
+  # 「contains child resources: sessions」で失敗します。その場合は deletion_policy = "FORCE"
+  # にして apply → destroy すると child ごと削除できます（cleanup.md 参照）。
+  # PREVENT は destroy を止め、ABANDON は API に残したまま state から外します。
+  deletion_policy = var.deletion_policy
 }
