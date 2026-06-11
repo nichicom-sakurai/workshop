@@ -36,12 +36,13 @@ workshop/
     │       └── s3-object-upload/     # 既存 S3 bucket に object を upload する mutating サンプル
     ├── gc/
     │   ├── apps/
-    │   │   ├── adk-helloworld/       # Google ADK の最小 HelloWorld agent (Gemini API key 方式でローカル実行する Python app)
+    │   │   ├── adk-helloworld/       # Google ADK の最小 HelloWorld agent (ローカル実行 + Agent Engine deploy 用 source archive 生成)
     │   │   └── cloud-run-rest/       # Cloud Run に deploy する最小の Bun REST service (Dockerfile 付き)
     │   └── terraform/
     │       ├── README.md             # サンプル一覧と共通手順
     │       ├── project-info/         # Google Cloud 操作ごとの独立した read-only サンプル (project nck-sakurai を読む)
-    │       └── cloud-run-service-basic/  # Artifact Registry + private Cloud Run service を作る mutating サンプル
+    │       ├── cloud-run-service-basic/  # Artifact Registry + private Cloud Run service を作る mutating サンプル
+    │       └── adk-agent-engine-basic/   # ADK agent を Vertex AI Agent Engine へ deploy する mutating サンプル
     └── openai/              # OpenAI Agents SDK (TypeScript) の最小 HelloWorld サンプル (Agent + run、key 未設定時は案内して exit 0)
 ```
 
