@@ -79,6 +79,7 @@ eval "$(mise activate zsh)"
 | `dev` | プロジェクトを指定して実行 | `mise run dev aws` |
 | `dev:all` | `packages/` 配下を全実行 | `mise run dev:all` |
 | `chat` | プロジェクトの対話チャットを起動 | `mise run chat openai` |
+| `web` | プロジェクトの Web チャット UI を起動 | `mise run web openai` |
 | `bootstrap` (alias `bs`) | 全環境の依存セットアップ | `mise run bs` |
 | `install-hooks` | git commit-msg フックを有効化 | `mise run install-hooks` |
 
@@ -86,6 +87,7 @@ eval "$(mise activate zsh)"
 mise run dev aws      # <name> を個別実行 (aws / gc / openai)
 mise run dev:all      # まとめて実行
 mise run chat openai  # openai とターミナルで対話チャット
+mise run web openai   # openai の Web チャット UI (ブラウザ)
 mise tasks            # 登録済みタスク一覧
 ```
 

@@ -29,6 +29,10 @@ done
 description = "指定プロジェクトのチャットを起動 (例: mise run chat openai)"
 run = "mise exec -- bun run --cwd=packages/{{arg(name='project')}} chat"
 
+[tasks.web]
+description = "指定プロジェクトの Web チャット UI を起動 (例: mise run web openai)"
+run = "mise exec -- bun run --cwd=packages/{{arg(name='project')}} web"
+
 # --- terraform サンプルの実行タスク ---
 
 [tasks.tf]

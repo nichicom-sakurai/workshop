@@ -51,6 +51,21 @@ mise run chat openai
 
 会話の継続は、SDK の `run()` が返す `result.history` を次ターンの入力に渡すことで実現しています。
 
+## Web チャット UI
+
+ブラウザで使える最小のチャット UI (`web.ts` + `chat.html`) を Bun.serve で同梱しています（依存ゼロ）。
+
+```bash
+mise run web openai
+# → 表示された http://localhost:3000 をブラウザで開く
+```
+
+- 応答は SDK の `run({ stream: true })` をそのままトークン単位でストリーミング表示します。
+- 「クリア」ボタンで会話をリセットできます。
+- サーバ側で会話履歴を 1 本だけ保持する単一ユーザ前提の構成です（複数タブを開くと履歴を共有します）。
+- ポートは `PORT` 環境変数で変更できます（既定 3000）。
+- `OPENAI_API_KEY` 未設定時は案内を表示して終了します。
+
 ## 想定出力
 
 - **API key 未設定時**: `[INFO] OPENAI_API_KEY が未設定のため...` の案内を表示して exit 0 で終了します。

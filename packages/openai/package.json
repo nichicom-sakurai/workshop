@@ -5,7 +5,8 @@
   "type": "module",
   "scripts": {
     "start": "bun run index.ts",
-    "chat": "bun run chat.ts"
+    "chat": "bun run chat.ts",
+    "web": "bun run web.ts"
   },
   "dependencies": {
     "@openai/agents": "0.11.6",
