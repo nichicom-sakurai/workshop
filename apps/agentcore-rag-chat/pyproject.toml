@@ -1,0 +1,14 @@
+[project]
+name = "agentcore-rag-chat"
+version = "0.1.0"
+description = "Supervisor + 3 specialist RAG agents for Amazon Bedrock AgentCore Runtime, backed by Bedrock Knowledge Bases (S3 Vectors) and AgentCore Memory."
+readme = "README.md"
+requires-python = "==3.13.*"
+dependencies = [
+  "bedrock-agentcore==1.14.0",
+  "boto3==1.43.27",
+  "strands-agents==1.42.0",
+]
+
+[tool.uv]
+package = false
