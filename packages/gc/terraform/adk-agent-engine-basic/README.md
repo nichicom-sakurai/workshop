@@ -93,16 +93,89 @@ mise exec -- terraform -chdir=$D apply
 
 ## 動作確認
 
-作成後、Agent Engine は Cloud Console（Vertex AI → Agent Engine / Reasoning Engine）または出力された
-リソース名で確認できます。
+作成後、Agent Engine は Cloud Console または出力されたリソース名で確認できます。
 
 ```bash
 D=packages/gc/terraform/adk-agent-engine-basic
 mise exec -- terraform -chdir=$D output -raw reasoning_engine_name
 ```
 
-> agent への実際のクエリ（`query` / `stream_query`）は Vertex AI SDK（Python）から行います。
-> このサンプルが学ぶのは **Terraform による deploy** までで、SDK からの推論呼び出しは対象外です。
+Console で見る場合は **Agent Platform → Deployments**（旧 Agent Engine）の一覧で、表示名 `adk-helloworld` を探します。直リンク:
+
+```
+https://console.cloud.google.com/agent-platform/runtimes?project=nck-sakurai
+```
+
+> 2026 年に Vertex AI は Gemini Enterprise Agent Platform へ改称され、Agent Engine は **Deployments** になりました。
+> この一覧は `aiplatform.googleapis.com` だけで表示できます。`apphub.googleapis.com`（App Hub）の有効化を求められるのは
+> **Topology（関係グラフ）ビュー専用**で、deploy 済みエンジンの確認には不要です（有効化しなくて構いません）。
+
+## 呼び出し方（SDK / REST）
+
+このサンプルの学習範囲は **Terraform による deploy** までですが、参考として deploy 済みの `adk-helloworld` を実際に叩く方法を載せます。
+**実際に Gemini を呼ぶため課金が発生**します。認証は ADC（事前に `gcloud auth application-default login`）。
+`<RESOURCE_ID>` は数値 ID（`terraform output -raw reasoning_engine_name`）で、完全名は
+`projects/nck-sakurai/locations/us-central1/reasoningEngines/<RESOURCE_ID>` です。
+
+### Python SDK（推奨）
+
+`AdkApp` で deploy したエージェントは、`create_session` で session を作ってから `stream_query` で問い合わせます
+（remote では session ID は `remote_session["id"]`。ローカルの `session.id` と取り出し方が違う点に注意）。
+
+```python
+import vertexai
+from vertexai import agent_engines
+
+vertexai.init(project="nck-sakurai", location="us-central1")
+
+remote_app = agent_engines.get(
+    "projects/nck-sakurai/locations/us-central1/reasoningEngines/<RESOURCE_ID>"
+)
+
+remote_session = remote_app.create_session(user_id="u_123")
+for event in remote_app.stream_query(
+    user_id="u_123",
+    session_id=remote_session["id"],
+    message="こんにちは、自己紹介して",
+):
+    print(event)
+```
+
+依存はアーカイブと同じ（`google-cloud-aiplatform[agent_engines]` + `google-adk`）。ローカル `.venv`
+（`pyproject.toml`）には入れていないため、上記コードを `invoke.py` に保存し、使い捨ての環境で実行するのが楽です:
+
+```bash
+mise exec -- uv run \
+  --with 'google-cloud-aiplatform[agent_engines]==1.157.0' \
+  --with 'google-adk==2.2.0' \
+  python invoke.py
+```
+
+### REST
+
+session 作成（標準メソッドは `:query`）→ ストリーミング問い合わせ（stream 系は `:streamQuery`）の 2 段階です。
+`class_method` に AdkApp のメソッド名、`input` にその引数を渡します。
+
+```bash
+ENGINE="https://us-central1-aiplatform.googleapis.com/v1/projects/nck-sakurai/locations/us-central1/reasoningEngines/<RESOURCE_ID>"
+TOKEN="$(gcloud auth print-access-token)"
+
+# 1. session を作成（返ってくる output の id を控える）
+curl -s -X POST -H "Authorization: Bearer ${TOKEN}" -H "Content-Type: application/json" \
+  "${ENGINE}:query" \
+  -d '{"class_method": "create_session", "input": {"user_id": "u_123"}}'
+
+# 2. stream_query で問い合わせ（<SESSION_ID> は手順 1 で返った id）
+curl -s -X POST -H "Authorization: Bearer ${TOKEN}" -H "Content-Type: application/json" \
+  "${ENGINE}:streamQuery" \
+  -d '{"class_method": "async_stream_query", "input": {"user_id": "u_123", "session_id": "<SESSION_ID>", "message": "こんにちは"}}'
+```
+
+> ADK には別系統の HTTP API（`.../reasoningEngines/<RESOURCE_ID>/api/run`、ストリーミングは `/api/run_sse`、
+> body は `appName` / `userId` / `sessionId` / `newMessage`）もあります。正確な仕様は下記 doc を参照してください。
+
+参考: [Test deployed agents (ADK)](https://google.github.io/adk-docs/deploy/agent-engine/test/) /
+[Use an ADK agent (Google Cloud)](https://docs.cloud.google.com/vertex-ai/generative-ai/docs/agent-engine/use/adk)
 
 ## 出力 (outputs)
 
