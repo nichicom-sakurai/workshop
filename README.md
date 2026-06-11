@@ -23,10 +23,12 @@ workshop/
 ├── tools/
 │   ├── bootstrap.sh     # 全環境のセットアップスクリプト
 │   └── git-hooks/       # git フック (commit-msg: Conventional Commits 検証)
-└── packages/            # プロジェクト群 (この配下が bootstrap の対象。dev / dev:all は直下のプロジェクトのみ)
+├── apps/                # デプロイ対象アプリ群 (provider 非依存。bootstrap の対象。dev / dev:all の対象外)
+│   ├── agentcore-strands-basic/   # AgentCore Runtime に deploy する Python + Strands Agents app
+│   ├── adk-helloworld/            # Google ADK の最小 HelloWorld agent (ローカル実行 + Agent Engine deploy 用 source archive 生成)
+│   └── cloud-run-rest/            # Cloud Run に deploy する最小の Bun REST service (Dockerfile 付き)
+└── packages/            # プロジェクト群 (bootstrap の対象。dev / dev:all は直下のプロジェクトのみ)
     ├── aws/
-    │   ├── apps/
-    │   │   └── agentcore-strands-basic/   # AgentCore Runtime に deploy する Python + Strands Agents app
     │   ├── cost-estimator/           # 見積もり専用 catalog + bcm-pricing-calculator API adapter
     │   └── terraform/
     │       ├── README.md             # サンプル一覧と共通手順
@@ -35,9 +37,6 @@ workshop/
     │       ├── s3-private-bucket/    # private S3 bucket を作成し destroy まで学ぶ mutating サンプル
     │       └── s3-object-upload/     # 既存 S3 bucket に object を upload する mutating サンプル
     ├── gc/
-    │   ├── apps/
-    │   │   ├── adk-helloworld/       # Google ADK の最小 HelloWorld agent (ローカル実行 + Agent Engine deploy 用 source archive 生成)
-    │   │   └── cloud-run-rest/       # Cloud Run に deploy する最小の Bun REST service (Dockerfile 付き)
     │   └── terraform/
     │       ├── README.md             # サンプル一覧と共通手順
     │       ├── project-info/         # Google Cloud 操作ごとの独立した read-only サンプル (project nck-sakurai を読む)

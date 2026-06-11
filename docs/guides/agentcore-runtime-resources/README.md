@@ -14,7 +14,7 @@ apply すると、AWS 上に **7つのリソース**が作られます。この�
 
 [Amazon Bedrock AgentCore Runtime](https://docs.aws.amazon.com/bedrock-agentcore/latest/devguide/runtime.html) は、
 **サーバーを自分で用意せずに AI エージェントを動かせる、サーバーレスな実行環境**です。
-このサンプルでは、Python で書かれた小さなエージェント（[`agentcore-strands-basic`](../../../packages/aws/apps/agentcore-strands-basic/README.md)）を
+このサンプルでは、Python で書かれた小さなエージェント（[`agentcore-strands-basic`](../../../apps/agentcore-strands-basic/README.md)）を
 AgentCore Runtime にデプロイし、呼び出せる状態にするまでを Terraform で組み立てます。
 
 コードの渡し方には **direct code deployment**（コードを直接デプロイする方式）を使います。
