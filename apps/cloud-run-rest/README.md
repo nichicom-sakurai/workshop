@@ -5,7 +5,7 @@ Cloud Run の [container contract](https://docs.cloud.google.com/run/docs/contai
 型定義のみ dev 依存として `@types/bun` を持ち、エディタと `bunx tsc --noEmit` で型チェックできます。
 
 このアプリを private Cloud Run service として deploy する Terraform サンプルは
-[../../terraform/cloud-run-service-basic/](../../terraform/cloud-run-service-basic/) にあります。
+[`packages/gc/terraform/cloud-run-service-basic/`](../../packages/gc/terraform/cloud-run-service-basic/) にあります。
 
 ## ファイル構成
 
@@ -19,9 +19,8 @@ Cloud Run の [container contract](https://docs.cloud.google.com/run/docs/contai
 | `.dockerignore` | docker build コンテキストから実行に不要なファイルを除外 |
 | `.gcloudignore` | `gcloud builds submit` のアップロード対象から不要なファイルを除外 |
 
-> この repo のトップレベル package（`packages/<name>/`）は `index.ts` を直下に置く規約ですが、
-> このアプリは root の `apps/` 配下のアプリのため `src/index.ts` をエントリポイントにしています。
-> `mise run dev:all` の走査対象（`packages/` 直下）には含まれないので、常駐 server がタスクをブロックしません。
+> runnable app には `index.ts` を app 直下に置く構成（例 `apps/openai/`）と `src/index.ts` を使う構成があり、
+> このアプリは後者（`src/index.ts`）です。常駐 server のため、起動は下記の docker / 手順で行います。
 
 ## Cloud Run container contract の要点
 
@@ -70,7 +69,7 @@ curl -s localhost:8080/
 ## container image の build / push（Cloud Build）
 
 infrastructure（Artifact Registry / Cloud Run）は Terraform、image の build / push は `gcloud builds submit` と役割を分けています。
-Artifact Registry repository の作成を含む全体の流れは [Terraform サンプルの README](../../terraform/cloud-run-service-basic/README.md) を参照してください。
+Artifact Registry repository の作成を含む全体の流れは [Terraform サンプルの README](../../packages/gc/terraform/cloud-run-service-basic/README.md) を参照してください。
 
 このディレクトリから実行する build / push コマンドは次の形です。
 
@@ -89,5 +88,5 @@ gcloud builds submit --project nck-sakurai \
 
 ## バージョン同期の注意
 
-`Dockerfile` の `FROM oven/bun:<version>-slim` は、root の [`mise.toml`](../../../../mise.toml)（`[tools]` の `bun`）と同じバージョンに固定しています。
+`Dockerfile` の `FROM oven/bun:<version>-slim` は、root の [`mise.toml`](../../mise.toml)（`[tools]` の `bun`）と同じバージョンに固定しています。
 Docker は `mise.toml` を読めないため、`mise.toml` の bun を更新するときは `Dockerfile` の FROM タグも同時に更新してください。

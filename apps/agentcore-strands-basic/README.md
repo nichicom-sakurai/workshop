@@ -1,12 +1,12 @@
 # agentcore-strands-basic
 
-Terraform サンプル `../../terraform/agentcore-runtime-basic/` 用の最小 Python agent です。
+Terraform サンプル `packages/aws/terraform/agentcore-runtime-basic/` 用の最小 Python agent です。
 
 このアプリは Amazon Bedrock AgentCore Runtime の direct code deployment ZIP として
 package 化されます。`bedrock-agentcore` と `strands-agents` を使い、`BEDROCK_MODEL_ID`
 で設定した Amazon Bedrock model を呼び出します。
 
-この nested app は `mise run dev:all` の対象外です。
+このアプリは Python アプリ（`package.json` を持たない）のため `mise run dev` の対象ではありません（実行・検証は下記参照）。
 
 ## 依存関係の検証
 
@@ -46,7 +46,7 @@ mise exec -- uv run --directory apps/agentcore-strands-basic --locked \
   python main.py
 ```
 
-`jp.anthropic.claude-sonnet-4-6` は cross-region inference profile 形式の ID です（`jp.` は日本リージョン向けのプレフィックス。APAC 全体向けの `apac.` も使えます）。ap-northeast-1 などでは on-demand 形式の基盤モデル ID（例: `anthropic.claude-sonnet-4-6`）は呼び出せず、`ValidationException`（`on-demand throughput isn't supported`）になるため inference profile 形式が必要です。利用可能な ID の調べ方は [Terraform サンプルの README](../../terraform/agentcore-runtime-basic/README.md) と同ディレクトリの `terraform.tfvars.template` を参照してください。AWS 認証は provider 標準の仕組み（`AWS_PROFILE` または `AWS_ACCESS_KEY_ID` 等）を使います。
+`jp.anthropic.claude-sonnet-4-6` は cross-region inference profile 形式の ID です（`jp.` は日本リージョン向けのプレフィックス。APAC 全体向けの `apac.` も使えます）。ap-northeast-1 などでは on-demand 形式の基盤モデル ID（例: `anthropic.claude-sonnet-4-6`）は呼び出せず、`ValidationException`（`on-demand throughput isn't supported`）になるため inference profile 形式が必要です。利用可能な ID の調べ方は [Terraform サンプルの README](../../packages/aws/terraform/agentcore-runtime-basic/README.md) と同ディレクトリの `terraform.tfvars.template` を参照してください。AWS 認証は provider 標準の仕組み（`AWS_PROFILE` または `AWS_ACCESS_KEY_ID` 等）を使います。
 
 ## AgentCore Runtime 用に package 化
 

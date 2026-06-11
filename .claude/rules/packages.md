@@ -4,19 +4,20 @@ paths:
   - "apps/**"
 ---
 
-# packages/* conventions
+# packages/ & apps/ conventions
 
-Each project under `packages/<name>/` is an independent, private package — there are no root npm workspaces.
+`packages/<provider>/` holds provider Terraform-sample containers (just `terraform/<operation>/`; no runnable Bun entry point — `aws`, `gc`). Runnable / deployable code lives in `apps/<app>/`. There are no root npm workspaces.
 
-- `package.json` must set `"private": true`, `"type": "module"`, and `"scripts": { "start": "bun run index.ts" }`.
-- `index.ts` is the entry point. Bun runs TypeScript / ESM natively — no build step and no `tsconfig.json` are required (the app `cloud-run-rest` adds one anyway, for editor / `tsc` type-checking only; see below).
-- Root-level apps (`apps/<app>/`, e.g. `apps/cloud-run-rest/`) are app code **decoupled from any single provider** (they live flat at the repo root, not under a provider package). Most back a Terraform sample and are deployable; the exception is `apps/openai/`, a runnable SDK sample that backs no Terraform sample and is never deployed. Bun apps use `src/index.ts` as the entry point — **except** the flat `openai`, whose entry is `index.ts` at the app root. Apps are not picked up by `dev:all` (its loop covers top-level `packages/` only), but the `dev` / `chat` / `web` tasks resolve a `<name>` from `packages/` then `apps/` (so `mise run dev openai` reaches it), and bootstrap scans `apps/` and runs `bun install` in them. `cloud-run-rest` and `openai` each carry `@types/bun` (dev-only) + a `tsconfig.json` so `bunx tsc --noEmit` type-checks them; their `bun.lock` is committed for repeatable installs.
-- Reference implementation: `packages/aws/`.
-- Run one: `mise run dev <name>`. Run all: `mise run dev:all`.
-- `dev:all` and `tools/bootstrap.sh` auto-discover via `find` (`dev` / `chat` / `web` resolve a `<name>` from `packages/` then `apps/`) — never hand-edit task lists when adding a project.
+- A **runnable app**'s `package.json` must set `"private": true`, `"type": "module"`, and `"scripts": { "start": "bun run index.ts" }` (or `src/index.ts`).
+- Entry point: flat `index.ts` at the app root (e.g. `apps/openai/`) or `src/index.ts` (e.g. `apps/cloud-run-rest/`). Bun runs TypeScript / ESM natively — no build step and no `tsconfig.json` are required (`cloud-run-rest` / `openai` / `cost-estimator` add one anyway, for editor / `tsc` type-checking only; see below).
+- Root-level apps (`apps/<app>/`, e.g. `apps/cloud-run-rest/`) are app code **decoupled from any single provider** (they live flat at the repo root, not under a provider package). Most back a Terraform sample and are deployable; the exceptions are `apps/openai/` and `apps/cost-estimator/`, runnable samples that back no Terraform sample and are never deployed. Bun apps use `src/index.ts` as the entry point — **except** the flat `openai` and `cost-estimator`, whose entry is `index.ts` at the app root. There is no `dev:all`, but the `dev` / `chat` / `web` tasks resolve a runnable `<name>` (a dir with `package.json`) from `packages/` then `apps/` (so `mise run dev openai` reaches it), and bootstrap scans `apps/` and runs `bun install` in them. `cloud-run-rest`, `openai`, and `cost-estimator` each carry `@types/bun` (dev-only) + a `tsconfig.json` so `bunx tsc --noEmit` type-checks them; their `bun.lock` is committed for repeatable installs.
+- Reference implementation — runnable app: `apps/openai/` (flat) or `apps/cloud-run-rest/` (`src/`); Terraform-sample container: `packages/aws/`.
+- Run one: `mise run dev <name>` — resolves a runnable `<name>` (a dir with `package.json`) from `packages/` then `apps/`. There is no `dev:all`.
+- `tools/bootstrap.sh` auto-discovers `packages/` + `apps/` via `find`; `dev` / `chat` / `web` resolve a `<name>` from `packages/` then `apps/` — never hand-edit task lists when adding an app.
 - `bun` is mise-managed and not on PATH; call it as `mise exec -- bun ...` (mise tasks already wrap it).
-- No repo-wide test / lint / typecheck task is configured yet (though `cloud-run-rest` can be type-checked with `bunx tsc --noEmit`). If you add a repo-wide one, wire it into `package.json` scripts, `mise.toml` tasks, and `AGENTS.md` together.
-- Add a project-local `mise.toml` only when the package needs a tool/version different from root; then run `mise trust`.
+- No repo-wide test / lint / typecheck task is configured yet (though `cloud-run-rest` / `openai` / `cost-estimator` can be type-checked with `bunx tsc --noEmit`, and `cost-estimator` runs `bun test`). If you add a repo-wide one, wire it into `package.json` scripts, `mise.toml` tasks, and `AGENTS.md` together.
+- Add a project-local `mise.toml` only when the app needs a tool/version different from root; then run `mise trust`.
+- A new Terraform sample goes under `packages/<provider>/terraform/<operation>/` (own state); register it in that provider's `terraform/README.md`.
 
 ## Python apps
 
@@ -26,4 +27,4 @@ Some apps are Python instead of Bun (first: `apps/agentcore-strands-basic/`). Ke
 - **Name the virtualenv `.venv`** (not `venv` or a custom name). The VS Code Python Environments extension auto-discovers `./**/.venv`, so a correctly-named venv is found without any per-project interpreter path.
 - Register each Python app in the committed `.vscode/settings.json` under `python-envs.pythonProjects` (`{ "path": "...", "envManager": "ms-python.python:venv" }`). This is portable — it stores a relative path + env-manager type, never a machine-specific interpreter path. Do **not** add per-project `python.defaultInterpreterPath` lines: that setting takes a single path and does not scale to multiple Python apps.
 - Pylance resolves one interpreter per workspace folder, so in this single-root workspace only one Python app's imports resolve at a time — fine when working on one app. If you ever need several Python apps resolved simultaneously, switch to a multi-root `.code-workspace` (one folder per app); defer that until actually needed.
-- Not picked up by `dev:all`; bootstrap's recursive `find` runs in them but `bun install` is a no-op (no `package.json`). Build / test via uv — see the app's README.
+- Not runnable via `dev` (no `package.json`); bootstrap's recursive `find` runs in them but `bun install` is a no-op. Build / test via uv — see the app's README.

@@ -34,8 +34,8 @@ cost-estimator/
 依存は dev 用の `@types/bun` のみ。YAML パース（`Bun.YAML`）・テスト（`bun:test`）・
 型チェック（`tsc`）はすべて Bun 同梱機能で行い、**ランタイム依存はゼロ**です。
 
-> このツールは root の `apps/` 配下にあるため、`mise run dev:all`
-> （`packages/*` 直下のみ対象）では起動しません。`mise run bs` の `bun install` は対象です。
+> このツールは root の `apps/` 配下の runnable app です。`mise run dev cost-estimator`
+> で実行でき、`mise run bs` の `bun install` も対象です。
 
 ## 使い方
 

@@ -1,6 +1,6 @@
 # workshop
 
-クラウド / IaC 学習用のモノレポです。`packages/`（プロジェクト群）と `apps/`（アプリ群）に独立した単位を並べ、ツールのバージョンを [mise](https://mise.jdx.dev/) で一元管理します。
+クラウド / IaC 学習用のモノレポです。`packages/`（provider ごとの Terraform サンプル）と `apps/`（runnable / deploy 対象のアプリ）に独立した単位を並べ、ツールのバージョンを [mise](https://mise.jdx.dev/) で一元管理します。
 
 ## 必要なツール
 
@@ -23,13 +23,13 @@ workshop/
 ├── tools/
 │   ├── bootstrap.sh     # 全環境のセットアップスクリプト
 │   └── git-hooks/       # git フック (commit-msg: Conventional Commits 検証)
-├── apps/                # アプリ群 (provider 非依存。bootstrap の対象。dev:all の対象外、dev/chat/web は project 名で実行)
+├── apps/                # アプリ群 (provider 非依存。bootstrap の対象。dev/chat/web で project 名指定で実行)
 │   ├── agentcore-strands-basic/   # AgentCore Runtime に deploy する Python + Strands Agents app
 │   ├── adk-helloworld/            # Google ADK の最小 HelloWorld agent (ローカル実行 + Agent Engine deploy 用 source archive 生成)
 │   ├── cloud-run-rest/            # Cloud Run に deploy する最小の Bun REST service (Dockerfile 付き)
 │   ├── cost-estimator/            # AWS 構成の月額概算ツール (見積もり専用 catalog + bcm-pricing-calculator API adapter、deploy なし)
 │   └── openai/                    # OpenAI Agents SDK (TypeScript) の最小 HelloWorld サンプル (deploy なし。dev/chat/web で実行)
-└── packages/            # プロジェクト群 (bootstrap の対象。dev:all は直下のプロジェクトのみ)
+└── packages/            # provider ごとの Terraform サンプル置き場 (各 provider 配下に terraform/)
     ├── aws/
     │   └── terraform/
     │       ├── README.md             # サンプル一覧と共通手順
@@ -45,7 +45,7 @@ workshop/
             └── adk-agent-engine-basic/   # ADK agent を Vertex AI Agent Engine へ deploy する mutating サンプル
 ```
 
-`packages/` 配下の各プロジェクトは `bun` のバージョンを root の `mise.toml` から継承します。特定プロジェクトだけ別ツール / バージョンが必要な場合は、そのフォルダに `mise.toml` を置くと差分だけ上書きできます。
+`packages/<provider>/` 配下の Terraform サンプルと `apps/` 配下の各 app は、ツールのバージョンを root の `mise.toml` から継承します。特定ディレクトリだけ別ツール / バージョンが必要な場合は、そのフォルダに `mise.toml` を置くと差分だけ上書きできます。
 
 ## セットアップ
 
@@ -59,8 +59,8 @@ mise run bs
 `mise run bs`（= `bootstrap`）は次を実行します。
 
 1. root のツールを `mise install`
-2. `packages/*` の各プロジェクトで `mise install`（固有 `mise.toml` がある場合のみ）
-3. `packages/*` の各プロジェクトで `bun install`（`package.json` がある場合）
+2. `packages/*` と `apps/*` の各ディレクトリで `mise install`（固有 `mise.toml` がある場合のみ）
+3. `packages/*` と `apps/*` の各ディレクトリで `bun install`（`package.json` がある場合）
 4. git フックを有効化（`core.hooksPath` を `tools/git-hooks` に設定）
 
 ### shell への activate（推奨）
@@ -76,16 +76,14 @@ eval "$(mise activate zsh)"
 
 | タスク | 用途 | 例 |
 | --- | --- | --- |
-| `dev` | プロジェクトを指定して実行 | `mise run dev aws` |
-| `dev:all` | `packages/` 配下を全実行 | `mise run dev:all` |
+| `dev` | runnable app を指定して実行 | `mise run dev openai` |
 | `chat` | プロジェクトの対話チャットを起動 | `mise run chat openai` |
 | `web` | プロジェクトの Web チャット UI を起動 | `mise run web openai` |
 | `bootstrap` (alias `bs`) | 全環境の依存セットアップ | `mise run bs` |
 | `install-hooks` | git commit-msg フックを有効化 | `mise run install-hooks` |
 
 ```bash
-mise run dev aws      # <name> を個別実行 (aws / gc / openai)
-mise run dev:all      # まとめて実行
+mise run dev openai   # runnable app を個別実行 (openai / cost-estimator)
 mise run chat openai  # openai とターミナルで対話チャット
 mise run web openai   # openai の Web チャット UI (ブラウザ)
 mise tasks            # 登録済みタスク一覧
@@ -107,10 +105,9 @@ mise tasks            # 登録済みタスク一覧
 - [AgentCore Runtime sample が作る AWS リソース](./docs/guides/agentcore-runtime-resources/README.md)
 - [gcloud CLI 基本コマンド](./docs/guides/gcloud-cli/README.md)
 
-## プロジェクトの追加
+## アプリ / サンプルの追加
 
-1. `packages/<name>/` を作成し、`package.json`（`scripts.start` を定義）と実装を置く
-2. `mise run bs` で依存をインストール
-3. `mise run dev <name>` で実行
+- runnable app: `apps/<name>/` を作成し、`package.json`（`scripts.start` を定義）と `index.ts` を置く → `mise run bs` で依存をインストール → `mise run dev <name>` で実行
+- Terraform サンプル: `packages/<provider>/terraform/<operation>/` を作成（後述の [Terraform サンプル](#terraform-サンプル) 参照）
 
-`dev:all` と `bootstrap` は `packages/*` を自動で走査するため、追加後にタスクや設定を書き換える必要はありません。
+`bootstrap` は `packages/*` と `apps/*` を自動で走査するため、追加後にタスクや設定を書き換える必要はありません。
