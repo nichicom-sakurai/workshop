@@ -34,7 +34,7 @@ cp packages/openai/.env.template packages/openai/.env
 model は明示せず SDK 既定を使います。`OPENAI_DEFAULT_MODEL` を設定すると上書きできます。
 
 ```bash
-export OPENAI_DEFAULT_MODEL=gpt-5.4-mini
+export OPENAI_DEFAULT_MODEL=gpt-5
 ```
 
 ## 想定出力
@@ -45,4 +45,4 @@ export OPENAI_DEFAULT_MODEL=gpt-5.4-mini
 ## 注意点
 
 - API key を設定して実行すると OpenAI API の利用料金が発生します。
-- 依存 (`@openai/agents` / `zod`) は exact version で pin し、`bun.lock` を commit しています（[package.json](./package.json) を参照）。`zod` は SDK の peer dependency です。
+- 依存 (`@openai/agents` / `zod`) は exact version で pin し、`bun.lock` を commit しています（[package.json](./package.json) を参照）。`zod` は `@openai/agents` が peer dependency として要求するため、利用側で exact pin して宣言しています。

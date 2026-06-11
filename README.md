@@ -82,7 +82,7 @@ eval "$(mise activate zsh)"
 | `install-hooks` | git commit-msg フックを有効化 | `mise run install-hooks` |
 
 ```bash
-mise run dev aws      # aws / gc / openai を個別実行
+mise run dev aws      # <name> を個別実行 (aws / gc / openai)
 mise run dev:all      # まとめて実行
 mise tasks            # 登録済みタスク一覧
 ```
