@@ -15,18 +15,18 @@ bucket / object を作成します。AgentCore Runtime と Bedrock model invocat
 - `mise run bs` または `mise install` が完了していること
 - AWS provider が利用できる認証情報と region が設定されていること
 - 利用する Amazon Bedrock model への model access が有効であること
-- [`../../apps/agentcore-strands-basic/`](../../apps/agentcore-strands-basic/) の ZIP artifact を作成済みであること
+- [`apps/agentcore-strands-basic/`](../../../../apps/agentcore-strands-basic/) の ZIP artifact を作成済みであること
 
 ## 1. AgentCore 用 ZIP artifact を作成
 
 ```bash
-packages/aws/apps/agentcore-strands-basic/scripts/package.sh
+apps/agentcore-strands-basic/scripts/package.sh
 ```
 
 生成される artifact:
 
 ```text
-packages/aws/apps/agentcore-strands-basic/dist/agentcore-strands-basic.zip
+apps/agentcore-strands-basic/dist/agentcore-strands-basic.zip
 ```
 
 Terraform はこの ZIP を `artifact_zip_path`（この root module ディレクトリからの相対 path）で

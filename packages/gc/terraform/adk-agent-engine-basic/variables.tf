@@ -1,7 +1,7 @@
 variable "source_archive_path" {
   description = "Agent Engine 用 source archive(.tar.gz)へのパス。filebase64() がこの .tf の場所からの相対パスで読みます。default は package-agent-engine.sh が生成する場所を指します（gitignore 対象のため、plan/apply の前に script を実行してください）。"
   type        = string
-  default     = "../../apps/adk-helloworld/.build/source.tar.gz"
+  default     = "../../../../apps/adk-helloworld/.build/source.tar.gz"
 }
 
 variable "display_name" {

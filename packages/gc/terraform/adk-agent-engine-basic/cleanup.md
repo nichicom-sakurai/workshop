@@ -7,8 +7,8 @@
 
 ## 前提
 
-- `packages/gc/apps/adk-helloworld/.build/source.tar.gz`（apply 時に読んだ archive）が残っていること。
-  消してしまった場合は `bash packages/gc/apps/adk-helloworld/scripts/package-agent-engine.sh` で
+- `apps/adk-helloworld/.build/source.tar.gz`（apply 時に読んだ archive）が残っていること。
+  消してしまった場合は `bash apps/adk-helloworld/scripts/package-agent-engine.sh` で
   再生成してから操作します（`filebase64` が plan/destroy の評価で参照します）。
 - `terraform init` が済んでいること。
 
@@ -86,7 +86,7 @@ mise exec -- terraform -chdir="${D}" destroy  # session ごと Agent Engine を�
 不要なら削除します。
 
 ```bash
-rm -rf packages/gc/apps/adk-helloworld/.build
+rm -rf apps/adk-helloworld/.build
 ```
 
 ## 削除後の確認

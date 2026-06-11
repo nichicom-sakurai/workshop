@@ -3,7 +3,7 @@
 
 # artifact_zip_path はこの root module ディレクトリからの相対 path です
 # (terraform -chdir で root module へ移動するため)。既定値は package.sh の出力先を指します。
-artifact_zip_path = "../../apps/agentcore-strands-basic/dist/agentcore-strands-basic.zip"
+artifact_zip_path = "../../../../apps/agentcore-strands-basic/dist/agentcore-strands-basic.zip"
 
 # model_id の調べ方（例は東京リージョン ap-northeast-1）:
 #   1. 使う region で利用可能なモデル ID を一覧する（最も確実）

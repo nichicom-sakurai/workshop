@@ -8,7 +8,7 @@
 
 # Agent Engine 用 source archive のパス（この .tf の場所からの相対パス）。
 # default は package-agent-engine.sh の出力先。別の場所に置いた場合のみ設定します。
-# source_archive_path = "../../apps/adk-helloworld/.build/source.tar.gz"
+# source_archive_path = "../../../../apps/adk-helloworld/.build/source.tar.gz"
 
 # 以下はいずれも default あり。変更したい場合のみコメントを外します。
 # display_name   = "adk-helloworld"
