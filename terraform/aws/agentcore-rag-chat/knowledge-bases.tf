@@ -79,4 +79,8 @@ resource "aws_bedrockagent_data_source" "this" {
       inclusion_prefixes = ["${each.value.prefix}/"]
     }
   }
+
+  # apply 直後に ingestion（start-ingestion-job）を走らせても prefix が空にならないよう、
+  # サンプル文書の upload 完了を data source 作成より先行させる。
+  depends_on = [aws_s3_object.data]
 }

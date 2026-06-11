@@ -2,50 +2,55 @@
 
 import unittest
 
-from rag_chat.memory import ConversationMemory, format_history
+from rag_chat.memory import ConversationMemory, format_turns
 
-EVENTS = [
-    {
-        "payload": [
-            {"conversational": {"role": "USER", "content": {"text": "hi"}}},
-            {"conversational": {"role": "ASSISTANT", "content": {"text": "hello"}}},
-        ]
-    }
+# get_last_k_turns の戻り値の形（turn = メッセージ dict のリスト）。新しいターンが後ろに来る想定。
+TURNS = [
+    [
+        {"role": "USER", "content": {"text": "hi"}},
+        {"role": "ASSISTANT", "content": {"text": "hello"}},
+    ],
+    [
+        {"role": "USER", "content": {"text": "and then?"}},
+        {"role": "ASSISTANT", "content": {"text": "sure"}},
+    ],
 ]
 
 
 class FakeMemoryClient:
-    def __init__(self, events=None):
-        self.events = events or []
+    def __init__(self, turns=None):
+        self.turns = turns or []
         self.created = []
-        self.list_kwargs = None
+        self.last_k_kwargs = None
 
     def create_event(self, **kwargs):
         self.created.append(kwargs)
         return {"eventId": "e1"}
 
-    def list_events(self, **kwargs):
-        self.list_kwargs = kwargs
-        return self.events
+    def get_last_k_turns(self, **kwargs):
+        self.last_k_kwargs = kwargs
+        return self.turns
 
 
-class FormatHistoryTest(unittest.TestCase):
-    def test_formats_roles(self):
-        text = format_history(EVENTS)
-        self.assertIn("User: hi", text)
-        self.assertIn("Assistant: hello", text)
+class FormatTurnsTest(unittest.TestCase):
+    def test_formats_roles_in_order(self):
+        text = format_turns(TURNS)
+        self.assertEqual(
+            text,
+            "User: hi\nAssistant: hello\nUser: and then?\nAssistant: sure",
+        )
 
     def test_handles_none_and_empty(self):
-        self.assertEqual(format_history(None), "")
-        self.assertEqual(format_history([]), "")
+        self.assertEqual(format_turns(None), "")
+        self.assertEqual(format_turns([]), "")
 
-    def test_ignores_malformed_events(self):
-        junk = [{"payload": "not-a-list"}, {"no_payload": True}, "string", {"payload": [{"x": 1}]}]
-        self.assertEqual(format_history(junk), "")
+    def test_ignores_malformed_turns(self):
+        junk = ["not-a-list", [{"no_role": 1}], [{"role": "USER", "content": {}}], [{"role": "USER", "content": {"text": "  "}}]]
+        self.assertEqual(format_turns(junk), "")
 
     def test_truncates_to_max_chars(self):
-        big = [{"payload": [{"conversational": {"role": "USER", "content": {"text": "x" * 100}}}]}]
-        self.assertEqual(len(format_history(big, max_chars=20)), 20)
+        big = [[{"role": "USER", "content": {"text": "x" * 100}}]]
+        self.assertEqual(len(format_turns(big, max_chars=20)), 20)
 
 
 class ConversationMemoryTest(unittest.TestCase):
@@ -60,13 +65,17 @@ class ConversationMemoryTest(unittest.TestCase):
         self.assertEqual(call["session_id"], "session-1")
         self.assertEqual(call["messages"], [("question", "USER"), ("answer", "ASSISTANT")])
 
-    def test_recent_history_formats_and_requests_payload(self):
-        client = FakeMemoryClient(events=EVENTS)
+    def test_recent_history_requests_k_turns_and_formats(self):
+        client = FakeMemoryClient(turns=TURNS)
         memory = ConversationMemory("mem-1", client=client)
         history = memory.recent_history("actor-1", "session-1", turns=3)
         self.assertIn("User: hi", history)
-        self.assertEqual(client.list_kwargs["max_results"], 6)
-        self.assertTrue(client.list_kwargs["include_payload"])
+        self.assertIn("Assistant: sure", history)
+        # 専用 API に k を渡している（自前の max_results スライスをしない）。
+        self.assertEqual(client.last_k_kwargs["k"], 3)
+        self.assertEqual(client.last_k_kwargs["memory_id"], "mem-1")
+        self.assertEqual(client.last_k_kwargs["actor_id"], "actor-1")
+        self.assertEqual(client.last_k_kwargs["session_id"], "session-1")
 
 
 if __name__ == "__main__":

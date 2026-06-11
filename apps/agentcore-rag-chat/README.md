@@ -11,6 +11,8 @@ Amazon Bedrock AgentCore Runtime の direct code deployment ZIP として packag
 - **3 つの独立した Bedrock Knowledge Base** — 各専門 agent は自分専用の KB だけを引きます (kb_id を tool のクロージャに束縛し、LLM からは不可視)。
 - **AgentCore Memory (short-term)** — 1 ターン (user + assistant) を会話 event として保存し、次ターンで直近履歴を supervisor 入力に前置きして multi-turn を実現します。
 
+> `database_rag_agent` は CSV/Markdown チャンクに対する **意味検索 (vector retrieval)** で答えます。SQL のような厳密な集計・結合 (例: 「C001 の注文件数は?」) は保証されない学習用デモで、本物の structured data Knowledge Base (Redshift / Glue) は対象外です。
+
 このアプリは Python アプリ (`package.json` を持たない) のため `mise run dev` の対象ではありません (実行・検証は下記参照)。
 
 ## 構成

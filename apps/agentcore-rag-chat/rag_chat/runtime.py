@@ -95,22 +95,25 @@ def build_response(
         memory = ConversationMemory(config.memory_id, region=config.region)
 
     # 履歴の取得失敗は会話を止めない（best-effort）。失敗時は履歴なしで続行する。
+    # ただし握りつぶすと「履歴が常に空」と区別がつかず原因（IAM 不足・memory_id 誤り等）の
+    # 切り分けが難しくなるため、warning を 1 行残す。
     history = ""
     if memory is not None:
         try:
             history = memory.recent_history(actor_id, session_id)
-        except Exception:
+        except Exception as exc:
+            print(f"[WARNING] memory recent_history failed: {exc}")
             history = ""
 
     supervisor = (supervisor_factory or default_supervisor_factory)(config)
     answer = run_supervisor(supervisor, prompt, history)
 
-    # 今回のターンを保存（次回の履歴に使う）。保存失敗も会話を止めない。
+    # 今回のターンを保存（次回の履歴に使う）。保存失敗も会話を止めない（warning は残す）。
     if memory is not None:
         try:
             memory.save_turn(actor_id, session_id, prompt, answer)
-        except Exception:
-            pass
+        except Exception as exc:
+            print(f"[WARNING] memory save_turn failed: {exc}")
 
     return {
         "status": "success",

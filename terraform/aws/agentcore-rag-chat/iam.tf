@@ -132,6 +132,8 @@ resource "aws_iam_role" "kb_service" {
 
 data "aws_iam_policy_document" "kb_service" {
   statement {
+    # AWS 公式の Knowledge Base service-role ポリシー例に含まれる model 列挙権限
+    # (kb-permissions.html)。resource レベルの絞り込みは効かないため "*"。
     sid    = "ListBedrockModels"
     effect = "Allow"
     actions = [
