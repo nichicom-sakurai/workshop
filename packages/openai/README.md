@@ -46,3 +46,4 @@ export OPENAI_DEFAULT_MODEL=gpt-5
 
 - API key を設定して実行すると OpenAI API の利用料金が発生します。
 - 依存 (`@openai/agents` / `zod`) は exact version で pin し、`bun.lock` を commit しています（[package.json](./package.json) を参照）。`zod` は `@openai/agents` が peer dependency として要求するため、利用側で exact pin して宣言しています。
+- 型チェック用に `@types/bun` + `tsconfig.json` を同梱しています。このディレクトリで `mise exec -- bunx tsc --noEmit` を実行できます（Bun は実行時に tsconfig を使わないため、型チェック専用）。
