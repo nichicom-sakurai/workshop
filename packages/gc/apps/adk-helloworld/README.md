@@ -15,6 +15,10 @@
 | `hello_world/agent.py` | `root_agent`（HelloWorld agent）の定義本体 |
 | `hello_world/.env.template` | API key などのテンプレート。実 `.env` は gitignore 対象（コミットしない） |
 | `tests/test_agent.py` | `root_agent` の静的な定義（名前 / model / 指示文）を検証する unittest |
+| `agent-engine/agent_engine_app.py` | Agent Engine の entrypoint。`root_agent` を `AdkApp` で包んだ `agent_engine` を公開（archive root 専用・ローカル run では未使用） |
+| `agent-engine/requirements.txt` | Agent Engine runtime の依存（`google-adk` + `google-cloud-aiplatform[agent_engines]`）。`google-adk` は `pyproject.toml` と同期 |
+| `scripts/package-agent-engine.sh` | Agent Engine 用 source archive（`.tar.gz`）を生成する script。出力 `.build/` は gitignore 対象 |
+| `tests/test_agent_engine_packaging.py` | pin 同期と entrypoint 変数名を静的検証するガードテスト（import せずテキスト検査） |
 
 > ADK の規約では、エージェントは Python パッケージ（フォルダ）として置き、
 > `__init__.py` が `from . import agent` で本体を読み込み、`agent.py` が `root_agent` を公開します。
@@ -113,6 +117,46 @@ mise exec -- uv run --directory packages/gc/apps/adk-helloworld --locked \
 
 - **`--with_ui` は開発確認用**: コマンドに `--with_ui` を付けると ADK の dev UI 付きで deploy されます。ブラウザで動作を確認したいときに便利ですが、**開発確認用**であり本番利用は想定していません。本番相当の deploy では付けません。
 
+## Vertex AI Agent Engine へ deploy（Terraform）
+
+Cloud Run だけでなく、**Vertex AI Agent Engine（API 名: Reasoning Engine）**へ Terraform で deploy する
+学習サンプルも用意しています。deploy 本体（`google_vertex_ai_reasoning_engine` の作成）は
+[packages/gc/terraform/adk-agent-engine-basic](../../terraform/adk-agent-engine-basic/) 側にあり、
+このアプリ側は **deploy に渡す source archive の生成**を担当します
+（**infrastructure は Terraform、artifact 生成は script** という責務分離）。
+
+### 仕組み（inline source 方式）
+
+最小の **inline source（`python_spec`）方式**を使います。archive にはソースと依存定義だけを入れ、依存の
+インストールは Agent Engine の managed runtime に任せます。
+
+- archive root に `hello_world/`（ローカル run と共通の agent）+ `agent_engine_app.py` + `requirements.txt`
+  を並べます。**依存ライブラリは同梱しません**（runtime が `requirements.txt` を pip install）。
+- entrypoint は ADK の `root_agent` そのものではなく、それを `AdkApp` で包んだ `agent_engine`
+  変数（`agent-engine/agent_engine_app.py`）を指します。raw な agent を指すと runtime で失敗します。
+- `agent_engine_app.py` は `vertexai`（`google-cloud-aiplatform[agent_engines]`）を import しますが、
+  これは **archive の `requirements.txt` 側にだけ**入れ、ローカルの `.venv`（`pyproject.toml`）には足しません。
+  そのためローカルの `adk run` / `adk web` は従来どおり `google-adk` だけで動きます。
+
+### source archive を生成する
+
+```bash
+bash packages/gc/apps/adk-helloworld/scripts/package-agent-engine.sh
+```
+
+`.build/source.tar.gz` が生成されます（`packages/gc/apps/*/.build/` は gitignore 対象でコミットされません）。
+script は `.env*` / `.adk/` / `__pycache__` などローカル runtime/secret 由来のものを archive から除外します。
+
+### deploy する
+
+生成した archive を読んで Agent Engine を作成する Terraform の手順（前提 API の有効化、`init` / `fmt` /
+`validate` / `plan` / `apply`、cleanup）は
+[adk-agent-engine-basic の README](../../terraform/adk-agent-engine-basic/README.md) を参照してください。
+
+> Agent Engine 用 `requirements.txt` の `google-adk` は `pyproject.toml` の pin と一致させます。
+> ズレは `tests/test_agent_engine_packaging.py` が検出します。
+
 ## バージョンの注意
 
 依存バージョン（`google-adk` / Python）は `pyproject.toml` と root の [`mise.toml`](../../../../mise.toml)（`[tools]` の `python`）で固定しています。更新するときは `pyproject.toml` の pin と `uv.lock` を合わせて更新してください（`uv lock`）。
+Agent Engine 用の依存（`agent-engine/requirements.txt`）も `google-adk` を合わせて更新します。
