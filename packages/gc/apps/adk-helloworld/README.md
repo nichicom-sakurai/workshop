@@ -35,16 +35,6 @@ mise exec -- uv run --directory packages/gc/apps/adk-helloworld --locked \
   python -m unittest discover -s tests
 ```
 
-## エディタで import 警告が出る場合（Pylance）
-
-VS Code で `from google.adk import Agent` などに「インポートを解決できません」と警告が出ることがあります。これは **import の書き方の誤りではなく**、Pylance が参照する Python interpreter がこの app の `.venv` を指していないことが原因です（`adk run` やテストは `uv run` 経由で `.venv` を使うため正しく動きます）。
-
-この repo は single-root workspace で、Pylance は workspace 全体で interpreter を 1 つだけ選びます。Python app が複数あるため（本 app と `packages/aws/apps/agentcore-strands-basic/`）、選択中の interpreter 次第でどちらか一方の import しか解決しません。解消するには interpreter をこの app の `.venv` に切り替えます（`.venv` はテスト実行で作成済み。無ければ上の「テストの実行」を一度回す）。
-
-- コマンドパレット（`Cmd/Ctrl+Shift+P`）→ `Python: Select Interpreter` → `packages/gc/apps/adk-helloworld/.venv/bin/python`
-
-> 複数の Python app を同時に解決させたい場合は、各 app を 1 フォルダとする multi-root `.code-workspace` への移行が選択肢です（現状は 1 app ずつの作業で足りるため未導入）。
-
 ## ローカル実行（Gemini API key 方式・主手順）
 
 ### 1. API key を用意して `.env` を作る
@@ -52,9 +42,10 @@ VS Code で `from google.adk import Agent` などに「インポートを解決�
 [Google AI Studio](https://aistudio.google.com/apikey) で API key を取得し、テンプレートから `.env` を作って key を書き込みます。`.env` は agent パッケージ（`hello_world/`）の中に置きます。
 
 ```bash
-cd packages/gc/apps/adk-helloworld
-cp hello_world/.env.template hello_world/.env
-# hello_world/.env を編集し、GOOGLE_API_KEY=YOUR_API_KEY_HERE を実 key に置き換える
+cp packages/gc/apps/adk-helloworld/hello_world/.env.template \
+  packages/gc/apps/adk-helloworld/hello_world/.env
+# packages/gc/apps/adk-helloworld/hello_world/.env を編集し、
+# GOOGLE_API_KEY=YOUR_API_KEY_HERE を実 key に置き換える
 ```
 
 > コミットされるのは `.env.template` だけです。実 `.env`（および実 API key）は repository に保存しないでください（`.gitignore` 済み）。
