@@ -40,10 +40,15 @@ SPECIALISTS: dict[str, Specialist] = {
     "aws_service": Specialist(
         key="aws_service",
         tool_name="aws_service_rag_agent",
+        # （日本語訳）AWS サービスとその使い方（例: EC2, S3, Lambda, IAM, ネットワーク）に関する
+        # 質問に答える。AWS の製品・機能・使い方に関する質問にはこの agent を使う。
         tool_description=(
             "Answer questions about AWS services and how to use them (e.g. EC2, S3, "
             "Lambda, IAM, networking). Use this for AWS product/feature/how-to questions."
         ),
+        # （日本語訳）あなたは AWS サービスの専門家。まず必ず search_knowledge_base tool を呼んで
+        # AWS サービスのナレッジベースに基づいて回答し、簡潔に答えて文書の記載を引用する。
+        # ナレッジベースに関連情報が無ければ、推測せずその旨を率直に伝える。
         system_prompt=(
             "You are an AWS service specialist. Always call your search_knowledge_base "
             "tool first to ground your answer in the AWS service knowledge base, then "
@@ -54,11 +59,17 @@ SPECIALISTS: dict[str, Specialist] = {
     "database": Specialist(
         key="database",
         tool_name="database_rag_agent",
+        # （日本語訳）軽量な CSV/Markdown の「データベース」レコードとして保存されたサンプル業務
+        # データ（顧客・注文・商品）に関する質問に答える。そのデータ内の特定の行・件数・関連に
+        # 関する質問にはこの agent を使う。
         tool_description=(
             "Answer questions about the sample business data (customers, orders, products) "
             "stored as lightweight CSV/Markdown 'database' records. Use this for questions "
             "about specific rows, counts, or relationships in that data."
         ),
+        # （日本語訳）あなたは小規模なサンプルデータセットのデータアナリスト。まず必ず
+        # search_knowledge_base tool を呼んで関連レコードを取得し、それらのレコードだけに厳密に
+        # 基づいて回答する。存在しない行をでっち上げない。
         system_prompt=(
             "You are a data analyst for a small sample dataset. Always call your "
             "search_knowledge_base tool first to retrieve the relevant records, then answer "
@@ -68,10 +79,16 @@ SPECIALISTS: dict[str, Specialist] = {
     "document": Specialist(
         key="document",
         tool_name="document_rag_agent",
+        # （日本語訳）Markdown/PDF 文書として保存された社内文書・ポリシー（ハンドブック・
+        # ガイドライン・FAQ）に関する質問に答える。ポリシー・プロセス・FAQ に関する質問には
+        # この agent を使う。
         tool_description=(
             "Answer questions about internal documents and policies (handbook, guidelines, "
             "FAQs) stored as Markdown/PDF documents. Use this for policy/process/FAQ questions."
         ),
+        # （日本語訳）あなたはドキュメントアシスタント。まず必ず search_knowledge_base tool を
+        # 呼んで関連する箇所を見つけ、簡潔に答えて、役立つ場合は文書を引用する。関連情報が
+        # 見つからなければその旨を伝える。
         system_prompt=(
             "You are a documentation assistant. Always call your search_knowledge_base tool "
             "first to find the relevant passages, then answer concisely and quote the "
@@ -81,6 +98,14 @@ SPECIALISTS: dict[str, Specialist] = {
 }
 
 
+# （日本語訳）あなたはユーザーの質問を最も適切な専門 agent にルーティングし、その結果を
+# 1 つの簡潔な回答に統合する supervisor。専門 agent は次のとおり:
+#   - aws_service_rag_agent: AWS サービスおよび使い方に関する質問。
+#   - database_rag_agent: サンプル業務データ（顧客/注文/商品）に関する質問。
+#   - document_rag_agent: 社内文書・ポリシー・FAQ に関する質問。
+# 質問に最適な専門 agent を 1 つ選んでその tool を呼ぶ。質問が明らかに複数ドメインにまたがる
+# 場合は、複数の専門 agent を呼んで回答を統合してよい。専門 agent に相談せず自分の事前知識
+# だけで回答してはならない。
 SUPERVISOR_SYSTEM_PROMPT = (
     "You are a supervisor that routes a user's question to the most appropriate specialist "
     "agent and integrates the result into a single concise answer. The specialists are:\n"
@@ -141,6 +166,8 @@ def build_specialist_tools(deps: AgentDeps) -> list[Any]:
     コンテキストは run_specialist / クロージャ側に隠蔽）。tool 名・説明は SPECIALISTS と一致。
     """
 
+    # （日本語訳）AWS サービスとその使い方（EC2, S3, Lambda, IAM 等）に関する質問に答える。
+    #   query: AWS サービス専門 agent に転送される、ユーザーの AWS 関連の質問。
     @tool
     def aws_service_rag_agent(query: str) -> str:
         """Answer questions about AWS services and how to use them (EC2, S3, Lambda, IAM, etc.).
@@ -150,6 +177,8 @@ def build_specialist_tools(deps: AgentDeps) -> list[Any]:
         """
         return run_specialist("aws_service", query, deps)
 
+    # （日本語訳）サンプル業務データ（顧客・注文・商品）に関する質問に答える。
+    #   query: データベース専門 agent に転送される、ユーザーのデータに関する質問。
     @tool
     def database_rag_agent(query: str) -> str:
         """Answer questions about the sample business data (customers, orders, products).
@@ -159,6 +188,8 @@ def build_specialist_tools(deps: AgentDeps) -> list[Any]:
         """
         return run_specialist("database", query, deps)
 
+    # （日本語訳）社内文書・ポリシー・FAQ に関する質問に答える。
+    #   query: ドキュメント専門 agent に転送される、ユーザーの文書に関する質問。
     @tool
     def document_rag_agent(query: str) -> str:
         """Answer questions about internal documents, policies, and FAQs.
