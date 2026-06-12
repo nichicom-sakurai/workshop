@@ -11,6 +11,7 @@ AWS provider の認証と Terraform の基本操作を学ぶための、自己�
 | [s3-private-bucket](./s3-private-bucket/) | mutating | `aws_s3_bucket` で private S3 bucket を1つ作成し、`destroy` まで lifecycle を学ぶ |
 | [s3-object-upload](./s3-object-upload/) | mutating | `aws_s3_object` で既存 bucket に local file を1つ upload し、object cleanup まで学ぶ |
 | [agentcore-runtime-basic](./agentcore-runtime-basic/) | mutating | AgentCore Runtime に Strands Agents + Amazon Bedrock の Python app を direct code deployment で deploy する |
+| [agentcore-rag-chat](./agentcore-rag-chat/) | mutating | supervisor + 3 専門 RAG agent を AgentCore Runtime / Memory と Bedrock Knowledge Bases (S3 Vectors) で構築する RAG チャット |
 
 新しいサンプルは `terraform/` 直下にディレクトリを 1 つ足し、この表に 1 行追加します（`<operation>` は `s3-bucket-list` のような kebab-case の「対象 + 操作」）。read-only は名詞 / `*-list` / `*-read`、リソースを作成する mutating はリソース名中心で命名し、本表の「種別」列で区別します。
 
@@ -24,6 +25,7 @@ read-only の基礎から、低リスクな mutating（リソース作成）へ�
 4. `iam-policy-document`（未追加） — policy JSON の組み立てを read-only で学ぶ。
 5. `s3-bucket-policy`（未追加） — bucket policy の attachment と least privilege を学ぶ。
 6. [agentcore-runtime-basic](./agentcore-runtime-basic/) — S3 artifact、IAM role、AgentCore Runtime / endpoint、Bedrock model invocation を組み合わせる。
+7. [agentcore-rag-chat](./agentcore-rag-chat/) — 3 つの Knowledge Base (S3 Vectors)、AgentCore Memory、agents-as-tools の multi-agent を組み合わせた RAG チャットへ発展させる。
 
 ## 種別ごとの扱い（read-only / mutating）
 
@@ -32,6 +34,7 @@ read-only の基礎から、低リスクな mutating（リソース作成）へ�
   - [s3-private-bucket](./s3-private-bucket/) は private S3 bucket を作成します。bucket 名が衝突した場合は `bucket_prefix` を変えて再実行してください。
   - [s3-object-upload](./s3-object-upload/) は既存 bucket に object を作成します。bucket を削除する前に、このサンプルの [`cleanup.md`](./s3-object-upload/cleanup.md) で object を先に削除してください。
   - [agentcore-runtime-basic](./agentcore-runtime-basic/) は AgentCore Runtime、custom endpoint、IAM、S3 artifact bucket / object を作成します。Bedrock model access と利用量課金にも注意してください。
+  - [agentcore-rag-chat](./agentcore-rag-chat/) は AgentCore Runtime / Memory、3 つの Knowledge Base、S3 Vectors、S3 bucket、IAM を作成します。Knowledge Base の ingestion / sync（`apply` 後に実行）、generation / embedding 両方の model access、利用量課金に注意してください。
 
 ## 前提
 

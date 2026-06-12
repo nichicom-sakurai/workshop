@@ -1,0 +1,4 @@
+interface:
+  display_name: "Strands Design Review"
+  short_description: "Check Strands designs and reviews"
+  default_prompt: "Review this Strands Agents SDK design or implementation against official docs."

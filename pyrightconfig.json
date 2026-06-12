@@ -1,0 +1,16 @@
+{
+  "executionEnvironments": [
+    {
+      "root": "apps/agentcore-rag-chat",
+      "extraPaths": ["apps/agentcore-rag-chat/.venv/lib/python3.13/site-packages"]
+    },
+    {
+      "root": "apps/agentcore-strands-basic",
+      "extraPaths": ["apps/agentcore-strands-basic/.venv/lib/python3.13/site-packages"]
+    },
+    {
+      "root": "apps/adk-helloworld",
+      "extraPaths": ["apps/adk-helloworld/.venv/lib/python3.13/site-packages"]
+    }
+  ]
+}

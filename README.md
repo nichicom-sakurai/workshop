@@ -25,6 +25,7 @@ workshop/
 │   └── git-hooks/       # git フック (commit-msg: Conventional Commits 検証)
 ├── apps/                # アプリ群 (provider 非依存。bootstrap の対象。dev/chat/web で project 名指定で実行)
 │   ├── agentcore-strands-basic/   # AgentCore Runtime に deploy する Python + Strands Agents app
+│   ├── agentcore-rag-chat/        # supervisor + 3 専門 RAG agent の Python app (AgentCore Runtime / Memory / KB に deploy)
 │   ├── adk-helloworld/            # Google ADK の最小 HelloWorld agent (ローカル実行 + Agent Engine deploy 用 source archive 生成)
 │   ├── cloud-run-rest/            # Cloud Run に deploy する最小の Bun REST service (Dockerfile 付き)
 │   ├── cost-estimator/            # AWS 構成の月額概算ツール (見積もり専用 catalog + bcm-pricing-calculator API adapter、deploy なし)
@@ -33,6 +34,7 @@ workshop/
     ├── aws/
     │   ├── README.md             # サンプル一覧と共通手順
     │   ├── agentcore-runtime-basic/  # AgentCore Runtime + Strands Agents app を deploy する mutating サンプル
+    │   ├── agentcore-rag-chat/   # supervisor + 3 専門 RAG agent (Runtime / Memory / KB(S3 Vectors)) を作る mutating サンプル
     │   ├── caller-identity/      # AWS 操作ごとの独立した read-only サンプル (caller identity を読む)
     │   ├── s3-private-bucket/    # private S3 bucket を作成し destroy まで学ぶ mutating サンプル
     │   └── s3-object-upload/     # 既存 S3 bucket に object を upload する mutating サンプル
