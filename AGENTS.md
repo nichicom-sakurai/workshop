@@ -98,6 +98,27 @@ Note: the provider Terraform-sample roots `terraform/aws/` and `terraform/gc/` h
 - [OK] Text style for any Japanese (e.g. README): half-width space between latin and Japanese (`Flutter アプリ`), no space between a number and Japanese (`3個`, `2025年`).
 - Link, don't copy: point to [README.md](./README.md) for human setup detail instead of duplicating it.
 
+### Strands Agents SDK work
+
+When designing, implementing, or reviewing code that uses `strands-agents`,
+Amazon Bedrock AgentCore, multi-agent systems, tools, MCP tools, or
+agents-as-tools:
+
+- Check the relevant official Strands Agents SDK documentation before making
+  Strands-specific design or review claims. In Claude Code, prefer the project
+  `strands` MCP server when it is available; otherwise use the active
+  environment's official-doc search or the public Strands docs.
+- Explicitly identify the applicable Strands pattern: model-driven agent,
+  custom tools, MCP tools, multi-agent, agents-as-tools, memory/session,
+  streaming, model provider configuration, or AgentCore deployment.
+- Prefer the documented Strands pattern over ad hoc orchestration. Keep
+  specialist agents focused, tool names/descriptions clear, response handling
+  explicit, and AWS credentials/configuration external to code.
+- If the Strands documentation tool is unavailable, say so before making
+  claims that depend on current Strands behavior.
+- For a repeatable design or review workflow, use the
+  `strands-design-review` project skill.
+
 ## 6. Gotchas
 
 - **git is initialized.** Branches / commits / PRs apply. Follow the global conventions: branch `{prefix}/GH-{issue}` when an issue exists, otherwise `{prefix}/{kebab-case-description}`; commit `{type}({scope}): {Japanese description}`.
@@ -116,15 +137,21 @@ Note: the provider Terraform-sample roots `terraform/aws/` and `terraform/gc/` h
 
 Project-scoped config for the coding agents. Both Claude Code and Codex are wired up; they share the same skill, kept in sync across the two trees.
 
+Shared MCP:
+
+- `.mcp.json` — project-scoped Claude Code MCP server config. It registers the `strands` server (`uvx strands-agents-mcp-server`) so Strands Agents SDK design/review work can query official docs after Claude Code approves the project-scoped server.
+
 Claude Code (`.claude/`, auto-loaded):
 
 - `.claude/agents/env-doctor.md` — subagent that diagnoses the toolchain / bootstrap state.
 - `.claude/skills/new-package/` — `/new-package <name>` slash command to scaffold a project.
+- `.claude/skills/strands-design-review/` — Strands Agents SDK / AgentCore design and review workflow. Use it before Strands-specific architecture or review claims; it expects the Claude Code `strands` MCP server when available.
 - `.claude/rules/*.md` — path-scoped conventions, auto-loaded when editing matching files: `projects.md`, `shell.md`, `mise.md`.
 
 Codex (`.codex/`, loaded for trusted projects):
 
 - `.codex/skills/new-package/SKILL.md` — the Codex twin of the Claude `new-package` skill (verified to surface in Codex's "Available skills"). Keep the two `new-package/SKILL.md` files in sync.
+- `.codex/skills/strands-design-review/SKILL.md` — the Codex twin of the Claude `strands-design-review` skill. Keep the two `strands-design-review/SKILL.md` files in sync.
 - `.codex/hooks.json` — a live `session_start` hook printing a one-line repo reminder. Codex asks you to approve the hook (trusted hash) on first run. Schema/details in `.codex/hooks/README.md`.
 - `.codex/config.toml` — Codex project config (options commented out by default).
 - `.codex/rules/` — empty: the Codex permission-rules feature (`request_rule`) is removed in the installed CLI; see its `README.md`.
